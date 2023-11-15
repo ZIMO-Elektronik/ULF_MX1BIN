@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake MX1BinTests Clang",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_TOOLCHAIN_FILE=CMakeModules/src/toolchains/clang.cmake -DCMAKE_BUILD_TYPE=Debug"
+    },
+    {
+      "label": "CMake MX1BinTests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug"
+    },
+    {
+      "label": "Ninja MX1BinTests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ninja -C build MX1BinTests"
+    },
+    {
+      "label": "Run MX1BinTests",
+      "type": "shell",
+      "isBackground": true,
+      "command": "./build/tests/MX1BinTests"
+    }
+  ]
+}
