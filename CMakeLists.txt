@@ -27,6 +27,12 @@ endif()
 
 target_common_warnings(MX1Bin INTERFACE)
 
+if(NOT TARGET DCC::DCC)
+  cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.41.1")
+endif()
+
+target_link_libraries(MX1Bin INTERFACE DCC::DCC)
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
   file(
