@@ -1,12 +1,25 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// Frame verification
+///
+/// \file   ulf/mx1bin/frame.hpp
+/// \author Jonas Gahlert
+/// \date   16/07/2025
+
 #pragma once
 
 #include <cstdint>
+#include <ctre.hpp>
 #include <expected>
 #include <optional>
 #include <span>
 #include <system_error>
 
 namespace ulf::mx1bin::detail {
+
+constexpr ctll::fixed_string pattern{"\x01\x01.+?(?<!\x10)\x17"};
 
 /// Verify frame
 ///
@@ -16,19 +29,13 @@ namespace ulf::mx1bin::detail {
 /// \retval std::span                   First found frame
 std::expected<std::optional<std::span<uint8_t const>>, std::errc>
 verify(std::span<uint8_t const> frame) {
-  auto const count{size(frame)};
-  // Can't be MX1 binary yet
-  if (!count) return std::nullopt;
-  // Not start of heading (SOH)
-  else if ((count >= 1uz && frame[0uz] != '\x01') ||
-           (count >= 2uz && frame[1uz] != '\x01'))
-    return std::unexpected(std::errc::invalid_argument);
-  // Look for end of transmission block (ETB)
-  for (auto i{2uz}; i < count; ++i)
-    if (frame[i - 1uz] != '\x10' && frame[i] == '\x17')
-      return frame.subspan(0uz, i + 1uz);
-  // Not enough characters
-  return std::nullopt;
+  // Any match
+  auto m{ctre::starts_with<pattern>(frame)};
+  if (!m) return std::unexpected(std::errc::invalid_argument);
+  // Match
+  m = ctre::match<pattern>(frame.subspan(m.count()));
+  if (!m) return std::nullopt;
+  return frame.subspan(m.count());
 }
 
 } // namespace ulf::mx1bin::detail

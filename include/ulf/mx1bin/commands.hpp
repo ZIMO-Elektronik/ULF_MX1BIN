@@ -1,3 +1,13 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// MX1Bin commands
+///
+/// \file   ulf/mx1bin/commands.hpp
+/// \author Jonas Gahlert
+/// \date   16/07/2025
+
 #pragma once
 
 #include <cstdint>

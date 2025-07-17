@@ -1,3 +1,13 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// Utilities
+///
+/// \file   ulf/mx1bin/utility.hpp
+/// \author Jonas Gahlert
+/// \date   16/07/2025
+
 #pragma once
 
 #include <cstddef>
@@ -18,13 +28,19 @@ uint16_t data2uint16(RandomIt& in) {
 }
 
 /// Is control character
-/// @param c char
+/// @param [in] c char
 /// @retval true  Is control character
 /// @retval false Not control character
 constexpr bool is_control_char(uint8_t c) {
   return c == soh || c == eot || c == dle;
 }
 
+/// Encode character if applicable
+///
+/// @tparam OutputIt Output iterator
+/// @param [in] c    Char
+/// @param [in] out  Output iterator
+/// @return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
 constexpr auto encode(uint8_t const c, OutputIt out) {
   if (is_control_char(c)) {
@@ -34,6 +50,11 @@ constexpr auto encode(uint8_t const c, OutputIt out) {
   return out;
 }
 
+/// Decode character if applicable
+///
+/// @tparam InputIt Input iterator
+/// @param in Input iterator
+/// @return  Decoded char
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 constexpr auto decode(InputIt& in) {

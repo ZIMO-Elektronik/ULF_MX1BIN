@@ -31,7 +31,9 @@ if(NOT TARGET DCC::DCC)
   cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.41.1")
 endif()
 
-target_link_libraries(MX1Bin INTERFACE DCC::DCC)
+cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.10.0")
+
+target_link_libraries(MX1Bin INTERFACE DCC::DCC ctre::ctre)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
