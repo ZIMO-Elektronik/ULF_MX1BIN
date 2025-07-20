@@ -10,6 +10,50 @@
 
 #pragma once
 
-#include <array>
+#include <ztl/inplace_vector.hpp>
+#include "message.hpp"
 
-namespace ulf::mx1bin {}
+namespace ulf::mx1bin {
+
+using Packet = ztl::inplace_vector<uint8_t, 30u>;
+
+Packet response2mx1bin(Response re) {
+  Packet result{};
+  auto iter{begin(result)};
+
+  if (std::holds_alternative<Nak>(re)) {
+    std::get<Nak>(re).encode(iter);
+  } else if (std::holds_alternative<TrackControlReply>(re)) {
+    std::get<TrackControlReply>(re).encode(iter);
+  } else if (std::holds_alternative<DecoderControlReply>(re)) {
+    std::get<DecoderControlReply>(re).encode(iter);
+  } else if (std::holds_alternative<InvertFunctionBitsReply>(re)) {
+    std::get<InvertFunctionBitsReply>(re).encode(iter);
+  } else if (std::holds_alternative<ShuttleTrainReply>(re)) {
+    std::get<ShuttleTrainReply>(re).encode(iter);
+  } else if (std::holds_alternative<AccessoryReply>(re)) {
+    std::get<AccessoryReply>(re).encode(iter);
+  } else if (std::holds_alternative<LocoMemoryQueryReply>(re)) {
+    std::get<LocoMemoryQueryReply>(re).encode(iter);
+  } else if (std::holds_alternative<AccessoryMemoryQueryReply>(re)) {
+    std::get<AccessoryMemoryQueryReply>(re).encode(iter);
+  } else if (std::holds_alternative<AddressControlReply>(re)) {
+    std::get<AddressControlReply>(re).encode(iter);
+  } else if (std::holds_alternative<CommandStationIOQueryReply>(re)) {
+    std::get<CommandStationIOQueryReply>(re).encode(iter);
+  } else if (std::holds_alternative<CommandStationCvManipReply>(re)) {
+    std::get<CommandStationCvManipReply>(re).encode(iter);
+  } else if (std::holds_alternative<CommandStationEquipmentQueryReply>(re)) {
+    std::get<CommandStationEquipmentQueryReply>(re).encode(iter);
+  } else if (std::holds_alternative<DecoderCvManipReply>(re)) {
+    std::get<DecoderCvManipReply>(re).encode(iter);
+  } else if (std::holds_alternative<DecoderCvManipErrorReply>(re)) {
+    std::get<DecoderCvManipErrorReply>(re).encode(iter);
+  } else {
+    std::get<DecoderCvManipBusyReply>(re).encode(iter);
+  }
+
+  return result;
+}
+
+} // namespace ulf::mx1bin

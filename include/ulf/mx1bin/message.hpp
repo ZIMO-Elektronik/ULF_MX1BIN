@@ -19,9 +19,19 @@
 
 namespace ulf::mx1bin {
 
-struct Reset : public detail::Head {};
+struct Reset : public detail::Head {
+  Reset& decode(std::span<uint8_t const> bytes) {
+    Head::decode(bytes);
+    return *this;
+  }
+};
 
-struct Nak : public detail::Head {};
+struct Nak : public detail::Head {
+  Nak& decode(std::span<uint8_t const> bytes) {
+    Head::decode(bytes);
+    return *this;
+  }
+};
 
 struct TrackControl : public detail::Head {
   uint8_t cAction{};
@@ -81,13 +91,33 @@ struct Acceleration : public detail::DecoderControlBase {
   }
 };
 
-struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {};
+struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
+  ShuttleTrain& decode(std::span<uint8_t const> bytes) {
+    ShuttleTrain_Accessory_Base::decode(bytes);
+    return *this;
+  }
+};
 
-struct Accessory : public detail::ShuttleTrain_Accessory_Base {};
+struct Accessory : public detail::ShuttleTrain_Accessory_Base {
+  Accessory& decode(std::span<uint8_t const> bytes) {
+    ShuttleTrain_Accessory_Base::decode(bytes);
+    return *this;
+  }
+};
 
-struct LocoMemoryQuery : public detail::DecoderControlBase {};
+struct LocoMemoryQuery : public detail::DecoderControlBase {
+  LocoMemoryQuery& decode(std::span<uint8_t const> bytes) {
+    DecoderControlBase::decode(bytes);
+    return *this;
+  }
+};
 
-struct AccessoryMemoryQuery : public detail::DecoderControlBase {};
+struct AccessoryMemoryQuery : public detail::DecoderControlBase {
+  AccessoryMemoryQuery& decode(std::span<uint8_t const> bytes) {
+    DecoderControlBase::decode(bytes);
+    return *this;
+  }
+};
 
 struct AddressControl : public detail::DecoderControlBase {
   uint8_t cControl{};
@@ -101,7 +131,12 @@ struct AddressControl : public detail::DecoderControlBase {
   }
 };
 
-struct CommandStationIOQuery : public detail::CommandStationQueryBase {};
+struct CommandStationIOQuery : public detail::CommandStationQueryBase {
+  CommandStationIOQuery& decode(std::span<uint8_t const> bytes) {
+    CommandStationQueryBase::decode(bytes);
+    return *this;
+  }
+};
 
 struct CommandStationCvManip : public detail::Head {
   uint8_t variable_hi{};
@@ -117,7 +152,12 @@ struct CommandStationCvManip : public detail::Head {
   }
 };
 
-struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {};
+struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
+  CommandStationEquipmentQuery& decode(std::span<uint8_t const> bytes) {
+    CommandStationQueryBase::decode(bytes);
+    return *this;
+  }
+};
 
 struct SerialInfo : public detail::Head {
   uint8_t toolID{};
@@ -358,6 +398,7 @@ using Message = std::variant<Reset,
                              TrackControl,
                              DecoderControl,
                              InvertFunctionBits,
+                             Acceleration,
                              ShuttleTrain,
                              Accessory,
                              LocoMemoryQuery,
@@ -369,21 +410,21 @@ using Message = std::variant<Reset,
                              SerialInfo,
                              DecoderCvManip>;
 
-/// Reply
-using Reply = std::variant<Nak,
-                           TrackControlReply,
-                           DecoderControlReply,
-                           InvertFunctionBitsReply,
-                           ShuttleTrainReply,
-                           AccessoryReply,
-                           LocoMemoryQueryReply,
-                           AccessoryMemoryQueryReply,
-                           AddressControlReply,
-                           CommandStationIOQueryReply,
-                           CommandStationCvManipReply,
-                           CommandStationEquipmentQueryReply,
-                           DecoderCvManipReply,
-                           DecoderCvManipErrorReply,
-                           DecoderCvManipBusyReply>;
+/// Response
+using Response = std::variant<Nak,
+                              TrackControlReply,
+                              DecoderControlReply,
+                              InvertFunctionBitsReply,
+                              ShuttleTrainReply,
+                              AccessoryReply,
+                              LocoMemoryQueryReply,
+                              AccessoryMemoryQueryReply,
+                              AddressControlReply,
+                              CommandStationIOQueryReply,
+                              CommandStationCvManipReply,
+                              CommandStationEquipmentQueryReply,
+                              DecoderCvManipReply,
+                              DecoderCvManipErrorReply,
+                              DecoderCvManipBusyReply>;
 
 } // namespace ulf::mx1bin
