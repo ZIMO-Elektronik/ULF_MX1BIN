@@ -20,8 +20,12 @@ using Packet = ztl::inplace_vector<uint8_t, 30u>;
 Packet response2mx1bin(Response re) {
   Packet result{};
   auto iter{begin(result)};
+  *iter++ = detail::soh;
+  *iter++ = detail::soh;
 
-  if (std::holds_alternative<Nak>(re)) {
+  if (std::holds_alternative<Ack>(re)) {
+    std::get<Ack>(re).encode(iter);
+  } else if (std::holds_alternative<Nak>(re)) {
     std::get<Nak>(re).encode(iter);
   } else if (std::holds_alternative<TrackControlReply>(re)) {
     std::get<TrackControlReply>(re).encode(iter);
@@ -52,6 +56,9 @@ Packet response2mx1bin(Response re) {
   } else {
     std::get<DecoderCvManipBusyReply>(re).encode(iter);
   }
+
+  *iter++ = detail::crc8(std::span<uint8_t const>{result}.subspan(2uz));
+  *iter++ = detail::eot;
 
   return result;
 }

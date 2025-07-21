@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <variant>
 #include <ztl/inplace_vector.hpp>
@@ -31,6 +32,10 @@ struct Nak : public detail::Head {
     Head::decode(bytes);
     return *this;
   }
+  template<std::output_iterator<uint8_t> OutputIt>
+  auto encode(OutputIt out) {
+    return Head::encode(out);
+  }
 };
 
 struct TrackControl : public detail::Head {
@@ -45,20 +50,26 @@ struct TrackControl : public detail::Head {
 
 struct DecoderControl : public detail::DecoderControlBase {
   uint8_t cSpeed{};
-  uint8_t cData1{};
-  uint8_t cData2{};
-  uint8_t cData3{};
-  uint8_t cData4{};
-  uint8_t cData5{};
+  std::optional<uint8_t> cData1{};
+  std::optional<uint8_t> cData2{};
+  std::optional<uint8_t> cData3{};
+  std::optional<uint8_t> cData4{};
+  std::optional<uint8_t> cData5{};
   DecoderControl& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
+    auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
     cSpeed = detail::decode(iter);
-    cData1 = detail::decode(iter);
-    cData2 = detail::decode(iter);
-    cData3 = detail::decode(iter);
-    cData4 = detail::decode(iter);
-    cData5 = detail::decode(iter);
+    cData1 =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+    cData2 =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+    cData3 =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+    cData4 =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+    cData5 =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -121,12 +132,14 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
 
 struct AddressControl : public detail::DecoderControlBase {
   uint8_t cControl{};
-  uint8_t cOutputs{};
+  std::optional<uint8_t> cOutputs{};
   AddressControl& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
+    auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
     cControl = detail::decode(iter);
-    cOutputs = detail::decode(iter);
+    cOutputs =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -141,13 +154,15 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
 struct CommandStationCvManip : public detail::Head {
   uint8_t variable_hi{};
   uint8_t variable_lo{};
-  uint8_t value{};
+  std::optional<uint8_t> value{};
   CommandStationCvManip& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
+    auto end{cend(bytes)};
     Head::decode(iter);
     variable_hi = detail::decode(iter);
     variable_lo = detail::decode(iter);
-    value = detail::decode(iter);
+    value =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -174,16 +189,20 @@ struct SerialInfo : public detail::Head {
 struct DecoderCvManip : public detail::DecoderControlBase {
   uint8_t variable_hi{};
   uint8_t variable_lo{};
-  uint8_t value{};
+  std::optional<uint8_t> value{};
   DecoderCvManip& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
+    auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
     variable_hi = detail::decode(iter);
     variable_lo = detail::decode(iter);
-    value = detail::decode(iter);
+    value =
+      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
     return *this;
   }
 };
+
+struct Ack : public detail::ReplyHead {};
 
 struct TrackControlReply : public detail::ReplyHead {};
 
@@ -411,7 +430,8 @@ using Message = std::variant<Reset,
                              DecoderCvManip>;
 
 /// Response
-using Response = std::variant<Nak,
+using Response = std::variant<Ack,
+                              Nak,
                               TrackControlReply,
                               DecoderControlReply,
                               InvertFunctionBitsReply,

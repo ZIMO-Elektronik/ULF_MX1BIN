@@ -19,7 +19,7 @@
 
 namespace ulf::mx1bin::detail {
 
-constexpr ctll::fixed_string pattern{"\x01\x01.+?(?<!\x10)\x17"};
+constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
 
 /// Verify frame
 ///
@@ -33,9 +33,12 @@ verify(std::span<uint8_t const> frame) {
   auto m{ctre::starts_with<pattern>(frame)};
   if (!m) return std::unexpected(std::errc::invalid_argument);
   // Match
-  m = ctre::match<pattern>(frame.subspan(m.count()));
+  m = ctre::match<pattern>(frame.subspan(0uz, m.size()));
   if (!m) return std::nullopt;
-  return frame.subspan(m.count());
+  // CRC
+  if (detail::crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
+    return std::unexpected(std::errc::bad_message);
+  return frame.subspan(m.size());
 }
 
 } // namespace ulf::mx1bin::detail

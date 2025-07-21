@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <numeric>
 #include <span>
+#include <vector>
+#include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
 
@@ -42,11 +44,12 @@ constexpr uint8_t crc8(uint8_t byte) {
 /// \param  bytes Bytes to calculate CRC8 for
 /// \return CRC8
 constexpr uint8_t crc8(std::span<uint8_t const> bytes) {
-  return std::accumulate(
-    cbegin(bytes),
-    cend(bytes),
-    static_cast<uint8_t>(0u),
-    [](uint8_t a, uint8_t b) { return crc8(static_cast<uint8_t>(a ^ b)); });
+  uint8_t result{0xFFuz};
+
+  auto iter{cbegin(bytes)};
+  while (iter != cend(bytes)) { result = crc8(decode(iter) ^ result); }
+
+  return result;
 }
 
 } // namespace ulf::mx1bin::detail

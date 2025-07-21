@@ -10,7 +10,7 @@ target_common_warnings(MX1BinTests PRIVATE)
 cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.8.1")
 cpmaddpackage(URI "gh:google/googletest#main" OPTIONS "INSTALL_GTEST OFF")
 
-target_link_libraries(MX1BinTests PRIVATE ctre::ctre GTest::gtest_main
-                                          GTest::gmock)
+target_link_libraries(MX1BinTests PRIVATE ULF::MX1Bin ctre::ctre
+                                          GTest::gtest_main GTest::gmock)
 
 gtest_discover_tests(MX1BinTests)
