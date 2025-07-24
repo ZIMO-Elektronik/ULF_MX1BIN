@@ -37,17 +37,29 @@ constexpr bool is_control_char(uint8_t c) {
 
 /// Encode character if applicable
 ///
-/// @tparam OutputIt& Output iterator
+/// @tparam OutputIt Output iterator
 /// @param [in] c    Char
 /// @param [in] out  Output iterator
 /// @return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
-constexpr auto encode(uint8_t const c, OutputIt& out) {
+constexpr auto encode_8(uint8_t const c, OutputIt& out) {
   if (is_control_char(c)) {
     *out++ = detail::dle;
     *out++ = c ^ cypher;
   } else *out++ = c;
   return out;
+}
+
+/// Encode 2 byte value if applicable
+///
+/// @tparam OutputIt Output iterator
+/// @param v         Value
+/// @param out       Output iterator
+/// @return   Output iterator
+template<std::output_iterator<uint8_t> OutputIt>
+constexpr auto encode_16(uint16_t const v, OutputIt& out) {
+  out = encode_8(static_cast<uint8_t>((v & 0xFF00u) >> 8u), out);
+  return encode_8(static_cast<uint8_t>((v & 0x00FFu) >> 0u), out);
 }
 
 /// Decode character if applicable
@@ -57,11 +69,23 @@ constexpr auto encode(uint8_t const c, OutputIt& out) {
 /// @return  Decoded char
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
-constexpr auto decode(InputIt& in) {
+constexpr auto decode_8(InputIt& in) {
   if (*in == dle) {
     in++;
     return static_cast<uint8_t>(*in++ ^ cypher);
   } else return static_cast<uint8_t>(*in++);
+}
+
+/// Decode 2 byte value if applicable
+///
+/// @tparam InputIt Input iterator
+/// @param v        Value
+/// @param in       Input iterator
+/// @return  Decoded value
+template<std::input_iterator InputIt>
+requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
+constexpr auto decode_16(InputIt& in) {
+  return static_cast<uint16_t>(decode_8(in) << 8u | decode_8(in) << 0u);
 }
 
 } // namespace ulf::mx1bin::detail

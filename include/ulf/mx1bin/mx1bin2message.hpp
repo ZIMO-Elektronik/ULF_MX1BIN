@@ -34,10 +34,10 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   auto frame{**res};
   frame = frame.subspan(2);
   auto iter{begin(frame)};
-  detail::decode(iter); // uSID
-  detail::decode(iter); // type
+  detail::decode_8(iter); // uSID
+  detail::decode_8(iter); // type
 
-  switch (static_cast<Commands>(detail::decode(iter))) {
+  switch (static_cast<Commands>(detail::decode_8(iter))) {
     case Commands::Reset: {
       return Reset{}.decode(frame);
     }

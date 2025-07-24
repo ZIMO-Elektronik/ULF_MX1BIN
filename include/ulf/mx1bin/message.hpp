@@ -43,7 +43,7 @@ struct TrackControl : public detail::Head {
   TrackControl& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     Head::decode(iter);
-    cAction = detail::decode(iter);
+    cAction = detail::decode_8(iter);
     return *this;
   }
 };
@@ -59,17 +59,17 @@ struct DecoderControl : public detail::DecoderControlBase {
     auto iter{begin(bytes)};
     auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
-    cSpeed = detail::decode(iter);
+    cSpeed = detail::decode_8(iter);
     cData1 =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     cData2 =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     cData3 =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     cData4 =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     cData5 =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -83,11 +83,11 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
   InvertFunctionBits& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     DecoderControlBase::decode(iter);
-    cData1 = detail::decode(iter);
-    cData2 = detail::decode(iter);
-    cData3 = detail::decode(iter);
-    cData4 = detail::decode(iter);
-    cData5 = detail::decode(iter);
+    cData1 = detail::decode_8(iter);
+    cData2 = detail::decode_8(iter);
+    cData3 = detail::decode_8(iter);
+    cData4 = detail::decode_8(iter);
+    cData5 = detail::decode_8(iter);
     return *this;
   }
 };
@@ -97,7 +97,7 @@ struct Acceleration : public detail::DecoderControlBase {
   Acceleration& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     DecoderControlBase::decode(iter);
-    cAzBz = detail::decode(iter);
+    cAzBz = detail::decode_8(iter);
     return *this;
   }
 };
@@ -137,9 +137,9 @@ struct AddressControl : public detail::DecoderControlBase {
     auto iter{begin(bytes)};
     auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
-    cControl = detail::decode(iter);
+    cControl = detail::decode_8(iter);
     cOutputs =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -152,17 +152,15 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
 };
 
 struct CommandStationCvManip : public detail::Head {
-  uint8_t variable_hi{};
-  uint8_t variable_lo{};
+  uint16_t variable{};
   std::optional<uint8_t> value{};
   CommandStationCvManip& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     auto end{cend(bytes)};
     Head::decode(iter);
-    variable_hi = detail::decode(iter);
-    variable_lo = detail::decode(iter);
+    variable = detail::decode_16(iter);
     value =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -180,24 +178,22 @@ struct SerialInfo : public detail::Head {
   SerialInfo& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     Head::decode(iter);
-    toolID = detail::decode(iter);
-    action = detail::decode(iter);
+    toolID = detail::decode_8(iter);
+    action = detail::decode_8(iter);
     return *this;
   }
 };
 
 struct DecoderCvManip : public detail::DecoderControlBase {
-  uint8_t variable_hi{};
-  uint8_t variable_lo{};
+  uint16_t variable{};
   std::optional<uint8_t> value{};
   DecoderCvManip& decode(std::span<uint8_t const> bytes) {
     auto iter{begin(bytes)};
     auto end{cend(bytes)};
     DecoderControlBase::decode(iter);
-    variable_hi = detail::decode(iter);
-    variable_lo = detail::decode(iter);
+    variable = detail::decode_16(iter);
     value =
-      (iter != end) ? std::make_optional(detail::decode(iter)) : std::nullopt;
+      (iter != end) ? std::make_optional(detail::decode_8(iter)) : std::nullopt;
     return *this;
   }
 };
@@ -217,8 +213,7 @@ struct ShuttleTrainReply : public detail::ReplyDecoderControlBase {};
 struct AccessoryReply : public detail::ReplyDecoderControlBase {};
 
 struct LocoMemoryQueryReply : public detail::ReplyErrorBase {
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
+  uint16_t cAdr{};
   uint8_t cSpeed{};
   uint8_t cData1{};
   uint8_t cData2{};
@@ -230,33 +225,29 @@ struct LocoMemoryQueryReply : public detail::ReplyErrorBase {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
-    detail::encode(cAdr_hi, out);
-    detail::encode(cAdr_lo, out);
-    detail::encode(cSpeed, out);
-    detail::encode(cData1, out);
-    detail::encode(cData2, out);
-    detail::encode(cData3, out);
-    detail::encode(cAzBz, out);
-    detail::encode(cStatus, out);
-    detail::encode(cData4, out);
-    detail::encode(cData5, out);
+    detail::encode_16(cAdr, out);
+    detail::encode_8(cSpeed, out);
+    detail::encode_8(cData1, out);
+    detail::encode_8(cData2, out);
+    detail::encode_8(cData3, out);
+    detail::encode_8(cAzBz, out);
+    detail::encode_8(cStatus, out);
+    detail::encode_8(cData4, out);
+    detail::encode_8(cData5, out);
     return out;
   }
 };
 
 struct AccessoryMemoryQueryReply : public detail::ReplyErrorBase {
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
+  uint16_t cAdr{};
   uint8_t cPair{};
   uint8_t cOutputs{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
-    detail::encode(error, out);
-    detail::encode(cAdr_hi, out);
-    detail::encode(cAdr_lo, out);
-    detail::encode(cPair, out);
-    detail::encode(cOutputs, out);
+    detail::encode_16(cAdr, out);
+    detail::encode_8(cPair, out);
+    detail::encode_8(cOutputs, out);
     return out;
   }
 };
@@ -267,32 +258,28 @@ struct AddressControlReply : public detail::ReplyHead {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(payload, out);
-    detail::encode(cOutputs, out);
+    detail::encode_8(payload, out);
+    detail::encode_8(cOutputs, out);
     return out;
   }
 };
 
 struct CommandStationIOQueryReply : public detail::ReplyHead {
   uint8_t values{};
-  uint8_t cCurrent1_hi{};
-  uint8_t cCurrent1_lo{};
+  uint16_t cCurrent1{};
   uint8_t cVoltage1{};
-  uint8_t cCurrent2_hi{};
-  uint8_t cCurrent2_lo{};
+  uint16_t cCurrent2{};
   uint8_t cVoltage2{};
   uint8_t cAux{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(values, out);
-    detail::encode(cCurrent1_hi, out);
-    detail::encode(cCurrent1_lo, out);
-    detail::encode(cVoltage1, out);
-    detail::encode(cCurrent2_hi, out);
-    detail::encode(cCurrent2_lo, out);
-    detail::encode(cVoltage2, out);
-    detail::encode(cAux, out);
+    detail::encode_8(values, out);
+    detail::encode_16(cCurrent1, out);
+    detail::encode_8(cVoltage1, out);
+    detail::encode_16(cCurrent2, out);
+    detail::encode_8(cVoltage2, out);
+    detail::encode_8(cAux, out);
     return out;
   }
 };
@@ -302,29 +289,25 @@ struct CommandStationCvManipReply : public detail::ReplyErrorBase {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
-    detail::encode(value, out);
+    detail::encode_8(value, out);
     return out;
   }
 };
 
 struct CommandStationEquipmentQueryReply : public detail::ReplyLongHead {
-  uint8_t cAddress_hi{};
-  uint8_t cAddress_lo{};
+  uint16_t cAddress{};
   uint8_t cDevice{};
   uint8_t cRom_size{};
   uint8_t cRam_size{};
-  uint8_t cPrintver_hi{};
-  uint8_t cPrintver_lo{};
-  uint8_t cVersion_hi{};
-  uint8_t cVersion_lo{};
+  uint16_t cPrintver{};
+  uint16_t cVersion{};
   uint8_t cDate_day{};
   uint8_t cDate_month{};
   uint8_t cDate_century{};
   uint8_t cDate_year{};
   uint8_t cSwitches{};
   uint8_t cDevelopVersion{};
-  uint8_t cBootRom_hi{};
-  uint8_t cBootRom_lo{};
+  uint16_t cBootRom{};
   uint8_t cBootRom_develop{};
   uint8_t values{};
   uint8_t cSerNum_hi{};
@@ -334,81 +317,67 @@ struct CommandStationEquipmentQueryReply : public detail::ReplyLongHead {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyLongHead::encode(out);
-    detail::encode(cAddress_hi, out);
-    detail::encode(cAddress_lo, out);
-    detail::encode(cDevice, out);
-    detail::encode(cRom_size, out);
-    detail::encode(cRam_size, out);
-    detail::encode(cPrintver_hi, out);
-    detail::encode(cPrintver_lo, out);
-    detail::encode(cVersion_hi, out);
-    detail::encode(cVersion_lo, out);
-    detail::encode(cDate_day, out);
-    detail::encode(cDate_month, out);
-    detail::encode(cDate_century, out);
-    detail::encode(cDate_year, out);
-    detail::encode(cSwitches, out);
-    detail::encode(cDevelopVersion, out);
-    detail::encode(cBootRom_hi, out);
-    detail::encode(cBootRom_lo, out);
-    detail::encode(cBootRom_develop, out);
-    detail::encode(values, out);
-    detail::encode(cSerNum_hi, out);
-    detail::encode(cSerNum_mh, out);
-    detail::encode(cSerNum_ml, out);
-    detail::encode(cSerNum_lo, out);
+    detail::encode_16(cAddress, out);
+    detail::encode_8(cDevice, out);
+    detail::encode_8(cRom_size, out);
+    detail::encode_8(cRam_size, out);
+    detail::encode_16(cPrintver, out);
+    detail::encode_16(cVersion, out);
+    detail::encode_8(cDate_day, out);
+    detail::encode_8(cDate_month, out);
+    detail::encode_8(cDate_century, out);
+    detail::encode_8(cDate_year, out);
+    detail::encode_8(cSwitches, out);
+    detail::encode_8(cDevelopVersion, out);
+    detail::encode_16(cBootRom, out);
+    detail::encode_8(cBootRom_develop, out);
+    detail::encode_8(values, out);
+    detail::encode_8(cSerNum_hi, out);
+    detail::encode_8(cSerNum_mh, out);
+    detail::encode_8(cSerNum_ml, out);
+    detail::encode_8(cSerNum_lo, out);
     return out;
   }
 };
 
 struct DecoderCvManipReply : public detail::ReplyHead {
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
-  uint8_t variable_hi{};
-  uint8_t variable_lo{};
+  uint16_t cAdr{};
+  uint16_t variable{};
   uint8_t cValue{};
   uint8_t cError{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(cAdr_hi, out);
-    detail::encode(cAdr_lo, out);
-    detail::encode(variable_hi, out);
-    detail::encode(variable_lo, out);
-    detail::encode(cValue, out);
-    detail::encode(cError, out);
+    detail::encode_16(cAdr, out);
+    detail::encode_16(variable, out);
+    detail::encode_8(cValue, out);
+    detail::encode_8(cError, out);
     return out;
   }
 };
 
 struct DecoderCvManipErrorReply : public detail::ReplyHead {
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
+  uint16_t cAdr{};
   uint8_t cError{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(cAdr_hi, out);
-    detail::encode(cAdr_lo, out);
-    detail::encode(cError, out);
+    detail::encode_16(cAdr, out);
+    detail::encode_8(cError, out);
     return out;
   }
 };
 
 struct DecoderCvManipBusyReply : public detail::ReplyHead {
   uint8_t const busy{0x04u};
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
-  uint8_t variable_hi{};
-  uint8_t variable_lo{};
+  uint16_t cAdr{};
+  uint16_t variable{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(busy, out);
-    detail::encode(cAdr_hi, out);
-    detail::encode(cAdr_lo, out);
-    detail::encode(variable_hi, out);
-    detail::encode(variable_lo, out);
+    detail::encode_8(busy, out);
+    detail::encode_16(cAdr, out);
+    detail::encode_16(variable, out);
     return out;
   }
 };

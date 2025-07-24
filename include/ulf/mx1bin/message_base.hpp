@@ -23,16 +23,16 @@ struct Head {
   uint8_t code{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
-    detail::encode(uSID, out);
-    detail::encode(type, out);
-    detail::encode(code, out);
+    detail::encode_8(uSID, out);
+    detail::encode_8(type, out);
+    detail::encode_8(code, out);
     return out;
   }
   template<std::input_iterator InputIt>
   Head& decode(InputIt& in) {
-    uSID = detail::decode(in);
-    type = detail::decode(in);
-    code = detail::decode(in);
+    uSID = detail::decode_8(in);
+    type = detail::decode_8(in);
+    code = detail::decode_8(in);
     return *this;
   }
   Head& decode(std::span<uint8_t const> bytes) {
@@ -42,13 +42,11 @@ struct Head {
 };
 
 struct DecoderControlBase : public Head {
-  uint8_t cAdr_hi{};
-  uint8_t cAdr_lo{};
+  uint16_t cAdr{};
   template<std::input_iterator InputIt>
   DecoderControlBase& decode(InputIt& in) {
     Head::decode(in);
-    cAdr_hi = detail::decode(in);
-    cAdr_lo = detail::decode(in);
+    cAdr = detail::decode_16(in);
     return *this;
   }
   DecoderControlBase& decode(std::span<uint8_t const> bytes) {
@@ -62,7 +60,7 @@ struct ShuttleTrain_Accessory_Base : public DecoderControlBase {
   template<std::input_iterator InputIt>
   ShuttleTrain_Accessory_Base& decode(InputIt& in) {
     DecoderControlBase::decode(in);
-    cData = detail::decode(in);
+    cData = detail::decode_8(in);
     return *this;
   }
   ShuttleTrain_Accessory_Base& decode(std::span<uint8_t const> bytes) {
@@ -76,7 +74,7 @@ struct CommandStationQueryBase : public detail::Head {
   template<std::input_iterator InputIt>
   CommandStationQueryBase& decode(InputIt& in) {
     Head::decode(in);
-    zero = detail::decode(in);
+    zero = detail::decode_8(in);
     return *this;
   }
   CommandStationQueryBase& decode(std::span<uint8_t const> bytes) {
@@ -92,18 +90,18 @@ struct ReplyHead {
   uint8_t reply_uSID{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
-    detail::encode(uSID, out);
-    detail::encode(type, out);
-    detail::encode(code, out);
-    detail::encode(reply_uSID, out);
+    detail::encode_8(uSID, out);
+    detail::encode_8(type, out);
+    detail::encode_8(code, out);
+    detail::encode_8(reply_uSID, out);
     return out;
   }
   template<std::input_iterator InputIt>
   ReplyHead& decode(InputIt& in) {
-    uSID = detail::decode(in);
-    type = detail::decode(in);
-    code = detail::decode(in);
-    reply_uSID = detail::decode(in);
+    uSID = detail::decode_8(in);
+    type = detail::decode_8(in);
+    code = detail::decode_8(in);
+    reply_uSID = detail::decode_8(in);
     return *this;
   }
   ReplyHead& decode(std::span<uint8_t const> bytes) {
@@ -120,11 +118,11 @@ struct ReplyLongHead {
   uint8_t reply_uSID{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
-    detail::encode(uSID, out);
-    detail::encode(type, out);
-    detail::encode(code, out);
-    detail::encode(lengthOfHeader, out);
-    detail::encode(reply_uSID, out);
+    detail::encode_8(uSID, out);
+    detail::encode_8(type, out);
+    detail::encode_8(code, out);
+    detail::encode_8(lengthOfHeader, out);
+    detail::encode_8(reply_uSID, out);
     return out;
   }
 };
@@ -134,7 +132,7 @@ struct ReplyErrorBase : public ReplyHead {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode(error, out);
+    detail::encode_8(error, out);
     return out;
   }
 };
@@ -144,7 +142,7 @@ struct ReplyDecoderControlBase : public ReplyErrorBase {
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
-    detail::encode(payload, out);
+    detail::encode_8(payload, out);
     return out;
   }
 };

@@ -69,7 +69,7 @@ static_assert(sizeof(CRC8) == sizeof(uint8_t));
 constexpr uint8_t crc8(std::span<uint8_t const> bytes) {
   CRC8 crc;
   auto iter{cbegin(bytes)};
-  while (iter != cend(bytes)) { crc.next(detail::decode(iter)); }
+  while (iter != cend(bytes)) { crc.next(detail::decode_8(iter)); }
   return crc;
 }
 

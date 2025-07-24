@@ -42,7 +42,7 @@ struct CRC16 : detail::CRCBase<uint16_t, 0xFFFFu> {
 constexpr uint16_t crc16(std::span<uint8_t const> bytes) {
   CRC16 crc;
   auto iter{cbegin(bytes)};
-  while (iter != cend(bytes)) { crc.next(detail::decode(iter)); }
+  while (iter != cend(bytes)) { crc.next(detail::decode_8(iter)); }
   return crc;
 }
 
