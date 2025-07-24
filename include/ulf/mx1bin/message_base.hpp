@@ -22,7 +22,7 @@ struct Head {
   uint8_t type{};
   uint8_t code{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     detail::encode(uSID, out);
     detail::encode(type, out);
     detail::encode(code, out);
@@ -91,7 +91,7 @@ struct ReplyHead {
   uint8_t code{};
   uint8_t reply_uSID{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     detail::encode(uSID, out);
     detail::encode(type, out);
     detail::encode(code, out);
@@ -112,10 +112,27 @@ struct ReplyHead {
   }
 };
 
+struct ReplyLongHead {
+  uint8_t uSID{};
+  uint8_t type{};
+  uint8_t code{};
+  uint8_t lengthOfHeader{};
+  uint8_t reply_uSID{};
+  template<std::output_iterator<uint8_t> OutputIt>
+  auto encode(OutputIt& out) {
+    detail::encode(uSID, out);
+    detail::encode(type, out);
+    detail::encode(code, out);
+    detail::encode(lengthOfHeader, out);
+    detail::encode(reply_uSID, out);
+    return out;
+  }
+};
+
 struct ReplyErrorBase : public ReplyHead {
   uint8_t error{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(error, out);
     return out;
@@ -125,7 +142,7 @@ struct ReplyErrorBase : public ReplyHead {
 struct ReplyDecoderControlBase : public ReplyErrorBase {
   uint8_t payload{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
     detail::encode(payload, out);
     return out;

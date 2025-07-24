@@ -33,7 +33,7 @@ struct Nak : public detail::Head {
     return *this;
   }
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     return Head::encode(out);
   }
 };
@@ -228,7 +228,7 @@ struct LocoMemoryQueryReply : public detail::ReplyErrorBase {
   uint8_t cData4{};
   uint8_t cData5{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
     detail::encode(cAdr_hi, out);
     detail::encode(cAdr_lo, out);
@@ -250,7 +250,7 @@ struct AccessoryMemoryQueryReply : public detail::ReplyErrorBase {
   uint8_t cPair{};
   uint8_t cOutputs{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
     detail::encode(error, out);
     detail::encode(cAdr_hi, out);
@@ -265,7 +265,7 @@ struct AddressControlReply : public detail::ReplyHead {
   uint8_t payload{};
   uint8_t cOutputs{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(payload, out);
     detail::encode(cOutputs, out);
@@ -283,7 +283,7 @@ struct CommandStationIOQueryReply : public detail::ReplyHead {
   uint8_t cVoltage2{};
   uint8_t cAux{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(values, out);
     detail::encode(cCurrent1_hi, out);
@@ -300,14 +300,14 @@ struct CommandStationIOQueryReply : public detail::ReplyHead {
 struct CommandStationCvManipReply : public detail::ReplyErrorBase {
   uint8_t value{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyErrorBase::encode(out);
     detail::encode(value, out);
     return out;
   }
 };
 
-struct CommandStationEquipmentQueryReply {
+struct CommandStationEquipmentQueryReply : public detail::ReplyLongHead {
   uint8_t cAddress_hi{};
   uint8_t cAddress_lo{};
   uint8_t cDevice{};
@@ -332,7 +332,8 @@ struct CommandStationEquipmentQueryReply {
   uint8_t cSerNum_ml{};
   uint8_t cSerNum_lo{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
+    ReplyLongHead::encode(out);
     detail::encode(cAddress_hi, out);
     detail::encode(cAddress_lo, out);
     detail::encode(cDevice, out);
@@ -368,7 +369,7 @@ struct DecoderCvManipReply : public detail::ReplyHead {
   uint8_t cValue{};
   uint8_t cError{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(cAdr_hi, out);
     detail::encode(cAdr_lo, out);
@@ -385,7 +386,7 @@ struct DecoderCvManipErrorReply : public detail::ReplyHead {
   uint8_t cAdr_lo{};
   uint8_t cError{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(cAdr_hi, out);
     detail::encode(cAdr_lo, out);
@@ -401,7 +402,7 @@ struct DecoderCvManipBusyReply : public detail::ReplyHead {
   uint8_t variable_hi{};
   uint8_t variable_lo{};
   template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt out) {
+  auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode(busy, out);
     detail::encode(cAdr_hi, out);

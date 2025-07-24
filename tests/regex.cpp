@@ -5,6 +5,10 @@
 
 #include <ulf/mx1bin.hpp>
 
+#include <ulf/mx1bin/crc16.hpp>
+#include <ulf/mx1bin/crc8.hpp>
+#include <vector>
+
 namespace {
 
 constexpr ctll::fixed_string pattern{"\x01\x01.+?(?<!\x10)\x17"};
@@ -41,4 +45,46 @@ TEST(test, test) {
   auto tmp = ulf::mx1bin::detail::verify(test);
   ASSERT_TRUE(tmp);
   ASSERT_TRUE(*tmp);
+}
+
+TEST(test, auth) {
+  std::vector<uint8_t> result{
+    0x01, 0x01, 0x80, 0xFF, 0x0D, 0x05, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
+    0x10, 0x21, 0x00, 0x00, 0x54, 0x0E, 0x10, 0x21, 0x14, 0x19, 0x00, 0x70,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x21, 0x89, 0xed, 0x40, 0xCF, 0x17};
+
+  ulf::mx1bin::CommandStationEquipmentQueryReply reply{};
+
+  reply.uSID = 0x80;
+  reply.type = 0xFF;
+  reply.code = 0x0D;
+  reply.lengthOfHeader = 0x05;
+  reply.reply_uSID = 0x00;
+  reply.cAddress_hi = 0x00;
+  reply.cAddress_lo = 0x00;
+  reply.cDevice = 0x04;
+  reply.cRom_size = 0x00;
+  reply.cRam_size = 0x00;
+  reply.cPrintver_hi = 0x01;
+  reply.cPrintver_lo = 0x00;
+  reply.cVersion_hi = 0x00;
+  reply.cVersion_lo = 0x54;
+  reply.cDate_day = 0x0E;
+  reply.cDate_month = 0x01;
+  reply.cDate_century = 0x14;
+  reply.cDate_year = 0x19;
+  reply.cSwitches = 0x00;
+  reply.cDevelopVersion = 0x70;
+  reply.cBootRom_hi = 0x00;
+  reply.cBootRom_lo = 0x00;
+  reply.cBootRom_develop = 0x00;
+  reply.values = 0x00;
+  reply.cSerNum_hi = 0x00;
+  reply.cSerNum_mh = 0x01;
+  reply.cSerNum_ml = 0x89;
+  reply.cSerNum_lo = 0xed;
+
+  auto tmp{ulf::mx1bin::response2mx1bin(reply)};
+
+  ASSERT_TRUE(std::ranges::equal(result, tmp));
 }

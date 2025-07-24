@@ -37,12 +37,12 @@ constexpr bool is_control_char(uint8_t c) {
 
 /// Encode character if applicable
 ///
-/// @tparam OutputIt Output iterator
+/// @tparam OutputIt& Output iterator
 /// @param [in] c    Char
 /// @param [in] out  Output iterator
 /// @return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
-constexpr auto encode(uint8_t const c, OutputIt out) {
+constexpr auto encode(uint8_t const c, OutputIt& out) {
   if (is_control_char(c)) {
     *out++ = detail::dle;
     *out++ = c ^ cypher;

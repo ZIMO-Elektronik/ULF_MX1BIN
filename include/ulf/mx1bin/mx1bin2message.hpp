@@ -25,7 +25,7 @@ namespace ulf::mx1bin {
 ///
 /// \param bytes  MX1Bin frame
 /// \return       DCC Packet
-std::expected<std::optional<Message>, std::errc>
+constexpr std::expected<std::optional<Message>, std::errc>
 mx1bin_2message(std::span<uint8_t const> bytes) {
   auto res{detail::verify(bytes)};
   if (!res) return std::unexpected(res.error());
@@ -33,8 +33,11 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
 
   auto frame{**res};
   frame = frame.subspan(2);
+  auto iter{begin(frame)};
+  detail::decode(iter); // uSID
+  detail::decode(iter); // type
 
-  switch (static_cast<Commands>(frame[2])) {
+  switch (static_cast<Commands>(detail::decode(iter))) {
     case Commands::Reset: {
       return Reset{}.decode(frame);
     }

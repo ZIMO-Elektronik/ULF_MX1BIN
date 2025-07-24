@@ -27,7 +27,7 @@ constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
 /// \retval std::errc::invalid_argument Error
 /// \retval std::nullopt                Incomplete
 /// \retval std::span                   First found frame
-std::expected<std::optional<std::span<uint8_t const>>, std::errc>
+constexpr std::expected<std::optional<std::span<uint8_t const>>, std::errc>
 verify(std::span<uint8_t const> frame) {
   // Any match
   auto m{ctre::starts_with<pattern>(frame)};
@@ -36,9 +36,9 @@ verify(std::span<uint8_t const> frame) {
   m = ctre::match<pattern>(frame.subspan(0uz, m.size()));
   if (!m) return std::nullopt;
   // CRC
-  if (detail::crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
+  if (crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
     return std::unexpected(std::errc::bad_message);
-  return frame.subspan(m.size());
+  return frame.subspan(0u, m.size());
 }
 
 } // namespace ulf::mx1bin::detail
