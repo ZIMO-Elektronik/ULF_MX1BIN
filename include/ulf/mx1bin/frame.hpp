@@ -36,8 +36,17 @@ verify(std::span<uint8_t const> frame) {
   m = ctre::match<pattern>(frame.subspan(0uz, m.size()));
   if (!m) return std::nullopt;
   // CRC
-  if (crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
-    return std::unexpected(std::errc::bad_message);
+  if (frame[m.size() - 3uz] == dle) {
+    // Encoded CRC8
+    if (crc8(frame.subspan(2uz, m.size() - 5uz)) ^ (frame[m.size() - 2uz]) ^
+        cypher)
+      return std::unexpected(std::errc::bad_message);
+  } else {
+    // Non-encoded CRC8
+    if (crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
+      return std::unexpected(std::errc::bad_message);
+  }
+
   return frame.subspan(0u, m.size());
 }
 

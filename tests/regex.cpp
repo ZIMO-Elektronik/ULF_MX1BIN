@@ -84,3 +84,26 @@ TEST(test, auth) {
 
   ASSERT_TRUE(std::ranges::equal(result, tmp));
 }
+
+TEST(tt, tt) {
+  std::vector<uint8_t> t{0x01,
+                         0x01,
+                         0x6d,
+                         0x10,
+                         0x30,
+                         0x03,
+                         0x80,
+                         0x03,
+                         0x00,
+                         0xbc,
+                         0x7f,
+                         0x00,
+                         0x00,
+                         0x00,
+                         0x10,
+                         0x21,
+                         0x17};
+
+  auto tmp{ulf::mx1bin::mx1bin_2message(t)};
+  ASSERT_TRUE(tmp);
+}

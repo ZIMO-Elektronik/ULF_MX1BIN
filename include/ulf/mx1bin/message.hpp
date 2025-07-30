@@ -200,7 +200,15 @@ struct DecoderCvManip : public detail::DecoderControlBase {
 
 struct Ack : public detail::ReplyHead {};
 
-struct TrackControlReply : public detail::ReplyHead {};
+struct TrackControlReply : public detail::ReplyHead {
+  uint8_t statusBits{};
+  template<std::output_iterator<uint8_t> OutputIt>
+  auto encode(OutputIt& out) {
+    ReplyHead::encode(out);
+    detail::encode_8(statusBits, out);
+    return out;
+  }
+};
 
 struct DecoderControlReply : public detail::ReplyDecoderControlBase {};
 

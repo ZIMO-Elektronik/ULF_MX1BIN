@@ -63,11 +63,10 @@ constexpr Packet response2mx1bin(Response re) {
   result.resize(static_cast<Packet::size_type>(iter - begin(result)));
 
   if (!long_frame) {
-    *iter++ = crc8(std::span<uint8_t const>{result}.subspan(2uz));
+    detail::encode_8(crc8(std::span<uint8_t const>{result}.subspan(2uz)), iter);
   } else {
-    auto crc{crc16(std::span<uint8_t const>{result}.subspan(2uz))};
-    *iter++ = static_cast<uint8_t>((crc & 0xFF00u) >> 8u);
-    *iter++ = static_cast<uint8_t>((crc & 0x00FFu) >> 0u);
+    detail::encode_16(crc16(std::span<uint8_t const>{result}.subspan(2uz)),
+                      iter);
   }
 
   *iter++ = detail::eot;
