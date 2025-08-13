@@ -13,7 +13,7 @@
 #include <cstdint>
 
 namespace ulf::mx1bin {
-enum class Commands : uint8_t {
+enum class Command : uint8_t {
   Reset = 0u,                    // Status
   Nak = 1u,                      //
   Track_Ctrl = 2u,               // Track Control

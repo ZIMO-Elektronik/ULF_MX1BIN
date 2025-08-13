@@ -56,8 +56,8 @@ TEST(test, auth) {
   ulf::mx1bin::CommandStationEquipmentQueryReply reply{};
 
   reply.uSID = 0x80;
-  reply.type = 0xFF;
-  reply.code = 0x0D;
+  reply.info = 0xFF;
+  reply.code = ulf::mx1bin::Command::Station_Equipment_Query;
   reply.lengthOfHeader = 0x05;
   reply.reply_uSID = 0x00;
   reply.cAddress = 0x0000;
@@ -86,23 +86,8 @@ TEST(test, auth) {
 }
 
 TEST(tt, tt) {
-  std::vector<uint8_t> t{0x01,
-                         0x01,
-                         0x6d,
-                         0x10,
-                         0x30,
-                         0x03,
-                         0x80,
-                         0x03,
-                         0x00,
-                         0xbc,
-                         0x7f,
-                         0x00,
-                         0x00,
-                         0x00,
-                         0x10,
-                         0x21,
-                         0x17};
+  std::vector<uint8_t> t{
+    0x01, 0x01, 0x39, 0x10, 0x30, 0x13, 0x80, 0x03, 0x00, 0x1d, 0xea, 0x17};
 
   auto tmp{ulf::mx1bin::mx1bin_2message(t)};
   ASSERT_TRUE(tmp);

@@ -13,26 +13,27 @@
 #include <cstdint>
 #include <span>
 #include <ztl/inplace_vector.hpp>
+#include "commands.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
 
 struct Head {
   uint8_t uSID{};
-  uint8_t type{};
-  uint8_t code{};
+  uint8_t info{};
+  Command code{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     detail::encode_8(uSID, out);
-    detail::encode_8(type, out);
-    detail::encode_8(code, out);
+    detail::encode_8(info, out);
+    detail::encode_8(std::to_underlying(code), out);
     return out;
   }
   template<std::input_iterator InputIt>
   Head& decode(InputIt& in) {
     uSID = detail::decode_8(in);
-    type = detail::decode_8(in);
-    code = detail::decode_8(in);
+    info = detail::decode_8(in);
+    code = static_cast<Command>(detail::decode_8(in));
     return *this;
   }
   Head& decode(std::span<uint8_t const> bytes) {
@@ -85,22 +86,22 @@ struct CommandStationQueryBase : public detail::Head {
 
 struct ReplyHead {
   uint8_t uSID{};
-  uint8_t type{};
-  uint8_t code{};
+  uint8_t info{};
+  Command code{};
   uint8_t reply_uSID{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     detail::encode_8(uSID, out);
-    detail::encode_8(type, out);
-    detail::encode_8(code, out);
+    detail::encode_8(info, out);
+    detail::encode_8(std::to_underlying(code), out);
     detail::encode_8(reply_uSID, out);
     return out;
   }
   template<std::input_iterator InputIt>
   ReplyHead& decode(InputIt& in) {
     uSID = detail::decode_8(in);
-    type = detail::decode_8(in);
-    code = detail::decode_8(in);
+    info = detail::decode_8(in);
+    code = static_cast<Command>(detail::decode_8(in));
     reply_uSID = detail::decode_8(in);
     return *this;
   }
@@ -112,15 +113,15 @@ struct ReplyHead {
 
 struct ReplyLongHead {
   uint8_t uSID{};
-  uint8_t type{};
-  uint8_t code{};
+  uint8_t info{};
+  Command code{};
   uint8_t lengthOfHeader{};
   uint8_t reply_uSID{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     detail::encode_8(uSID, out);
-    detail::encode_8(type, out);
-    detail::encode_8(code, out);
+    detail::encode_8(info, out);
+    detail::encode_8(std::to_underlying(code), out);
     detail::encode_8(lengthOfHeader, out);
     detail::encode_8(reply_uSID, out);
     return out;

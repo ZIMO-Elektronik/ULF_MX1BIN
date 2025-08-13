@@ -32,55 +32,55 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   if (!*res) return std::nullopt;
 
   auto frame{**res};
-  frame = frame.subspan(2);
+  frame = frame.subspan(2u, size(frame) - 4u);
   auto iter{begin(frame)};
   detail::decode_8(iter); // uSID
   detail::decode_8(iter); // type
 
-  switch (static_cast<Commands>(detail::decode_8(iter))) {
-    case Commands::Reset: {
+  switch (static_cast<Command>(detail::decode_8(iter))) {
+    case Command::Reset: {
       return Reset{}.decode(frame);
     }
-    case Commands::Track_Ctrl: {
+    case Command::Track_Ctrl: {
       return TrackControl{}.decode(frame);
     }
-    case Commands::Loco_Ctrl: {
+    case Command::Loco_Ctrl: {
       return DecoderControl{}.decode(frame);
     }
-    case Commands::Invert_Fnkt: {
+    case Command::Invert_Fnkt: {
       return InvertFunctionBits{}.decode(frame);
     }
-    case Commands::Accelerate: {
+    case Command::Accelerate: {
       return Acceleration{}.decode(frame);
     }
-    case Commands::Shuttle_Train: {
+    case Command::Shuttle_Train: {
       return ShuttleTrain{}.decode(frame);
     }
-    case Commands::Accessory_Cmd: {
+    case Command::Accessory_Cmd: {
       return Accessory{}.decode(frame);
     }
-    case Commands::Loco_Mem_Query: {
+    case Command::Loco_Mem_Query: {
       return LocoMemoryQuery{}.decode(frame);
     }
-    case Commands::Accessory_Mem_Query: {
+    case Command::Accessory_Mem_Query: {
       return AccessoryMemoryQuery{}.decode(frame);
     }
-    case Commands::Address_Ctrl: {
+    case Command::Address_Ctrl: {
       return AddressControl{}.decode(frame);
     }
-    case Commands::Read_IO_State: {
+    case Command::Read_IO_State: {
       return CommandStationIOQuery{}.decode(frame);
     }
-    case Commands::Station_Cv_Manip: {
+    case Command::Station_Cv_Manip: {
       return CommandStationCvManip{}.decode(frame);
     }
-    case Commands::Station_Equipment_Query: {
+    case Command::Station_Equipment_Query: {
       return CommandStationEquipmentQuery{}.decode(frame);
     }
-    case Commands::Serial_Info: {
+    case Command::Serial_Info: {
       return SerialInfo{}.decode(frame);
     }
-    case Commands::Cv_Manip: {
+    case Command::Cv_Manip: {
       return DecoderCvManip{}.decode(frame);
     }
     default: return std::unexpected(std::errc::invalid_argument);
