@@ -129,11 +129,11 @@ struct ReplyLongHead {
 };
 
 struct ReplyErrorBase : public ReplyHead {
-  uint8_t error{};
+  Error error{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
-    detail::encode_8(error, out);
+    detail::encode_8(std::to_underlying(error), out);
     return out;
   }
 };

@@ -14,7 +14,7 @@
 
 namespace ulf::mx1bin {
 
-enum class Error {
+enum class Error : uint8_t {
   NO_ERROR = 0x00,
   ERR_ADRESSE = 0x01,
   ERR_INDEX = 0x02,
