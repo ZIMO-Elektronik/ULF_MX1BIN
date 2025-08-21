@@ -63,8 +63,8 @@ constexpr uint8_t make_header_info(FrameType frameType,
                                    MessageType messageType,
                                    Sender sender,
                                    StationType stationType) {
-  return std::to_underlying(frameType) || std::to_underlying(messageType) ||
-         std::to_underlying(sender) || std::to_underlying(stationType);
+  return std::to_underlying(frameType) | std::to_underlying(messageType) |
+         std::to_underlying(sender) | std::to_underlying(stationType);
 }
 
 constexpr FrameType get_frame_type(std::span<uint8_t const> frame) {
