@@ -380,12 +380,21 @@ struct DecoderCvManipBusyReply : public detail::ReplyHead {
   uint8_t const busy{0x04u};
   uint16_t cAdr{};
   uint16_t variable{};
+  std::optional<uint8_t> activeUSID{};
+  std::optional<uint16_t> activeAddr{};
+  std::optional<uint16_t> activeCv{};
   template<std::output_iterator<uint8_t> OutputIt>
   auto encode(OutputIt& out) {
     ReplyHead::encode(out);
     detail::encode_8(busy, out);
     detail::encode_16(cAdr, out);
     detail::encode_16(variable, out);
+    if (!activeUSID) return out;
+    detail::encode_8(*activeUSID, out);
+    if (!activeAddr) return out;
+    detail::encode_16(*activeAddr, out);
+    if (!activeCv) return out;
+    detail::encode_16(*activeCv, out);
     return out;
   }
 };
