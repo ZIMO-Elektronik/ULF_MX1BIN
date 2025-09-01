@@ -12,6 +12,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <ztl/ztl.hpp>
 
 namespace ulf::mx1bin::detail {
 
@@ -42,7 +44,7 @@ constexpr bool is_control_char(uint8_t c) {
 /// @param [in] out  Output iterator
 /// @return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
-constexpr auto encode_8(uint8_t const c, OutputIt& out) {
+[[maybe_unused]] constexpr auto encode_8(uint8_t const c, OutputIt& out) {
   if (is_control_char(c)) {
     *out++ = detail::dle;
     *out++ = c ^ cypher;
@@ -57,7 +59,7 @@ constexpr auto encode_8(uint8_t const c, OutputIt& out) {
 /// @param out       Output iterator
 /// @return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
-constexpr auto encode_16(uint16_t const v, OutputIt& out) {
+[[maybe_unused]] constexpr auto encode_16(uint16_t const v, OutputIt& out) {
   out = encode_8(static_cast<uint8_t>((v & 0xFF00u) >> 8u), out);
   return encode_8(static_cast<uint8_t>((v & 0x00FFu) >> 0u), out);
 }
@@ -69,7 +71,7 @@ constexpr auto encode_16(uint16_t const v, OutputIt& out) {
 /// @return  Decoded char
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
-constexpr auto decode_8(InputIt& in) {
+[[maybe_unused]] constexpr auto decode_8(InputIt& in) {
   if (*in == dle) {
     in++;
     return static_cast<uint8_t>(*in++ ^ cypher);
@@ -84,7 +86,7 @@ constexpr auto decode_8(InputIt& in) {
 /// @return  Decoded value
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
-constexpr auto decode_16(InputIt& in) {
+[[maybe_unused]] constexpr auto decode_16(InputIt& in) {
   return static_cast<uint16_t>(decode_8(in) << 8u | decode_8(in) << 0u);
 }
 

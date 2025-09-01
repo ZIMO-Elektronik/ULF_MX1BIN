@@ -53,7 +53,7 @@ TEST(test, auth) {
     0x10, 0x21, 0x00, 0x00, 0x54, 0x0E, 0x10, 0x21, 0x14, 0x19, 0x00, 0x70,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x21, 0x89, 0xed, 0x40, 0xCF, 0x17};
 
-  ulf::mx1bin::CommandStationEquipmentQueryReply reply{};
+  ulf::mx1bin::CommandStationEquipmentQuery::Reply reply{};
 
   reply.uSID = 0x80;
   reply.info = 0xFF;
@@ -91,4 +91,9 @@ TEST(tt, tt) {
 
   auto tmp{ulf::mx1bin::mx1bin_2message(t)};
   ASSERT_TRUE(tmp);
+}
+
+TEST(ff, ff) {
+  ulf::mx1bin::TrackControl t{};
+  ulf::mx1bin::response2mx1bin(t);
 }
