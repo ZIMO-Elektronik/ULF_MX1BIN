@@ -56,8 +56,8 @@ struct Decoder {
     if (*_iter == dle) {
       // Encoded
       _iter++;
-      return _iter++ != _end
-               ? std::make_optional(static_cast<uint8_t>(*_iter ^ cypher))
+      return _iter != _end
+               ? std::make_optional(static_cast<uint8_t>(*_iter++ ^ cypher))
                : std::nullopt;
     }
     // Non-encoded

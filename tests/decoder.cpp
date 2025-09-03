@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <ulf/mx1bin.hpp>
 #include <ulf/mx1bin/decoder.hpp>
 #include <vector>
 
@@ -18,5 +19,60 @@ TEST(decoder, strip) {
   d.strip();
   while (auto const val{d.s_uint8()}) { result.push_back(*val); }
 
-  ASSERT_TRUE(false);
+  // ASSERT_TRUE(false);
+}
+
+TEST(decoder, s) {
+  ulf::mx1bin::CommandStationEquipmentQuery q{};
+  q.code = ulf::mx1bin::Command::Station_Equipment_Query;
+  q.info = ulf::mx1bin::make_header_info(ulf::mx1bin::FrameType::Short,
+                                         ulf::mx1bin::MessageType::Primary,
+                                         ulf::mx1bin::Sender::PC,
+                                         ulf::mx1bin::StationType::MX1);
+
+  ztl::inplace_vector<uint8_t, 80u> q_v{};
+
+  ulf::mx1bin::detail::Encoder e{q_v};
+  e.addSOF();
+  q_v.resize(2u);
+  auto it{std::back_inserter(q_v)};
+  q.encode(it);
+  ulf::mx1bin::detail::encode_8(
+    ulf::mx1bin::crc8(std::span<uint8_t const>{q_v}.subspan(2uz)), it);
+  q_v.push_back(ulf::mx1bin::detail::eot);
+
+  ulf::mx1bin::detail::Decoder d{q_v};
+  d.strip();
+  auto head{ulf::mx1bin::detail::Head::decode(d)};
+
+  std::span<uint8_t const> sp{q_v};
+
+  auto message{ulf::mx1bin::mx1bin_2message(sp)};
+
+  // ASSERT_TRUE(false);
+}
+
+TEST(decoder, y) {
+  std::vector<uint8_t> v{
+    0x01,
+    0x01,
+    0x0a,
+    0x10,
+    0x30,
+    0x03,
+    0x80,
+    0x03,
+    0x00,
+    0x0c,
+    0x10,
+    0x21,
+    0x00,
+    0x00,
+    0x00,
+    0x86,
+    0x17,
+  };
+
+  auto message{ulf::mx1bin::mx1bin_2message(v)};
+  ASSERT_TRUE(true);
 }

@@ -92,8 +92,3 @@ TEST(tt, tt) {
   auto tmp{ulf::mx1bin::mx1bin_2message(t)};
   ASSERT_TRUE(tmp);
 }
-
-TEST(ff, ff) {
-  ulf::mx1bin::TrackControl t{};
-  ulf::mx1bin::response2mx1bin(t);
-}

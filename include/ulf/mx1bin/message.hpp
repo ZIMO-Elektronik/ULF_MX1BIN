@@ -21,16 +21,35 @@
 
 namespace ulf::mx1bin {
 
+/// Encodable concept
+template<typename T,
+         typename OutputIt = std::back_insert_iterator<std::vector<uint8_t>>>
+concept Encodable = requires {
+  {
+    &T::template encode<OutputIt>
+  } -> std::same_as<OutputIt (T::*)(OutputIt&) const>;
+};
+
+/// Decodable concept
+///
+/// \note This is safe, since return is checked against the actual type
+template<typename T>
+concept Decodable =
+  requires(T t, detail::Decoder<char const*, char const*> const& d) {
+    { T::decode(d) } -> std::same_as<std::expected<T, std::errc>>;
+  };
+
+template<Decodable T, std::ranges::input_range R>
+constexpr std::expected<T, std::errc> decode(R const& r) {
+  detail::Decoder d(r);
+  return T::decode(d);
+}
+
 struct Reset : public detail::Head {
   template<detail::decoder D>
   static std::expected<Reset, std::errc> decode(D& d) {
     if (auto const result{Head::decode(d)}) return Reset{*result};
     else return std::unexpected(result.error());
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d(r);
-    return decode(d);
   }
 };
 
@@ -44,10 +63,6 @@ struct Nak : public detail::Head {
   static auto decode(R const& r) {
     detail::Decoder d(r);
     return decode(d);
-  }
-  template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt& out) const {
-    return Head::encode(out);
   }
 };
 
@@ -72,15 +87,15 @@ struct TrackControl : public detail::Head {
     result.cAction = d.uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct DecoderControl : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {};
+  struct Reply : public detail::ReplyDecoderControlBase {
+    template<std::output_iterator<uint8_t> OutputIt>
+    auto encode(OutputIt& out) const {
+      return ReplyDecoderControlBase::encode(out);
+    }
+  };
 
   uint8_t cSpeed{};                ///> Speed
   std::optional<uint8_t> cData1{}; ///>
@@ -103,15 +118,15 @@ struct DecoderControl : public detail::DecoderControlBase {
     result.cData5 = d.s_uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct InvertFunctionBits : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {};
+  struct Reply : public detail::ReplyDecoderControlBase {
+    template<std::output_iterator<uint8_t> OutputIt>
+    auto encode(OutputIt& out) const {
+      return ReplyDecoderControlBase::encode(out);
+    }
+  };
 
   uint8_t cData1{}; ///>
   uint8_t cData2{}; ///>
@@ -133,15 +148,15 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
     result.cData5 = d.uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct Acceleration : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {};
+  struct Reply : public detail::ReplyDecoderControlBase {
+    template<std::output_iterator<uint8_t> OutputIt>
+    auto encode(OutputIt& out) const {
+      return ReplyDecoderControlBase::encode(out);
+    }
+  };
 
   uint8_t cAzBz{}; ///> Accelleration / Deccelleration
   template<detail::decoder D>
@@ -153,15 +168,15 @@ struct Acceleration : public detail::DecoderControlBase {
     result.cAzBz = d.uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
-  struct Reply : public detail::ReplyDecoderControlBase {};
+  struct Reply : public detail::ReplyDecoderControlBase {
+    template<std::output_iterator<uint8_t> OutputIt>
+    auto encode(OutputIt& out) const {
+      return ReplyDecoderControlBase::encode(out);
+    }
+  };
 
   template<detail::decoder D>
   static std::expected<ShuttleTrain, std::errc> decode(D& d) {
@@ -169,25 +184,20 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
       return ShuttleTrain{*base};
     else return std::unexpected(base.error());
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct Accessory : public detail::ShuttleTrain_Accessory_Base {
-  struct Reply : public detail::ReplyDecoderControlBase {};
+  struct Reply : public detail::ReplyDecoderControlBase {
+    template<std::output_iterator<uint8_t> OutputIt>
+    auto encode(OutputIt& out) const {
+      return ReplyDecoderControlBase::encode(out);
+    }
+  };
   template<detail::decoder D>
   static std::expected<Accessory, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})
       return Accessory{*base};
     else return std::unexpected(base.error());
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -224,12 +234,6 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
       return LocoMemoryQuery{*base};
     else return std::unexpected(base.error());
   }
-
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct AccessoryMemoryQuery : public detail::DecoderControlBase {
@@ -252,11 +256,6 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
     if (auto const base{DecoderControlBase::decode(d)})
       return AccessoryMemoryQuery{*base};
     else return std::unexpected(base.error());
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -286,11 +285,6 @@ struct AddressControl : public detail::DecoderControlBase {
     result.cOutputs = d.s_uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct CommandStationIOQuery : public detail::CommandStationQueryBase {
@@ -319,11 +313,6 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
       return CommandStationIOQuery{*base};
     else return std::unexpected(base.error());
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct CommandStationCvManip : public detail::Head {
@@ -350,34 +339,29 @@ struct CommandStationCvManip : public detail::Head {
     result.value = d.s_uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
   struct Reply : public detail::ReplyLongHead {
-    uint16_t cAddress{};
-    uint8_t cDevice{};
-    uint8_t cRom_size{};
-    uint8_t cRam_size{};
-    uint16_t cPrintver{};
-    uint16_t cVersion{};
-    uint8_t cDate_day{};
-    uint8_t cDate_month{};
-    uint8_t cDate_century{};
-    uint8_t cDate_year{};
-    uint8_t cSwitches{};
-    uint8_t cDevelopVersion{};
-    uint16_t cBootRom{};
-    uint8_t cBootRom_develop{};
-    uint8_t values{};
-    uint8_t cSerNum_hi{};
-    uint8_t cSerNum_mh{};
-    uint8_t cSerNum_ml{};
-    uint8_t cSerNum_lo{};
+    uint16_t cAddress{};                 ///> CAN address
+    uint8_t cDevice{};                   ///> Device ID
+    uint8_t cRom_size{};                 ///> ROM size
+    uint8_t cRam_size{};                 ///> RAM size
+    uint16_t cPrintver{};                ///>
+    uint16_t cVersion{};                 ///> Version Major/Minor
+    uint8_t cDate_day{};                 ///> Software date Day
+    uint8_t cDate_month{};               ///> Software date Month
+    uint8_t cDate_century{};             ///> Software date Century
+    uint8_t cDate_year{};                ///> Software date Year
+    uint8_t cSwitches{};                 ///>
+    uint8_t cDevelopVersion{};           ///> Version Patch
+    uint16_t cBootRom{};                 ///>
+    uint8_t cBootRom_develop{};          ///>
+    uint8_t values{};                    ///>
+    std::optional<uint8_t> cSerNum_hi{}; ///> Serial Number [0]
+    std::optional<uint8_t> cSerNum_mh{}; ///> Serial Number [1]
+    std::optional<uint8_t> cSerNum_ml{}; ///> Serial Number [2]
+    std::optional<uint8_t> cSerNum_lo{}; ///> Serial Number [3]
     template<std::output_iterator<uint8_t> OutputIt>
     auto encode(OutputIt& out) const {
       ReplyLongHead::encode(out);
@@ -396,10 +380,10 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
       detail::encode_16(cBootRom, out);
       detail::encode_8(cBootRom_develop, out);
       detail::encode_8(values, out);
-      detail::encode_8(cSerNum_hi, out);
-      detail::encode_8(cSerNum_mh, out);
-      detail::encode_8(cSerNum_ml, out);
-      detail::encode_8(cSerNum_lo, out);
+      if (cSerNum_hi) detail::encode_8(*cSerNum_hi, out);
+      if (cSerNum_mh) detail::encode_8(*cSerNum_mh, out);
+      if (cSerNum_ml) detail::encode_8(*cSerNum_ml, out);
+      if (cSerNum_lo) detail::encode_8(*cSerNum_lo, out);
       return out;
     }
   };
@@ -409,11 +393,6 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
     if (auto const base{CommandStationQueryBase::decode(d)})
       return CommandStationEquipmentQuery{*base};
     else return std::unexpected(base.error());
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -429,11 +408,6 @@ struct SerialInfo : public detail::Head {
     result.toolID = d.uint8();
     result.action = d.uint8();
     return result;
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -502,23 +476,17 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     result.value = d.s_uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct Ack : public detail::ReplyHead {
+  template<std::output_iterator<uint8_t> OutputIt>
+  auto encode(OutputIt& out) const {
+    return ReplyHead::encode(out);
+  }
   template<detail::decoder D>
   static std::expected<Ack, std::errc> decode(D& d) {
     if (auto const base{ReplyHead::decode(d)}) return Ack{*base};
     else return std::unexpected(base.error());
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -556,7 +524,8 @@ using Message = std::variant<Reset,
 
 template<typename T>
 concept Long = requires(T t) {
-  requires std::same_as<T, CommandStationEquipmentQuery::Reply>;
+  requires std::same_as<std::remove_cv_t<std::remove_reference_t<T>>,
+                        CommandStationEquipmentQuery::Reply>;
 };
 
 template<typename T>
@@ -564,21 +533,7 @@ concept Short = requires(T t) { requires !Long<T>; };
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
 
-template<typename T>
-concept Encodable = requires(T t, Packet::iterator It) {
-  { t.encode(It) } -> std::output_iterator<uint8_t>;
-};
-
-template<typename T>
-concept Decodable = requires(T t) {
-  { t.template decode<std::span<uint8_t const>> } -> std::same_as<bool>;
-};
-
-template<Decodable T, detail::decoder D>
-constexpr std::expected<T, std::errc> decode(D& d) {
-  T t{};
-  if (!t.decode(d)) return std::unexpected(std::errc::invalid_argument);
-  return t;
-}
+static_assert(Encodable<TrackControl::Reply>);
+static_assert(!Encodable<TrackControl>);
 
 } // namespace ulf::mx1bin

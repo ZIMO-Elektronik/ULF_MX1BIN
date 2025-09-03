@@ -37,11 +37,6 @@ struct Head {
       return std::unexpected(std::errc::invalid_argument);
     return Head{.uSID{d.uint8()}, .info{d.uint8()}, .code{d.uint8()}};
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct DecoderControlBase : public Head {
@@ -54,11 +49,6 @@ struct DecoderControlBase : public Head {
     DecoderControlBase result{*base};
     result.cAdr = d.uint16();
     return result;
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -73,11 +63,6 @@ struct ShuttleTrain_Accessory_Base : public DecoderControlBase {
     result.cData = d.uint8();
     return result;
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    Decoder d{r};
-    return decode(d);
-  }
 };
 
 struct CommandStationQueryBase : public detail::Head {
@@ -90,11 +75,6 @@ struct CommandStationQueryBase : public detail::Head {
     CommandStationQueryBase result{*base};
     result.zero = d.uint8();
     return result;
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    Decoder d{r};
-    return decode(d);
   }
 };
 
@@ -120,11 +100,6 @@ struct ReplyHead {
                      .info = d.uint8(),
                      .code = static_cast<Command>(d.uint8()),
                      .reply_uSID = d.uint8()};
-  }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    Decoder d{r};
-    return decode(d);
   }
 };
 

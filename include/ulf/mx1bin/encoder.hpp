@@ -10,7 +10,7 @@ template<typename T>
 concept encoder = requires { typename T::encoder_tag; };
 
 /// MX1Bin message stream encoder
-template<std::input_iterator I, std::sentinel_for<I> S>
+template<std::output_iterator<uint8_t> I, std::sentinel_for<I> S>
 struct Encoder {
   // Encoder tag
   using encoder_tag = void;
@@ -19,8 +19,7 @@ struct Encoder {
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
              std::convertible_to<std::ranges::sentinel_t<R>, S>
-  Encoder(R const& r)
-    : _iter{std::ranges::begin(r)}, _end{std::ranges::end(r)} {}
+  Encoder(R&& r) : _iter{std::ranges::begin(r)}, _end{std::ranges::end(r)} {}
   Encoder(I iter, S end) : _iter{iter}, _end{end} {}
   Encoder(Encoder const& d) = default;
 
@@ -61,10 +60,11 @@ private:
 };
 
 // Deduction guides
-template<std::input_iterator I, std::sentinel_for<I> S>
+template<std::output_iterator<uint8_t> I, std::sentinel_for<I> S>
 Encoder(I, S) -> Encoder<I, S>;
 
 template<std::ranges::input_range R>
-Encoder(R&&) -> Encoder<std::ranges::iterator_t<R>, std::ranges::sentinel_t<R>>;
+Encoder(R&&) -> Encoder<decltype(std::ranges::begin(std::declval<R&>())),
+                        decltype(std::ranges::end(std::declval<R&>()))>;
 
 } // namespace ulf::mx1bin::detail
