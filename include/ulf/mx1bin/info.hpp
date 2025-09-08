@@ -67,20 +67,36 @@ constexpr uint8_t make_header_info(FrameType frameType,
          std::to_underlying(sender) | std::to_underlying(stationType);
 }
 
+constexpr FrameType get_frame_type(uint8_t const info) {
+  return static_cast<FrameType>(info & frame_type_msk);
+}
+
 constexpr FrameType get_frame_type(std::span<uint8_t const> frame) {
-  return static_cast<FrameType>((frame[2] & frame_type_msk));
+  return get_frame_type(frame[2]);
+}
+
+constexpr MessageType get_message_type(uint8_t const info) {
+  return static_cast<MessageType>(info & message_type_msk);
 }
 
 constexpr MessageType get_message_type(std::span<uint8_t const> frame) {
-  return static_cast<MessageType>((frame[2] & message_type_msk));
+  return get_message_type(frame[2]);
+}
+
+constexpr Sender get_sender(uint8_t const info) {
+  return static_cast<Sender>(info & sender_msk);
 }
 
 constexpr Sender get_sender(std::span<uint8_t const> frame) {
-  return static_cast<Sender>((frame[2] & sender_msk));
+  return get_sender(frame[2]);
+}
+
+constexpr StationType get_station_type(uint8_t const info) {
+  return static_cast<StationType>(info & station_type_msk);
 }
 
 constexpr StationType get_station_type(std::span<uint8_t const> frame) {
-  return static_cast<StationType>((frame[2] & station_type_msk));
+  return get_station_type(frame[2]);
 }
 
 } // namespace ulf::mx1bin
