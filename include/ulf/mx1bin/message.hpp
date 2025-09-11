@@ -46,6 +46,10 @@ constexpr std::expected<T, std::errc> decode(R const& r) {
 }
 
 struct Reset : public detail::Head {
+  template<detail::encoder E>
+  auto encode(E e) {
+    return Head::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<Reset, std::errc> decode(D& d) {
     if (auto const result{Head::decode(d)}) return Reset{*result};
@@ -54,6 +58,10 @@ struct Reset : public detail::Head {
 };
 
 struct Nak : public detail::Head {
+  template<detail::encoder E>
+  auto encode(E e) {
+    return Head::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<Nak, std::errc> decode(D& d) {
     if (auto const result{Head::decode(d)}) return Nak{*result};
@@ -69,15 +77,30 @@ struct Nak : public detail::Head {
 struct TrackControl : public detail::Head {
   struct Reply : public detail::ReplyHead {
     uint8_t statusBits{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_8(statusBits, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      ReplyHead::encode(e);
+      e.uint8(statusBits);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base || !d.has_at_least(sizeof(cAction)))
+        return std::unexpected(std::errc::invalid_argument);
+      Reply result{*base};
+      result.statusBits = d.uint8();
+      return result;
     }
   };
 
   uint8_t cAction{}; ///> Action
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = Head::encode(e);
+    e.uint8(cAction);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<TrackControl, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
@@ -91,9 +114,13 @@ struct TrackControl : public detail::Head {
 
 struct DecoderControl : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      return ReplyDecoderControlBase::encode(out);
+    template<detail::encoder E>
+    auto encode(E e) const {
+      return ReplyDecoderControlBase::encode(e);
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      return ReplyDecoderControlBase::decode(d);
     }
   };
 
@@ -103,6 +130,17 @@ struct DecoderControl : public detail::DecoderControlBase {
   std::optional<uint8_t> cData3{}; ///>
   std::optional<uint8_t> cData4{}; ///>
   std::optional<uint8_t> cData5{}; ///>
+  template<detail::encoder E>
+  auto encode(E e) {
+    e = DecoderControlBase::encode(e);
+    e.uint8(cSpeed);
+    e.uint8(cData1);
+    e.uint8(cData2);
+    e.uint8(cData3);
+    e.uint8(cData4);
+    e.uint8(cData5);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<DecoderControl, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
@@ -122,9 +160,15 @@ struct DecoderControl : public detail::DecoderControlBase {
 
 struct InvertFunctionBits : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      return ReplyDecoderControlBase::encode(out);
+    template<detail::encoder E>
+    auto encode(E e) const {
+      return ReplyDecoderControlBase::encode(e);
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      if (auto const base{ReplyDecoderControlBase::decode(d)})
+        return Reply{*base};
+      else return std::unexpected(base.error());
     }
   };
 
@@ -133,6 +177,16 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
   uint8_t cData3{}; ///>
   uint8_t cData4{}; ///>
   uint8_t cData5{}; ///>
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = ReplyDecoderControlBase::encode(e);
+    e.uint8(cData1);
+    e.uint8(cData2);
+    e.uint8(cData3);
+    e.uint8(cData4);
+    e.uint8(cData5);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<InvertFunctionBits, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
@@ -152,13 +206,25 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
 
 struct Acceleration : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      return ReplyDecoderControlBase::encode(out);
+    template<detail::encoder E>
+    auto encode(E e) const {
+      return ReplyDecoderControlBase::encode(e);
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      if (auto const base{ReplyDecoderControlBase::decode(d)})
+        return Reply{*base};
+      else return std::unexpected{base.error()};
     }
   };
 
   uint8_t cAzBz{}; ///> Accelleration / Deccelleration
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = ReplyDecoderControlBase::encode(e);
+    e.uint8(cAzBz);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<Acceleration, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
@@ -176,8 +242,18 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
     auto encode(OutputIt& out) const {
       return ReplyDecoderControlBase::encode(out);
     }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      if (auto const base{ReplyDecoderControlBase::decode(d)})
+        return Reply{*base};
+      else return std::unexpected(base.error());
+    }
   };
 
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return ReplyDecoderControlBase::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<ShuttleTrain, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})
@@ -188,11 +264,22 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
 
 struct Accessory : public detail::ShuttleTrain_Accessory_Base {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      return ReplyDecoderControlBase::encode(out);
+    template<detail::encoder E>
+    auto encode(E e) const {
+      return ReplyDecoderControlBase::encode(e);
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      if (auto const base{ReplyDecoderControlBase::decode(d)})
+        return Reply{*base};
+      else return std::unexpected(base.error());
     }
   };
+
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return ReplyDecoderControlBase::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<Accessory, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})

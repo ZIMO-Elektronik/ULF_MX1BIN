@@ -42,6 +42,14 @@ struct Encoder {
     *_iter++ = v;
   }
 
+  /// Overloaded Encode uint8
+  ///
+  /// @param v Optional value
+  /// @see Encoder::uint8(uint8_t)
+  inline void uint8(std::optional<uint8_t> v) {
+    if (v) return uint8(*v);
+  }
+
   /// Encode uint16
   ///
   /// @warning UB if out of space
@@ -49,6 +57,14 @@ struct Encoder {
   void uint16(uint16_t v) {
     uint8(v & 0xFF00u >> 8u);
     uint8(v & 0x00FFu >> 0u);
+  }
+
+  /// Overloaded Encode uint16
+  ///
+  /// @param v Optional value
+  /// @see Encoder::uint16(uint16_t)
+  inline void uint16(std::optional<uint16_t> v) {
+    if (v) return uint16(*v);
   }
 
 private:
