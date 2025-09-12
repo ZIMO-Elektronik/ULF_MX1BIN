@@ -20,24 +20,22 @@ namespace ulf::mx1bin {
 template<Encodable E>
 constexpr Packet response2mx1bin(E& re) {
   Packet result{};
-  auto iter{begin(result)};
-  *iter++ = detail::soh;
-  *iter++ = detail::soh;
+  detail::Encoder e{result};
+  e.addSOF();
 
-  re.encode(iter);
+  e = re.encode(e);
 
-  result.resize(static_cast<Packet::size_type>(iter - begin(result)));
+  result.resize(e.difference());
 
   if constexpr (Long<E>) {
-    detail::encode_16(crc16(std::span<uint8_t const>{result}.subspan(2uz)),
-                      iter);
+    e.uint16(crc16(std::span<uint8_t const>{result}.subspan(2uz)));
   } else {
-    detail::encode_8(crc8(std::span<uint8_t const>{result}.subspan(2uz)), iter);
+    e.uint8(crc8(std::span<uint8_t const>{result}.subspan(2uz)));
   }
 
-  *iter++ = detail::eot;
+  e.addEOT();
 
-  result.resize(static_cast<Packet::size_type>(iter - begin(result)));
+  result.resize(e.difference());
 
   return result;
 }

@@ -19,8 +19,10 @@ struct Encoder {
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
              std::convertible_to<std::ranges::sentinel_t<R>, S>
-  Encoder(R&& r) : _iter{std::ranges::begin(r)}, _end{std::ranges::end(r)} {}
-  Encoder(I iter, S end) : _iter{iter}, _end{end} {}
+  Encoder(R&& r)
+    : _iter{std::ranges::begin(r)}, _begin{std::ranges::begin(r)},
+      _end{std::ranges::end(r)} {}
+  Encoder(I iter, S end) : _iter{iter}, _begin{iter}, _end{end} {}
   Encoder(Encoder const& d) = default;
 
   void addSOF() {
@@ -28,7 +30,9 @@ struct Encoder {
     *_iter++ = soh;
   }
 
-  void addEOH() { *_iter++ = eot; }
+  void addEOT() { *_iter++ = eot; }
+
+  size_t difference() { return std::distance(_begin, _iter); }
 
   /// Encode uint8
   ///
@@ -38,8 +42,7 @@ struct Encoder {
     if (is_control_char(v)) {
       *_iter++ = dle;
       *_iter++ = v ^ cypher;
-    }
-    *_iter++ = v;
+    } else *_iter++ = v;
   }
 
   /// Overloaded Encode uint8
@@ -55,8 +58,8 @@ struct Encoder {
   /// @warning UB if out of space
   /// @param v Value
   void uint16(uint16_t v) {
-    uint8(v & 0xFF00u >> 8u);
-    uint8(v & 0x00FFu >> 0u);
+    uint8(static_cast<uint8_t>((v & 0xFF00u) >> 8u));
+    uint8(static_cast<uint8_t>((v & 0x00FFu) >> 0u));
   }
 
   /// Overloaded Encode uint16
@@ -68,11 +71,9 @@ struct Encoder {
   }
 
 private:
-  /// Iterator
-  I _iter;
-
-  /// End
-  S _end;
+  I _iter;  ///> Iterator
+  I _begin; ///> Begin
+  S _end;   ///> End
 };
 
 // Deduction guides

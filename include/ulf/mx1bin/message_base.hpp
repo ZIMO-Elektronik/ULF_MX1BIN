@@ -35,7 +35,9 @@ struct Head {
   static std::expected<Head, std::errc> decode(D& d) {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code)))
       return std::unexpected{std::errc::invalid_argument};
-    return Head{.uSID{d.uint8()}, .info{d.uint8()}, .code{d.uint8()}};
+    return Head{.uSID{d.uint8()},
+                .info{d.uint8()},
+                .code{static_cast<Command>(d.uint8())}};
   }
 };
 

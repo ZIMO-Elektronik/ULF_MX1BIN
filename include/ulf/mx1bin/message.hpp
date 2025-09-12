@@ -23,11 +23,9 @@ namespace ulf::mx1bin {
 
 /// Encodable concept
 template<typename T,
-         typename OutputIt = std::back_insert_iterator<std::vector<uint8_t>>>
+         typename E = detail::Encoder<unsigned char*, unsigned char*>>
 concept Encodable = requires {
-  {
-    &T::template encode<OutputIt>
-  } -> std::same_as<OutputIt (T::*)(OutputIt&) const>;
+  { &T::template encode<E> } -> std::same_as<E (T::*)(E) const>;
 };
 
 /// Decodable concept
@@ -179,7 +177,7 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
   uint8_t cData5{}; ///>
   template<detail::encoder E>
   auto encode(E e) const {
-    e = ReplyDecoderControlBase::encode(e);
+    e = DecoderControlBase::encode(e);
     e.uint8(cData1);
     e.uint8(cData2);
     e.uint8(cData3);
@@ -221,7 +219,7 @@ struct Acceleration : public detail::DecoderControlBase {
   uint8_t cAzBz{}; ///> Accelleration / Deccelleration
   template<detail::encoder E>
   auto encode(E e) const {
-    e = ReplyDecoderControlBase::encode(e);
+    e = DecoderControlBase::encode(e);
     e.uint8(cAzBz);
     return e;
   }
@@ -252,7 +250,7 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
 
   template<detail::encoder E>
   auto encode(E e) const {
-    return ReplyDecoderControlBase::encode(e);
+    return ShuttleTrain_Accessory_Base::encode(e);
   }
   template<detail::decoder D>
   static std::expected<ShuttleTrain, std::errc> decode(D& d) {
@@ -278,7 +276,7 @@ struct Accessory : public detail::ShuttleTrain_Accessory_Base {
 
   template<detail::encoder E>
   auto encode(E e) const {
-    return ReplyDecoderControlBase::encode(e);
+    return ShuttleTrain_Accessory_Base::encode(e);
   }
   template<detail::decoder D>
   static std::expected<Accessory, std::errc> decode(D& d) {
@@ -299,22 +297,46 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
     uint8_t cStatus{};
     uint8_t cData4{};
     uint8_t cData5{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyErrorBase::encode(out);
-      detail::encode_16(cAdr, out);
-      detail::encode_8(cSpeed, out);
-      detail::encode_8(cData1, out);
-      detail::encode_8(cData2, out);
-      detail::encode_8(cData3, out);
-      detail::encode_8(cAzBz, out);
-      detail::encode_8(cStatus, out);
-      detail::encode_8(cData4, out);
-      detail::encode_8(cData5, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyErrorBase::encode(e);
+      e.uint16(cAdr);
+      e.uint8(cSpeed);
+      e.uint8(cData1);
+      e.uint8(cData2);
+      e.uint8(cData3);
+      e.uint8(cAzBz);
+      e.uint8(cStatus);
+      e.uint8(cData4);
+      e.uint8(cData5);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyErrorBase::decode(d)};
+      if (!base ||
+          !d.has_at_least(sizeof(cAdr) + sizeof(cSpeed) + sizeof(cData1) +
+                          sizeof(cData2) + sizeof(cData3) + sizeof(cAzBz) +
+                          sizeof(cStatus) + sizeof(cData4) + sizeof(cData5)))
+        return std::unexpected(base.error());
+      Reply result{*base};
+      result.cAdr = d.uint16();
+      result.cSpeed = d.uint8();
+      result.cData1 = d.uint8();
+      result.cData2 = d.uint8();
+      result.cData3 = d.uint8();
+      result.cAzBz = d.uint8();
+      result.cStatus = d.uint8();
+      result.cData4 = d.uint8();
+      result.cData5 = d.uint8();
+      return result;
     }
   };
 
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return DecoderControlBase::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<LocoMemoryQuery, std::errc> decode(D& d) {
     if (auto const base{DecoderControlBase::decode(d)})
@@ -328,16 +350,32 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
     uint16_t cAdr{};
     uint8_t cPair{};
     uint8_t cOutputs{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyErrorBase::encode(out);
-      detail::encode_16(cAdr, out);
-      detail::encode_8(cPair, out);
-      detail::encode_8(cOutputs, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyErrorBase::encode(e);
+      e.uint16(cAdr);
+      e.uint8(cPair);
+      e.uint8(cOutputs);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyErrorBase::decode(d)};
+      if (!base ||
+          !d.has_at_least(sizeof(cAdr) + sizeof(cPair) + sizeof(cOutputs)))
+        return std::unexpected{std::errc::invalid_argument};
+      Reply result{*base};
+      result.cAdr = d.uint16();
+      result.cPair = d.uint8();
+      result.cOutputs = d.uint8();
+      return result;
     }
   };
 
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return ReplyErrorBase(e);
+  }
   template<detail::decoder D>
   static std::expected<AccessoryMemoryQuery, std::errc> decode(D& d) {
     if (auto const base{DecoderControlBase::decode(d)})
@@ -350,17 +388,34 @@ struct AddressControl : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyHead {
     uint8_t payload{};
     uint8_t cOutputs{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_8(payload, out);
-      detail::encode_8(cOutputs, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyHead::encode(e);
+      e.uint8(payload);
+      e.uint8(cOutputs);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base || d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
+        return std::unexpected{std::errc::invalid_argument};
+      Reply result{*base};
+      result.payload = d.uint8();
+      result.cOutputs = d.uint8();
+      return result;
     }
   };
 
   uint8_t cControl{};                ///>
   std::optional<uint8_t> cOutputs{}; ///>
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = DecoderControlBase::encode(e);
+    e.uint8(cControl);
+    e.uint8(cOutputs);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<AddressControl, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
@@ -382,16 +437,32 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
     uint16_t cCurrent2{};
     uint8_t cVoltage2{};
     uint8_t cAux{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_8(values, out);
-      detail::encode_16(cCurrent1, out);
-      detail::encode_8(cVoltage1, out);
-      detail::encode_16(cCurrent2, out);
-      detail::encode_8(cVoltage2, out);
-      detail::encode_8(cAux, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyHead::encode(e);
+      e.uint8(values);
+      e.uint16(cCurrent1);
+      e.uint8(cVoltage1);
+      e.uint16(cCurrent2);
+      e.uint8(cVoltage2);
+      e.uint8(cAux);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base || !d.has_at_least(sizeof(values) + sizeof(cCurrent1) +
+                                   sizeof(cVoltage1) + sizeof(cCurrent2) +
+                                   sizeof(cVoltage2) + sizeof(cAux)))
+        return std::unexpected{std::errc::invalid_argument};
+      Reply result{base};
+      result.values = d.uint8();
+      result.cCurrent1 = d.uint16();
+      result.cVoltage1 = d.uint8();
+      result.cCurrent2 = d.uint16();
+      result.cVoltage2 = d.uint8();
+      result.cAux = d.uint8();
+      return result;
     }
   };
   template<detail::decoder D>
@@ -405,16 +476,32 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
 struct CommandStationCvManip : public detail::Head {
   struct Reply : public detail::ReplyErrorBase {
     uint8_t value{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyErrorBase::encode(out);
-      detail::encode_8(value, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyErrorBase::encode(e);
+      e.uint8(value);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyErrorBase::decode(d)};
+      if (!base || !d.has_at_least(sizeof(value)))
+        return std::unexpected{std::errc::invalid_argument};
+      Reply result{*base};
+      result.value = d.uint8();
+      return result;
     }
   };
 
   uint16_t variable{};            ///> Cv Address
   std::optional<uint8_t> value{}; ///> Cv Value
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = Head::encode(e);
+    e.uint16(variable);
+    e.uint8(value);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<CommandStationCvManip, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
@@ -449,32 +536,36 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
     std::optional<uint8_t> cSerNum_mh{}; ///> Serial Number [1]
     std::optional<uint8_t> cSerNum_ml{}; ///> Serial Number [2]
     std::optional<uint8_t> cSerNum_lo{}; ///> Serial Number [3]
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyLongHead::encode(out);
-      detail::encode_16(cAddress, out);
-      detail::encode_8(cDevice, out);
-      detail::encode_8(cRom_size, out);
-      detail::encode_8(cRam_size, out);
-      detail::encode_16(cPrintver, out);
-      detail::encode_16(cVersion, out);
-      detail::encode_8(cDate_day, out);
-      detail::encode_8(cDate_month, out);
-      detail::encode_8(cDate_century, out);
-      detail::encode_8(cDate_year, out);
-      detail::encode_8(cSwitches, out);
-      detail::encode_8(cDevelopVersion, out);
-      detail::encode_16(cBootRom, out);
-      detail::encode_8(cBootRom_develop, out);
-      detail::encode_8(values, out);
-      if (cSerNum_hi) detail::encode_8(*cSerNum_hi, out);
-      if (cSerNum_mh) detail::encode_8(*cSerNum_mh, out);
-      if (cSerNum_ml) detail::encode_8(*cSerNum_ml, out);
-      if (cSerNum_lo) detail::encode_8(*cSerNum_lo, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyLongHead::encode(e);
+      e.uint16(cAddress);
+      e.uint8(cDevice);
+      e.uint8(cRom_size);
+      e.uint8(cRam_size);
+      e.uint16(cPrintver);
+      e.uint16(cVersion);
+      e.uint8(cDate_day);
+      e.uint8(cDate_month);
+      e.uint8(cDate_century);
+      e.uint8(cDate_year);
+      e.uint8(cSwitches);
+      e.uint8(cDevelopVersion);
+      e.uint16(cBootRom);
+      e.uint8(cBootRom_develop);
+      e.uint8(values);
+      e.uint8(cSerNum_hi);
+      e.uint8(cSerNum_mh);
+      e.uint8(cSerNum_ml);
+      e.uint8(cSerNum_lo);
+      return e;
     }
   };
 
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return CommandStationQueryBase::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<CommandStationEquipmentQuery, std::errc> decode(D& d) {
     if (auto const base{CommandStationQueryBase::decode(d)})
@@ -486,6 +577,13 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
 struct SerialInfo : public detail::Head {
   uint8_t toolID{}; ///> Tool ID
   uint8_t action{}; ///>
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = Head::encode(e);
+    e.uint8(toolID);
+    e.uint8(action);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<SerialInfo, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
@@ -504,14 +602,27 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     uint16_t variable{};
     uint8_t cValue{};
     uint8_t cError{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_16(cAdr, out);
-      detail::encode_16(variable, out);
-      detail::encode_8(cValue, out);
-      detail::encode_8(cError, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyHead::encode(e);
+      e.uint16(cAdr);
+      e.uint16(variable);
+      e.uint8(cValue);
+      e.uint8(cError);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
+                                   sizeof(cValue) + sizeof(cError)))
+        return std::unexpected{std::errc::invalid_argument};
+      Reply result{*base};
+      result.cAdr = d.uint16();
+      result.variable = d.uint16();
+      result.cValue = d.uint8();
+      result.cError = d.uint8();
+      return result;
     }
   };
 
@@ -522,36 +633,65 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     std::optional<uint8_t> activeUSID{};
     std::optional<uint16_t> activeAddr{};
     std::optional<uint16_t> activeCv{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_8(busy, out);
-      detail::encode_16(cAdr, out);
-      detail::encode_16(variable, out);
-      if (!activeUSID) return out;
-      detail::encode_8(*activeUSID, out);
-      if (!activeAddr) return out;
-      detail::encode_16(*activeAddr, out);
-      if (!activeCv) return out;
-      detail::encode_16(*activeCv, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyHead::encode(e);
+      e.uint8(busy);
+      e.uint16(cAdr);
+      e.uint16(variable);
+      e.uint8(activeUSID);
+      e.uint16(activeAddr);
+      e.uint16(activeCv);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Busy, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base ||
+          !d.has_at_least(sizeof(busy) + sizeof(cAdr) + sizeof(variable)))
+        return std::unexpected{std::errc::invalid_argument};
+      Busy result{*base};
+      d.uint8(); /// Busy is always 0x04
+      result.cAdr = d.uint8();
+      result.variable = d.uint8();
+      result.activeUSID = d.s_uint8();
+      result.activeAddr = d.s_uint8();
+      result.activeCv = d.s_uint8();
+      return result;
     }
   };
 
   struct Error : public detail::ReplyHead {
     uint16_t cAdr{};
     uint8_t cError{};
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      ReplyHead::encode(out);
-      detail::encode_16(cAdr, out);
-      detail::encode_8(cError, out);
-      return out;
+    template<detail::encoder E>
+    auto encode(E e) const {
+      e = ReplyHead::encode(e);
+      e.uint16(cAdr);
+      e.uint8(cError);
+      return e;
+    }
+    template<detail::decoder D>
+    static std::expected<Error, std::errc> decode(D& d) {
+      auto const base{ReplyHead::decode(d)};
+      if (!base || d.has_at_least(sizeof(cAdr) + sizeof(cError)))
+        return std::unexpected{std::errc::invalid_argument};
+      Error result{*base};
+      result.cAdr = d.uint16();
+      result.cError = d.uint8();
+      return result;
     }
   };
 
   uint16_t variable{};            ///> Cv Address
   std::optional<uint8_t> value{}; ///> Cv Value
+  template<detail::encoder E>
+  auto encode(E e) const {
+    e = DecoderControlBase::encode(e);
+    e.uint16(variable);
+    e.uint8(value);
+    return e;
+  }
   template<detail::decoder D>
   static std::expected<DecoderCvManip, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
@@ -566,9 +706,9 @@ struct DecoderCvManip : public detail::DecoderControlBase {
 };
 
 struct Ack : public detail::ReplyHead {
-  template<std::output_iterator<uint8_t> OutputIt>
-  auto encode(OutputIt& out) const {
-    return ReplyHead::encode(out);
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return ReplyHead::encode(e);
   }
   template<detail::decoder D>
   static std::expected<Ack, std::errc> decode(D& d) {
@@ -619,8 +759,5 @@ template<typename T>
 concept Short = requires(T t) { requires !Long<T>; };
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
-
-static_assert(Encodable<TrackControl::Reply>);
-static_assert(!Encodable<TrackControl>);
 
 } // namespace ulf::mx1bin

@@ -34,12 +34,12 @@ TEST(decoder, s) {
 
   ulf::mx1bin::detail::Encoder e{q_v};
   e.addSOF();
-  q_v.resize(2u);
-  auto it{std::back_inserter(q_v)};
-  q.encode(it);
-  ulf::mx1bin::detail::encode_8(
-    ulf::mx1bin::crc8(std::span<uint8_t const>{q_v}.subspan(2uz)), it);
-  q_v.push_back(ulf::mx1bin::detail::eot);
+  q.encode(e);
+  q_v.resize(e.difference());
+  e.uint8(ulf::mx1bin::crc8(std::span<uint8_t const>{q_v}.subspan(2uz)));
+  e.addEOT();
+
+  q_v.resize(e.difference());
 
   ulf::mx1bin::detail::Decoder d{q_v};
   d.strip();
