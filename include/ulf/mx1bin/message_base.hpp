@@ -156,7 +156,7 @@ struct ReplyErrorBase : public ReplyHead {
   template<encoder E>
   auto encode(E e) const {
     e = ReplyHead::encode(e);
-    e.uint8(error);
+    e.uint8(std::to_underlying(error));
     return e;
   }
   template<decoder D>
