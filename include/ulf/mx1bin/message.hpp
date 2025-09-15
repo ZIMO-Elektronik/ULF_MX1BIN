@@ -43,15 +43,15 @@ constexpr std::expected<T, std::errc> decode(R const& r) {
   return T::decode(d);
 }
 
-struct Reset : public detail::Head {
+struct Ack : public detail::ReplyHead {
   template<detail::encoder E>
-  auto encode(E e) {
-    return Head::encode(e);
+  auto encode(E e) const {
+    return ReplyHead::encode(e);
   }
   template<detail::decoder D>
-  static std::expected<Reset, std::errc> decode(D& d) {
-    if (auto const result{Head::decode(d)}) return Reset{*result};
-    else return std::unexpected(result.error());
+  static std::expected<Ack, std::errc> decode(D& d) {
+    if (auto const base{ReplyHead::decode(d)}) return Ack{*base};
+    else return std::unexpected(base.error());
   }
 };
 
@@ -65,10 +65,17 @@ struct Nak : public detail::Head {
     if (auto const result{Head::decode(d)}) return Nak{*result};
     else return std::unexpected(result.error());
   }
-  template<std::ranges::input_range R>
-  static auto decode(R const& r) {
-    detail::Decoder d(r);
-    return decode(d);
+};
+
+struct Reset : public detail::Head {
+  template<detail::encoder E>
+  auto encode(E e) {
+    return Head::encode(e);
+  }
+  template<detail::decoder D>
+  static std::expected<Reset, std::errc> decode(D& d) {
+    if (auto const result{Head::decode(d)}) return Reset{*result};
+    else return std::unexpected(result.error());
   }
 };
 
@@ -705,20 +712,10 @@ struct DecoderCvManip : public detail::DecoderControlBase {
   }
 };
 
-struct Ack : public detail::ReplyHead {
-  template<detail::encoder E>
-  auto encode(E e) const {
-    return ReplyHead::encode(e);
-  }
-  template<detail::decoder D>
-  static std::expected<Ack, std::errc> decode(D& d) {
-    if (auto const base{ReplyHead::decode(d)}) return Ack{*base};
-    else return std::unexpected(base.error());
-  }
-};
-
 /// Message
-using Message = std::variant<Reset,
+using Message = std::variant<Ack,
+                             Nak,
+                             Reset,
                              TrackControl,
                              TrackControl::Reply,
                              DecoderControl,

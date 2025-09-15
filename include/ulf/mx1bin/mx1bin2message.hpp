@@ -34,8 +34,10 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   auto frame{**res};
   frame = frame.subspan(2u, size(frame) - 4u);
 
-  auto head{decode<detail::Head>(frame)};
+  auto const head{decode<detail::Head>(frame)};
   if (!head) return std::unexpected(std::errc::invalid_argument);
+
+  auto const type{get_message_type((*head).info)};
 
   /// \todo Usually, we need to differentiate between message types
   switch ((*head).code) {
@@ -55,7 +57,10 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
     case Command::Station_Equipment_Query:
       return decode<CommandStationEquipmentQuery>(frame);
     case Command::Serial_Info: return decode<SerialInfo>(frame);
-    case Command::Cv_Manip: return decode<DecoderCvManip>(frame);
+    case Command::Cv_Manip:
+      if (type == MessageType::Primary) return decode<DecoderCvManip>(frame);
+      else if (type == MessageType::L1Ack) return decode<Ack>(frame);
+      break;
     default: return std::unexpected(std::errc::invalid_argument);
   }
 
