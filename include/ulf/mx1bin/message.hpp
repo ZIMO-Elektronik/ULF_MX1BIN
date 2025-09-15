@@ -57,7 +57,7 @@ struct Ack : public detail::ReplyHead {
 
 struct Nak : public detail::Head {
   template<detail::encoder E>
-  auto encode(E e) {
+  auto encode(E e) const {
     return Head::encode(e);
   }
   template<detail::decoder D>
@@ -69,7 +69,7 @@ struct Nak : public detail::Head {
 
 struct Reset : public detail::Head {
   template<detail::encoder E>
-  auto encode(E e) {
+  auto encode(E e) const {
     return Head::encode(e);
   }
   template<detail::decoder D>
