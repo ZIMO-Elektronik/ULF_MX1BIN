@@ -125,7 +125,9 @@ struct DecoderControl : public detail::DecoderControlBase {
     }
     template<detail::decoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
-      return ReplyDecoderControlBase::decode(d);
+      if (auto const result{ReplyDecoderControlBase::decode(d)})
+        return Reply{*result};
+      else return std::unexpected(result.error());
     }
   };
 

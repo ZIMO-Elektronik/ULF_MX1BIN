@@ -77,7 +77,25 @@ TEST(Message, TrackControl) {
 
 TEST(Message, TrackControl_Reply) {}
 TEST(Message, DecoderControl) {}
-TEST(Message, DecoderControl_Reply) {}
+TEST(Message, DecoderControl_Reply) {
+  CODABLE(ulf::mx1bin::DecoderControl::Reply)
+
+  ulf::mx1bin::DecoderControl::Reply reply{
+    {{{.uSID{0x00},
+       .info{0x01},
+       .code{ulf::mx1bin::Command::Track_Ctrl},
+       .reply_uSID{0x03}}}}};
+  reply.error = ulf::mx1bin::Error::NO_ERROR;
+  reply.payload = 0x8Cu;
+
+  CODE(reply);
+
+  MATCH_HEAD(reply);
+  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.error, d_reply.error);
+  ASSERT_EQ(reply.payload, d_reply.payload);
+}
+
 TEST(Message, InvertFunctionBits) {}
 TEST(Message, InvertFunctionBits_Reply) {}
 TEST(Message, Acceleration) {}

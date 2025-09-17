@@ -174,7 +174,7 @@ struct ReplyDecoderControlBase : public ReplyErrorBase {
   uint8_t payload{}; ///> Payload
   template<encoder E>
   auto encode(E e) const {
-    ReplyErrorBase::encode(e);
+    e = ReplyErrorBase::encode(e);
     e.uint8(payload);
     return e;
   }
