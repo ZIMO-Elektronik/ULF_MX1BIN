@@ -84,7 +84,7 @@ struct TrackControl : public detail::Head {
     uint8_t statusBits{};
     template<detail::encoder E>
     auto encode(E e) const {
-      ReplyHead::encode(e);
+      e = ReplyHead::encode(e);
       e.uint8(statusBits);
       return e;
     }
@@ -138,7 +138,7 @@ struct DecoderControl : public detail::DecoderControlBase {
   std::optional<uint8_t> cData4{}; ///>
   std::optional<uint8_t> cData5{}; ///>
   template<detail::encoder E>
-  auto encode(E e) {
+  auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cSpeed);
     e.uint8(cData1);
@@ -245,9 +245,9 @@ struct Acceleration : public detail::DecoderControlBase {
 
 struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<std::output_iterator<uint8_t> OutputIt>
-    auto encode(OutputIt& out) const {
-      return ReplyDecoderControlBase::encode(out);
+    template<detail::encoder E>
+    auto encode(E e) const {
+      return ReplyDecoderControlBase::encode(e);
     }
     template<detail::decoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
@@ -383,7 +383,7 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
 
   template<detail::encoder E>
   auto encode(E e) const {
-    return ReplyErrorBase(e);
+    return DecoderControlBase::encode(e);
   }
   template<detail::decoder D>
   static std::expected<AccessoryMemoryQuery, std::errc> decode(D& d) {
@@ -407,7 +407,7 @@ struct AddressControl : public detail::DecoderControlBase {
     template<detail::decoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
-      if (!base || d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
+      if (!base || !d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
         return std::unexpected{std::errc::invalid_argument};
       Reply result{*base};
       result.payload = d.uint8();
@@ -464,7 +464,7 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
                                    sizeof(cVoltage1) + sizeof(cCurrent2) +
                                    sizeof(cVoltage2) + sizeof(cAux)))
         return std::unexpected{std::errc::invalid_argument};
-      Reply result{base};
+      Reply result{*base};
       result.values = d.uint8();
       result.cCurrent1 = d.uint16();
       result.cVoltage1 = d.uint8();
@@ -474,6 +474,10 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
       return result;
     }
   };
+  template<detail::encoder E>
+  auto encode(E e) const {
+    return CommandStationQueryBase::encode(e);
+  }
   template<detail::decoder D>
   static std::expected<CommandStationIOQuery, std::errc> decode(D& d) {
     if (auto const base{CommandStationQueryBase::decode(d)})
