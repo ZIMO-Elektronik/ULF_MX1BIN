@@ -15,6 +15,7 @@
 #include <span>
 #include <variant>
 #include <ztl/inplace_vector.hpp>
+#include "bitfields.hpp"
 #include "decoder.hpp"
 #include "message_base.hpp"
 #include "utility.hpp"
@@ -37,6 +38,13 @@ concept Decodable =
     { T::decode(d) } -> std::same_as<std::expected<T, std::errc>>;
   };
 
+/// Decode helper
+///
+/// \tparam T Decodable type
+/// \tparam R Range type
+/// \param r  Input range
+/// \retval T         Decoded message
+/// \retval std::errc Malformed stream
 template<Decodable T, std::ranges::input_range R>
 constexpr std::expected<T, std::errc> decode(R const& r) {
   detail::Decoder d(r);
@@ -81,7 +89,7 @@ struct Reset : public detail::Head {
 
 struct TrackControl : public detail::Head {
   struct Reply : public detail::ReplyHead {
-    uint8_t statusBits{};
+    struct bitfields::TrackStatus statusBits{}; ///< Track status
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
@@ -99,7 +107,12 @@ struct TrackControl : public detail::Head {
     }
   };
 
-  uint8_t cAction{}; ///> Action
+  enum Action : uint8_t {
+    StopBroadcast = 0u,
+    TrackOff = 1u,
+    TrackOn = 2u,
+    Query = 3u
+  } cAction{}; ///> Action
   template<detail::encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
@@ -112,7 +125,7 @@ struct TrackControl : public detail::Head {
     if (!base || !d.has_at_least(sizeof(cAction)))
       return std::unexpected(std::errc::invalid_argument);
     TrackControl result{*base};
-    result.cAction = d.uint8();
+    result.cAction = static_cast<Action>(d.uint8());
     return result;
   }
 };
@@ -131,12 +144,12 @@ struct DecoderControl : public detail::DecoderControlBase {
     }
   };
 
-  uint8_t cSpeed{};                ///> Speed
-  std::optional<uint8_t> cData1{}; ///>
-  std::optional<uint8_t> cData2{}; ///>
-  std::optional<uint8_t> cData3{}; ///>
-  std::optional<uint8_t> cData4{}; ///>
-  std::optional<uint8_t> cData5{}; ///>
+  uint8_t cSpeed{};                               ///> Speed
+  std::optional<bitfields::ControlData> cData1{}; ///> Control data
+  std::optional<uint8_t> cData2{};                ///> F1..8
+  std::optional<uint8_t> cData3{};                ///> F9..12
+  std::optional<uint8_t> cData4{};                ///> F13..20
+  std::optional<uint8_t> cData5{};                ///> F21..28
   template<detail::encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -179,11 +192,11 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
     }
   };
 
-  uint8_t cData1{}; ///>
-  uint8_t cData2{}; ///>
-  uint8_t cData3{}; ///>
-  uint8_t cData4{}; ///>
-  uint8_t cData5{}; ///>
+  bitfields::ControlData cData1{}; ///> Control data
+  uint8_t cData2{};                ///> F1..8
+  uint8_t cData3{};                ///> F9..12
+  uint8_t cData4{};                ///> F13..20
+  uint8_t cData5{};                ///> F21..28
   template<detail::encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -225,7 +238,7 @@ struct Acceleration : public detail::DecoderControlBase {
     }
   };
 
-  uint8_t cAzBz{}; ///> Accelleration / Deccelleration
+  uint8_t cAzBz{}; ///> Accel / Break time
   template<detail::encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -297,15 +310,15 @@ struct Accessory : public detail::ShuttleTrain_Accessory_Base {
 
 struct LocoMemoryQuery : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyErrorBase {
-    uint16_t cAdr{};
-    uint8_t cSpeed{};
-    uint8_t cData1{};
-    uint8_t cData2{};
-    uint8_t cData3{};
-    uint8_t cAzBz{};
-    uint8_t cStatus{};
-    uint8_t cData4{};
-    uint8_t cData5{};
+    bitfields::DecoderAddress cAdr{}; ///< Address
+    uint8_t cSpeed{};                 ///< Speed
+    bitfields::ControlData cData1{};  ///< Control data
+    uint8_t cData2{};                 ///< F1..8
+    uint8_t cData3{};                 ///< F9..12
+    uint8_t cAzBz{};                  ///< Accel / Break time
+    uint8_t cStatus{};                ///< Active / inactive
+    uint8_t cData4{};                 ///< F13..20
+    uint8_t cData5{};                 ///< F21..28
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyErrorBase::encode(e);
@@ -356,9 +369,9 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
 
 struct AccessoryMemoryQuery : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyErrorBase {
-    uint16_t cAdr{};
-    uint8_t cPair{};
-    uint8_t cOutputs{};
+    bitfields::DecoderAddress cAdr{};
+    uint8_t cPair{};    ///<
+    uint8_t cOutputs{}; ///< Acc decoder outputs
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyErrorBase::encode(e);
@@ -395,8 +408,8 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
 
 struct AddressControl : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyHead {
-    uint8_t payload{};
-    uint8_t cOutputs{};
+    bitfields::AddressControl_Payload payload{}; ///< Control params
+    uint8_t cOutputs{};                          ///< Acc decoder outputs
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
@@ -416,8 +429,8 @@ struct AddressControl : public detail::DecoderControlBase {
     }
   };
 
-  uint8_t cControl{};                ///>
-  std::optional<uint8_t> cOutputs{}; ///>
+  bitfields::AddressControl_Control cControl{}; ///> Control parameters
+  std::optional<uint8_t> cOutputs{};            ///> Acc decoder outputs
   template<detail::encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -611,7 +624,7 @@ struct SerialInfo : public detail::Head {
 
 struct DecoderCvManip : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyHead {
-    uint16_t cAdr{};
+    bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
     uint8_t cValue{};
     uint8_t cError{};
@@ -641,7 +654,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
 
   struct Busy : public detail::ReplyHead {
     uint8_t const busy{0x04u};
-    uint16_t cAdr{};
+    bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
     std::optional<uint8_t> activeUSID{};
     std::optional<uint16_t> activeAddr{};
@@ -675,7 +688,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
   };
 
   struct Error : public detail::ReplyHead {
-    uint16_t cAdr{};
+    bitfields::DecoderAddress cAdr{};
     uint8_t cError{};
     template<detail::encoder E>
     auto encode(E e) const {

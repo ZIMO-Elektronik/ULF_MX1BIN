@@ -37,7 +37,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   auto const head{decode<detail::Head>(frame)};
   if (!head) return std::unexpected(std::errc::invalid_argument);
 
-  auto const type{get_message_type((*head).info)};
+  auto const type{(*head).info.messageType};
 
   /// \todo Usually, we need to differentiate between message types
   switch ((*head).code) {

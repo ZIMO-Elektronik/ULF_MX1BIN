@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <span>
 #include <ztl/inplace_vector.hpp>
+#include "bitfields.hpp"
 #include "commands.hpp"
 #include "decoder.hpp"
 #include "encoder.hpp"
@@ -21,13 +22,13 @@
 namespace ulf::mx1bin::detail {
 
 struct Head {
-  uint8_t uSID{}; ///> Unique Service ID
-  uint8_t info{}; ///> Header info byte
-  Command code{}; ///> Command code
+  uint8_t uSID{};         ///> Unique Service ID
+  bitfields::Info info{}; ///> Header info byte
+  Command code{};         ///> Command code
   template<encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
-    e.uint8(info);
+    e.uint8(static_cast<uint8_t>(info));
     e.uint8(std::to_underlying(code));
     return e;
   }
@@ -42,7 +43,7 @@ struct Head {
 };
 
 struct DecoderControlBase : public Head {
-  uint16_t cAdr{}; ///> Decoder Address
+  bitfields::DecoderAddress cAdr{}; ///> Decoder Address
   template<encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
@@ -99,14 +100,14 @@ struct CommandStationQueryBase : public detail::Head {
 };
 
 struct ReplyHead {
-  uint8_t uSID{};       ///> Unique Service ID
-  uint8_t info{};       ///> Header info byte
-  Command code{};       ///> Command code
-  uint8_t reply_uSID{}; ///> Reply uSID reference
+  uint8_t uSID{};         ///> Unique Service ID
+  bitfields::Info info{}; ///> Header info byte
+  Command code{};         ///> Command code
+  uint8_t reply_uSID{};   ///> Reply uSID reference
   template<encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
-    e.uint8(info);
+    e.uint8(static_cast<uint8_t>(info));
     e.uint8(std::to_underlying(code));
     e.uint8(reply_uSID);
     return e;
@@ -116,23 +117,23 @@ struct ReplyHead {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(Command) +
                         sizeof(reply_uSID)))
       return std::unexpected{std::errc::invalid_argument};
-    return ReplyHead{.uSID = d.uint8(),
-                     .info = d.uint8(),
-                     .code = static_cast<Command>(d.uint8()),
-                     .reply_uSID = d.uint8()};
+    return ReplyHead{.uSID{d.uint8()},
+                     .info{d.uint8()},
+                     .code{static_cast<Command>(d.uint8())},
+                     .reply_uSID{d.uint8()}};
   }
 };
 
 struct ReplyLongHead {
   uint8_t uSID{};           ///> Unique Service ID
-  uint8_t info{};           ///> Header info byte
+  bitfields::Info info{};   ///> Header info byte
   Command code{};           ///> Command code
   uint8_t lengthOfHeader{}; ///> Length of header
   uint8_t reply_uSID{};     ///> Reply uSID reference
   template<encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
-    e.uint8(info);
+    e.uint8(static_cast<uint8_t>(info));
     e.uint8(std::to_underlying(code));
     e.uint8(lengthOfHeader);
     e.uint8(reply_uSID);
@@ -171,11 +172,11 @@ struct ReplyErrorBase : public ReplyHead {
 };
 
 struct ReplyDecoderControlBase : public ReplyErrorBase {
-  uint8_t payload{}; ///> Payload
+  bitfields::ControlPayload payload{}; ///> Payload
   template<encoder E>
   auto encode(E e) const {
     e = ReplyErrorBase::encode(e);
-    e.uint8(payload);
+    e.uint8(static_cast<uint8_t>(payload));
     return e;
   }
   template<decoder D>

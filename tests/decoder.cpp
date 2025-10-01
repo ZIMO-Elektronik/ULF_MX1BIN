@@ -25,10 +25,10 @@ TEST(decoder, strip) {
 TEST(decoder, s) {
   ulf::mx1bin::CommandStationEquipmentQuery q{};
   q.code = ulf::mx1bin::Command::Station_Equipment_Query;
-  q.info = ulf::mx1bin::make_header_info(ulf::mx1bin::FrameType::Short,
-                                         ulf::mx1bin::MessageType::Primary,
-                                         ulf::mx1bin::Sender::PC,
-                                         ulf::mx1bin::StationType::MX1);
+  q.info.frameType = ulf::mx1bin::FrameType::Short;
+  q.info.messageType = ulf::mx1bin::MessageType::Primary;
+  q.info.sender = ulf::mx1bin::Sender::PC;
+  q.info.stationType = ulf::mx1bin::StationType::MX1;
 
   ztl::inplace_vector<uint8_t, 80u> q_v{};
 

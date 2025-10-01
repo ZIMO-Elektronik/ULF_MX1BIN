@@ -1,9 +1,43 @@
 #pragma once
 
 #include <span>
+#include <ztl/ztl.hpp>
 #include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
+
+template<typename T>
+struct is_std_optional : std::false_type {};
+
+/// Is std::optional trait
+/// \tparam T Type
+template<typename T>
+struct is_std_optional<std::optional<T>> : std::true_type {};
+
+template<typename T>
+struct optional_inner_type {};
+
+/// Inner type of optional
+/// \tparam T Type
+template<typename T>
+struct optional_inner_type<std::optional<T>> {
+  using type = T;
+};
+
+/// Is implicitly or explicitly convertible to
+template<typename _From, typename _To>
+concept convertible_to = std::is_convertible_v<_From, _To> ||
+                         requires { static_cast<_To>(std::declval<_From>()); };
+
+template<typename T, typename To>
+concept ConvertibleTo = convertible_to<T, To>;
+
+/// Optional and is convertible to
+template<typename T, typename To>
+concept OptionalConvertibleTo =
+  is_std_optional<std::remove_cvref_t<T>>::value &&
+  convertible_to<typename optional_inner_type<std::remove_cvref_t<T>>::type,
+                 To>;
 
 /// Encoder concept
 template<typename T>
@@ -36,9 +70,13 @@ struct Encoder {
 
   /// Encode uint8
   ///
-  /// @warning UB if out of space
-  /// @param v Value
-  void uint8(uint8_t v) {
+  /// \tparam T Type
+  /// \param  t Value
+  /// \warning UB if out of space
+  template<typename T>
+  requires ConvertibleTo<T, uint8_t>
+  void uint8(T&& t) {
+    auto const v{static_cast<uint8_t>(t)};
     if (is_control_char(v)) {
       *_iter++ = dle;
       *_iter++ = v ^ cypher;
@@ -47,25 +85,35 @@ struct Encoder {
 
   /// Overloaded Encode uint8
   ///
-  /// @param v Optional value
-  /// @see Encoder::uint8(uint8_t)
-  inline void uint8(std::optional<uint8_t> v) {
-    if (v) return uint8(*v);
+  /// \tparam T Optional type
+  /// \param  v Optional value
+  /// \see Encoder::uint8(uint8_t)
+  template<typename T>
+  requires OptionalConvertibleTo<T, uint8_t>
+  inline void uint8(T&& t) {
+    if (t) return uint8(static_cast<uint8_t>(*t));
   }
 
   /// Encode uint16
   ///
-  /// @warning UB if out of space
-  /// @param v Value
-  void uint16(uint16_t v) {
+  /// \tparam T Type
+  /// \param  t Value
+  /// \warning UB if out of space
+  template<typename T>
+  requires ConvertibleTo<T, uint16_t>
+  void uint16(T&& t) {
+    auto const v{static_cast<uint16_t>(t)};
     uint8(static_cast<uint8_t>((v & 0xFF00u) >> 8u));
     uint8(static_cast<uint8_t>((v & 0x00FFu) >> 0u));
   }
 
   /// Overloaded Encode uint16
   ///
-  /// @param v Optional value
-  /// @see Encoder::uint16(uint16_t)
+  /// \tparam T Optional type
+  /// \param  v Optional value
+  /// \see Encoder::uint16(uint16_t)
+  template<typename T>
+  requires OptionalConvertibleTo<T, uint16_t>
   inline void uint16(std::optional<uint16_t> v) {
     if (v) return uint16(*v);
   }

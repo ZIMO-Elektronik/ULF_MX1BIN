@@ -14,7 +14,10 @@
 
 #define MATCH_HEAD(var)                                                        \
   ASSERT_EQ(var.uSID, d_##var.uSID);                                           \
-  ASSERT_EQ(var.info, d_##var.info);                                           \
+  ASSERT_EQ(var.info.frameType, d_##var.info.frameType);                       \
+  ASSERT_EQ(var.info.messageType, d_##var.info.messageType);                   \
+  ASSERT_EQ(var.info.sender, d_##var.info.sender);                             \
+  ASSERT_EQ(var.info.stationType, d_##var.info.stationType);                   \
   ASSERT_EQ(var.code, d_##var.code);
 
 template<ulf::mx1bin::Encodable E>
@@ -67,7 +70,7 @@ TEST(Message, TrackControl) {
 
   ulf::mx1bin::TrackControl ctrl{
     {.uSID{0x00}, .info{0x01}, .code{ulf::mx1bin::Command::Track_Ctrl}}};
-  ctrl.cAction = 0x02;
+  ctrl.cAction = decltype(ctrl)::Action::TrackOn;
 
   CODE(ctrl)
 
