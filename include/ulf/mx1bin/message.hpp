@@ -89,7 +89,7 @@ struct Reset : public detail::Head {
 
 struct TrackControl : public detail::Head {
   struct Reply : public detail::ReplyHead {
-    struct bitfields::TrackStatus statusBits{}; ///< Track status
+    struct bitfields::TrackStatus statusBits {}; ///< Track status
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
@@ -144,7 +144,7 @@ struct DecoderControl : public detail::DecoderControlBase {
     }
   };
 
-  uint8_t cSpeed{};                               ///> Speed
+  bitfields::ControlSpeed cSpeed{};               ///> Speed
   std::optional<bitfields::ControlData> cData1{}; ///> Control data
   std::optional<uint8_t> cData2{};                ///> F1..8
   std::optional<uint8_t> cData3{};                ///> F9..12
@@ -311,7 +311,7 @@ struct Accessory : public detail::ShuttleTrain_Accessory_Base {
 struct LocoMemoryQuery : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyErrorBase {
     bitfields::DecoderAddress cAdr{}; ///< Address
-    uint8_t cSpeed{};                 ///< Speed
+    bitfields::ControlSpeed cSpeed{}; ///< Speed
     bitfields::ControlData cData1{};  ///< Control data
     uint8_t cData2{};                 ///< F1..8
     uint8_t cData3{};                 ///< F9..12
@@ -657,7 +657,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
     std::optional<uint8_t> activeUSID{};
-    std::optional<uint16_t> activeAddr{};
+    std::optional<bitfields::DecoderAddress> activeAddr{};
     std::optional<uint16_t> activeCv{};
     template<detail::encoder E>
     auto encode(E e) const {

@@ -72,6 +72,23 @@ struct TrackStatus {
   bool operator==(TrackStatus const&) const = default;
 };
 
+struct ControlSpeed {
+  uint8_t stop : 1u;
+  uint8_t speed : 7u;
+  ControlSpeed() = default;
+  ControlSpeed(uint8_t const val)
+    : stop{bits<7u, 1u>(val)}, speed{bits<0u, 7u>(val)} {}
+  ControlSpeed& operator=(uint8_t const val) {
+    stop = bits<7u, 1u>(val);
+    speed = bits<7u, 1u>(val);
+    return *this;
+  }
+  explicit operator uint8_t() const {
+    return {static_cast<uint8_t>(stop << 7u | speed << 0u)};
+  }
+  bool operator==(ControlSpeed const&) const = default;
+};
+
 struct ControlData {
   uint8_t manual : 1u;     ///< Manual control
   uint8_t direction : 1u;  ///< Direction
