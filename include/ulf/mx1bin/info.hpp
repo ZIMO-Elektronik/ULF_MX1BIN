@@ -42,4 +42,14 @@ enum class StationType : uint8_t {
   MX9 = 0x02u,
 };
 
+constexpr uint8_t make_header_info(FrameType frameType,
+                                   MessageType messageType,
+                                   Sender sender,
+                                   StationType stationType) {
+  return {static_cast<uint8_t>(std::to_underlying(frameType) << 7u |
+                               std::to_underlying(messageType) << 5u |
+                               std::to_underlying(sender) << 4u |
+                               std::to_underlying(stationType) << 0u)};
+}
+
 } // namespace ulf::mx1bin
