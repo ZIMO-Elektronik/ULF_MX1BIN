@@ -24,69 +24,79 @@ struct Info {
   MessageType messageType : 2; ///< Message type
   Sender sender : 1;           ///< Sender
   StationType stationType : 4; ///< Command station type
-  Info() = default;
-  Info(uint8_t const val)
-    : frameType{static_cast<FrameType>(bits<7u, 1u>(val))},
-      messageType{static_cast<MessageType>(bits<5u, 2u>(val))},
-      sender{static_cast<Sender>(bits<4u, 1u>(val))},
-      stationType{static_cast<StationType>(bits<0u, 4u>(val))} {}
-  Info& operator=(uint8_t const val) {
-    frameType = static_cast<FrameType>(bits<7u, 1u>(val));
-    messageType = static_cast<MessageType>(bits<5u, 2u>(val));
-    sender = static_cast<Sender>(bits<4u, 1u>(val));
-    stationType = static_cast<StationType>(bits<0u, 4u>(val));
-    return *this;
+  constexpr Info() = default;
+  constexpr Info(Info const&) = default;
+  constexpr Info(FrameType _frameType,
+                 MessageType _messageType,
+                 Sender _sender,
+                 StationType _stationType)
+    : frameType{_frameType}, messageType{_messageType}, sender{_sender},
+      stationType{_stationType} {}
+  constexpr Info(uint8_t const val) {
+    new (this) Info(static_cast<FrameType>(bits<7u, 1u>(val)),
+                    static_cast<MessageType>(bits<5u, 2u>(val)),
+                    static_cast<Sender>(bits<4u, 1u>(val)),
+                    static_cast<StationType>(bits<0u, 4u>(val)));
   }
-  explicit operator uint8_t() const {
+  constexpr Info& operator=(uint8_t const val) { return *new (this) Info(val); }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(std::to_underlying(frameType) << 7u |
                                  std::to_underlying(messageType) << 5u |
                                  std::to_underlying(sender) << 4u |
                                  std::to_underlying(stationType) << 0u)};
   }
-  bool operator==(Info const&) const = default;
+  constexpr bool operator==(Info const&) const = default;
 };
 
 struct TrackStatus {
-  uint8_t dcc : 1u;
-  uint8_t motorola : 1u;
-  uint8_t ues : 1u;
-  uint8_t trackVoltage : 1u;
-  uint8_t broadcastStop : 1u;
-  TrackStatus() = default;
-  TrackStatus(uint8_t const val)
-    : dcc{bits<7u, 1u>(val)}, motorola{bits<6u, 1u>(val)},
-      ues{bits<2u, 1u>(val)}, trackVoltage{bits<1u, 1u>(val)},
-      broadcastStop{bits<0u, 1u>(val)} {}
-  TrackStatus& operator=(uint8_t const val) {
-    dcc = bits<7u, 1u>(val);
-    motorola = bits<6u, 1u>(val);
-    ues = bits<2u, 1u>(val);
-    trackVoltage = bits<1u, 1u>(val);
-    broadcastStop = bits<0u, 1u>(val);
-    return *this;
+  uint8_t dcc : 1u;           ///< DCC Enabled?
+  uint8_t motorola : 1u;      ///< Motorola enabled?
+  uint8_t ues : 1u;           ///< UES enabled?
+  uint8_t trackVoltage : 1u;  ///< Track voltage enabled?
+  uint8_t broadcastStop : 1u; ///< Stop broadcast enabled?
+  constexpr TrackStatus() = default;
+  constexpr TrackStatus(TrackStatus const&) = default;
+  constexpr TrackStatus(uint8_t const _dcc,
+                        uint8_t const _motorola,
+                        uint8_t const _ues,
+                        uint8_t const _trackVoltage,
+                        uint8_t const _broadcastStop)
+    : dcc{_dcc}, motorola{_motorola}, ues{_ues}, trackVoltage{_trackVoltage},
+      broadcastStop{_broadcastStop} {}
+  constexpr TrackStatus(uint8_t const val) {
+    new (this) TrackStatus(bits<7u, 1u>(val),
+                           bits<6u, 1u>(val),
+                           bits<2u, 1u>(val),
+                           bits<1u, 1u>(val),
+                           bits<0u, 1u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr TrackStatus& operator=(uint8_t const val) {
+    return *new (this) TrackStatus(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(dcc << 7u | motorola << 6u | ues << 2u |
                                  trackVoltage << 1u | broadcastStop << 0u)};
   }
-  bool operator==(TrackStatus const&) const = default;
+  constexpr bool operator==(TrackStatus const&) const = default;
 };
 
 struct ControlSpeed {
-  uint8_t stop : 1u;
-  uint8_t speed : 7u;
-  ControlSpeed() = default;
-  ControlSpeed(uint8_t const val)
-    : stop{bits<7u, 1u>(val)}, speed{bits<0u, 7u>(val)} {}
-  ControlSpeed& operator=(uint8_t const val) {
-    stop = bits<7u, 1u>(val);
-    speed = bits<7u, 1u>(val);
-    return *this;
+  uint8_t stop : 1u;  ///< Emergency stop
+  uint8_t speed : 7u; ///< Speed
+  constexpr ControlSpeed() = default;
+  constexpr ControlSpeed(ControlSpeed const&) = default;
+  constexpr ControlSpeed(uint8_t const _stop, uint8_t const _speed)
+    : stop{_stop}, speed{_speed} {}
+  constexpr ControlSpeed(uint8_t const val) {
+    new (this) ControlSpeed(bits<7u, 1u>(val), bits<0u, 7u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr ControlSpeed& operator=(uint8_t const val) {
+    return *new (this) ControlSpeed(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(stop << 7u | speed << 0u)};
   }
-  bool operator==(ControlSpeed const&) const = default;
+  constexpr bool operator==(ControlSpeed const&) const = default;
 };
 
 struct ControlData {
@@ -96,47 +106,58 @@ struct ControlData {
   uint8_t speed_step : 2u; ///< Speed step system
   uint8_t az_enable : 1u;  ///< Accel time enable
   uint8_t bz_enable : 1u;  ///< Break time enable
-  ControlData() = default;
-  ControlData(uint8_t const val)
-    : manual{bits<7u, 1u>(val)}, direction{bits<5u, 1u>(val)},
-      headlights{bits<4u, 1u>(val)}, speed_step{bits<2u, 2u>(val)},
-      az_enable{bits<1u, 1u>(val)}, bz_enable{bits<0u, 1u>(val)} {}
-  ControlData& operator=(uint8_t const val) {
-    manual = bits<7u, 1u>(val);
-    direction = bits<5u, 1u>(val);
-    headlights = bits<4u, 1u>(val);
-    speed_step = bits<2u, 2u>(val);
-    az_enable = bits<1u, 1u>(val);
-    bz_enable = bits<0u, 1u>(val);
-    return *this;
+  constexpr ControlData() = default;
+  constexpr ControlData(ControlData const&) = default;
+  constexpr ControlData(uint8_t const _manual,
+                        uint8_t const _direction,
+                        uint8_t const _headlights,
+                        uint8_t const _speed_step,
+                        uint8_t const _az_enable,
+                        uint8_t const _bz_enable)
+    : manual{_manual}, direction{_direction}, headlights{_headlights},
+      speed_step{_speed_step}, az_enable{_az_enable}, bz_enable{_bz_enable} {}
+  constexpr ControlData(uint8_t const val) {
+    new (this) ControlData(bits<7u, 1u>(val),
+                           bits<5u, 1u>(val),
+                           bits<4u, 1u>(val),
+                           bits<2u, 2u>(val),
+                           bits<1u, 1u>(val),
+                           bits<0u, 1u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr ControlData& operator=(uint8_t const val) {
+    return *new (this) ControlData(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(manual << 7u | direction << 5u |
                                  headlights << 4u | speed_step << 2u |
                                  az_enable << 1u | bz_enable << 0u)};
   }
-  bool operator==(ControlData const&) const = default;
+  constexpr bool operator==(ControlData const&) const = default;
 };
 
 struct ControlPayload {
   uint8_t format : 2;      ///< Address format specification
   SpeedStep speedStep : 2; ///< Speed step system
   uint8_t trackState : 1;  ///< Track state
-  ControlPayload() = default;
-  ControlPayload(uint8_t const val)
-    : format{bits<6u, 2u>(val)}, speedStep{bits<2u, 2u>(val)},
-      trackState{bits<0u, 1u>(val)} {}
-  ControlPayload& operator=(uint8_t const val) {
-    format = bits<6u, 2u>(val);
-    speedStep = static_cast<SpeedStep>(bits<2u, 2u>(val));
-    trackState = bits<0u, 1u>(val);
-    return *this;
+  constexpr ControlPayload() = default;
+  constexpr ControlPayload(ControlPayload const&) = default;
+  constexpr ControlPayload(uint8_t const _format,
+                           SpeedStep const _speedStep,
+                           uint8_t const _trackState)
+    : format{_format}, speedStep{_speedStep}, trackState{_trackState} {}
+  constexpr ControlPayload(uint8_t const val) {
+    new (this) ControlPayload(bits<6u, 2u>(val),
+                              static_cast<SpeedStep>(bits<2u, 2u>(val)),
+                              bits<0u, 1u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr ControlPayload& operator=(uint8_t const val) {
+    return *new (this) ControlPayload(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(
       format << 6u | std::to_underlying(speedStep) << 2u | trackState)};
   }
-  bool operator==(ControlPayload const&) const = default;
+  constexpr bool operator==(ControlPayload const&) const = default;
 };
 
 struct AddressControl_Control {
@@ -144,22 +165,27 @@ struct AddressControl_Control {
   uint8_t type : 1u; ///< Address type
   uint8_t lock : 1u; ///< Lock address
   uint8_t log : 1u;  ///< Log external changes
-  AddressControl_Control() = default;
-  AddressControl_Control(uint8_t const val)
-    : set{bits<7u, 1u>(val)}, type{bits<5u, 1u>(val)}, lock{bits<1u, 1u>(val)},
-      log{bits<0u, 1u>(val)} {}
-  AddressControl_Control& operator=(uint8_t const val) {
-    set = bits<7u, 1u>(val);
-    type = bits<5u, 1u>(val);
-    lock = bits<1u, 1u>(val);
-    log = bits<0u, 1u>(val);
-    return *this;
+  constexpr AddressControl_Control() = default;
+  constexpr AddressControl_Control(AddressControl_Control const&) = default;
+  constexpr AddressControl_Control(uint8_t const _set,
+                                   uint8_t const _type,
+                                   uint8_t const _lock,
+                                   uint8_t const _log)
+    : set{_set}, type{_type}, lock{_lock}, log{_log} {}
+  constexpr AddressControl_Control(uint8_t const val) {
+    new (this) AddressControl_Control(bits<7u, 1u>(val),
+                                      bits<5u, 1u>(val),
+                                      bits<1u, 1u>(val),
+                                      bits<0u, 1u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr AddressControl_Control& operator=(uint8_t const val) {
+    return *new (this) AddressControl_Control(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {
       static_cast<uint8_t>(set << 7u | type << 5u | lock << 1u | log << 0u)};
   }
-  bool operator==(AddressControl_Control const&) const = default;
+  constexpr bool operator==(AddressControl_Control const&) const = default;
 };
 
 struct AddressControl_Payload {
@@ -168,41 +194,49 @@ struct AddressControl_Payload {
   uint8_t speedStep : 2u; ///< Speed step system
   uint8_t lock : 1u;      ///< Lock address
   uint8_t log : 1u;       ///< Log external changes
-  AddressControl_Payload() = default;
-  AddressControl_Payload(uint8_t const val)
-    : format{bits<6u, 2u>(val)}, type{bits<5u, 1u>(val)},
-      speedStep{bits<2u, 2u>(val)}, lock{bits<1u, 1u>(val)},
-      log{bits<0u, 1u>(val)} {}
-  AddressControl_Payload& operator=(uint8_t const val) {
-    format = bits<6u, 2u>(val);
-    type = bits<5u, 1u>(val);
-    speedStep = bits<2u, 2u>(val);
-    lock = bits<1u, 1u>(val);
-    log = bits<0u, 1u>(val);
-    return *this;
+  constexpr AddressControl_Payload() = default;
+  constexpr AddressControl_Payload(AddressControl_Payload const&) = default;
+  constexpr AddressControl_Payload(uint8_t const _format,
+                                   uint8_t const _type,
+                                   uint8_t const _speedStep,
+                                   uint8_t const _lock,
+                                   uint8_t const _log)
+    : format{_format}, type{_type}, speedStep{_speedStep}, lock{_lock},
+      log{_log} {}
+  constexpr AddressControl_Payload(uint8_t const val) {
+    new (this) AddressControl_Payload(bits<6u, 2u>(val),
+                                      bits<5u, 1u>(val),
+                                      bits<2u, 2u>(val),
+                                      bits<1u, 1u>(val),
+                                      bits<0u, 1u>(val));
   }
-  explicit operator uint8_t() const {
+  constexpr AddressControl_Payload& operator=(uint8_t const val) {
+    return *new (this) AddressControl_Payload(val);
+  }
+  constexpr explicit operator uint8_t() const {
     return {static_cast<uint8_t>(format << 6u | type << 5u | speedStep << 2u |
                                  lock << 1u | log << 0u)};
   }
-  bool operator==(AddressControl_Payload const&) const = default;
+  constexpr bool operator==(AddressControl_Payload const&) const = default;
 };
 
 struct DecoderAddress {
   uint16_t format : 2u;   ///< Address format specification
   uint16_t address : 14u; ///< Address value
-  DecoderAddress() = default;
-  DecoderAddress(uint16_t const val)
-    : format{bits<14u, 2u>(val)}, address{bits<0u, 14u>(val)} {}
-  DecoderAddress& operator=(uint16_t const val) {
-    format = bits<14u, 2u>(val);
-    address = bits<0u, 14u>(val);
-    return *this;
+  constexpr DecoderAddress() = default;
+  constexpr DecoderAddress(DecoderAddress const&) = default;
+  constexpr DecoderAddress(uint16_t const& _format, uint16_t const& _address)
+    : format{_format}, address{_address} {}
+  constexpr DecoderAddress(uint16_t const val) {
+    new (this) DecoderAddress(bits<14u, 2u>(val), bits<0u, 14u>(val));
   }
-  explicit operator uint16_t() const {
+  constexpr DecoderAddress& operator=(uint16_t const val) {
+    return *new (this) DecoderAddress(val);
+  }
+  constexpr explicit operator uint16_t() const {
     return {static_cast<uint16_t>(format << 14u | address << 0u)};
   }
-  bool operator==(DecoderAddress const&) const = default;
+  constexpr bool operator==(DecoderAddress const&) const = default;
 };
 
 } // namespace ulf::mx1bin::bitfields
