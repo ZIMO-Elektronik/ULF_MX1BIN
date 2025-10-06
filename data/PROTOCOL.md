@@ -164,14 +164,14 @@ Reply: [Dummy](#dummy)
 | [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Dummy](#dummy) <br> a..a Address   |
 
 ##### Query command station's accessory decoder memory : Code 9 - Primary - Command station
-<h3 id="accessory-memory-query_pri">Query command station's accessory decoder memory : Code 8 - Primary - Command station</h3>
+<h3 id="accessory-memory-query_pri">Query command station's accessory decoder memory : Code 9 - Primary - Command station</h3>
  
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
 | [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Dummy](#dummy) <br> a..a Address   |
 
 ##### Address control : Code 10 - Primary - Command station
-<h3 id="address-control_pri">Address control : Code 9 - Primary - Command station</h3>
+<h3 id="address-control_pri">Address control : Code 10 - Primary - Command station</h3>
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
@@ -182,7 +182,7 @@ Reply: [Dummy](#dummy)
 Reply: [Dummy](#dummy)
 
 ##### Read command station I/O state : Code 11 - Primary - Command station
-<h3 id="read-command-station-io_pri">Read command station I/O state : Code 10 - Primary - Command station</h3>
+<h3 id="read-command-station-io_pri">Read command station I/O state : Code 11 - Primary - Command station</h3>
 > Nobody knows, what the `zero` byte's purpose in this message is. However, the protocol does depend on it being there :sweat_smile:
 
 | Message byte(s) | Name | Value | Description     |
@@ -272,12 +272,16 @@ A generic Ack that confirms the message reception. This message inherits the mes
 | :-------------- | ---------- | ----------------------------------- |
 | [0]             | Primary-ID | uSID of the replied primary message |
 
+Reply: None
+
 ##### Nak : Code 1 - Reply level 1 - Any
 <h3 id="generic-nak">Nak : Code 1 - Reply level 1 - Any</h3>
 A generic Nak that implies problems during message reception. This is a header-only message.
 
-##### Decoder control : Reply level 1 - Code 3 / 4 / 5 / 6 - Command station
-<h3 id="decoder-control_re">Decoder control : Reply level 1 - Code 3 / 4 / 5 / 6 - Command station</h3>
+Reply: None
+
+##### Loco control : Code 3 / 4 / 5 / 6 - Reply level 1 - Command station
+<h3 id="loco-control_re">Loco control : Code 3 / 4 / 5 / 6 - Reply level 1 - Command station</h3>
 In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
 
 The actual track state needs to be queried seperatly using (Track Control)[#track-control_pri]
@@ -287,6 +291,70 @@ The actual track state needs to be queried seperatly using (Track Control)[#trac
 | [0]             | re-uSID | ID        | uSID of the message being replied to                                                        |
 | [1]             | Error   | -         | If any - Error                                                                              |
 | [2] if no Error | Status  | ff00ss0t  | ff - [Dummy](#dummy) <br> ss - [Dummy](#dummy) <br> t - track state (0 = normal, 1 = fault) |
+
+Reply: None
+
+##### Accessory control : Code 7 - Reply level 1 - Command station
+<h3 id="accessory-control_re">Accessory control : Code 7 - Reply level 1 - Command station</h3>
+In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
+
+The actual track state needs to be queried seperatly using (Track Control)[#track-control_pri]
+
+| Message byte(s) | Name    | Value     | Description                                                       |
+| :-------------- | ------- | --------- | ----------------------------------------------------------------- |
+| [0]             | re-uSID | ID        | uSID of the message being replied to                              |
+| [1]             | Error   | -         | If any - Error                                                    |
+| [2] if no Error | Status  | ff00000t  | ff - [Dummy](#dummy) <br> t - track state (0 = normal, 1 = fault) |
+
+Reply: None
+
+##### Query command station's loco memory : Code 8 - Reply level 1 - Command station 
+<h3 id="loco-memory-query_re">Query command station's loco memory : Code 8 - Reply level 1 - Command station</h3>
+In case there is no error within the request, the level 1 acknowledgement contains the requested da-
+ta.
+
+| Message byte(s)               | Name      | Value             | Description                             |
+| :---------------------------- | --------- | ----------------- | --------------------------------------- |
+| [0]                           | re-uSID   | ID                | uSID of the message being replied to    |
+| [1]                           | Error     | -                 | If any - Error                          |
+| [2..3] if no Error            | cAdr      | ffaaaaaa aaaaaaaa | ff - [Dummy](#dummy) <br> a..a Address  |
+| [4] if no Error               | cSpeed    | -                 | Speed in step system |
+| [5] if no Error               | cData1    | -                 | [7] Manual (ignore limits) <br> [6] N/A <br> [5] Direction (0 = fw, 1 = bw) <br> [4] Headlights (=DCC F0) <br> [3..2] Speed step system <br> [1] Decel. time enabled <br> [0] accel. time enabled |
+| [6] if no Error               | cData2    | -                 | [7..0] F1..F8 (DCC only)                |
+| [7] if no Error               | cData3    | -                 | [3..0] F9..F12 (DCC only)               |
+| [8] if no Error               | cAzBz     | -                 | [0..3] BZ (0..15) <br> [4..7] AZ (0..15)|
+| [9] if no Error               | cStatus   | 0 <br> 1          | Inactive <br> Active                    |
+| [10] if no Error - optional   | cData4    | -                 | [7..0] F13..F20 (DCC only)              |
+| [11] if no Error - optional   | cData5    | -                 | [7..0] F21..F28 (DCC only)              |
+
+Reply: None
+
+##### Query command station's accessory decoder memory : Code 9 - Reply level 1 - Command station
+<h3 id="accessory-memory-query_re">Query command station's accessory decoder memory : Code 9 - Reply level 1 - Command station</h3>
+In case there is no error within the request, the level 1 acknowledgement contains the requested da-
+ta.
+
+| Message byte(s)     | Name      | Value             | Description                                         |
+| :------------------ | --------- | ----------------- | --------------------------------------------------- |
+| [0]                 | re-uSID   | ID                | uSID of the message being replied to                |
+| [1]                 | Error     | -                 | If any - Error                                      |
+| [2..3] if no Error  | cAdr      | ffaaaaaa aaaaaaaa | ff - [Dummy](#dummy) <br> a..a Address              |
+| [4] if no Error     | cPair     | 0 <br> 1          | Paired output function <br> single output function  |
+| [5] if no Error     | cOutputs  | -                 | State of the Outputs                                |
+
+Reply: None
+
+##### Address control : Code 10 - Reply level 1 - Command station
+<h3 id="address-control_pri">Address control : Code 10 - Reply level 1 - Command station</h3>
+
+| Message byte(s)             | Name      | Value     | Description                              |
+| :-------------------------- | --------- | --------- | ---------------------------------------- |
+| [0]                         | re-uSID   | ID        | uSID of the message being replied to     |
+| [1]                         | Error     | -         | If any - Error                           |
+| [2..3] if no Error          | Status    | ffa0sskl  | ff - [Dummy](#dummy) <br> a - Address type (0=Loco, 1=Accessory) <br> ss - [Dummy](#dummy) <br> k - Lock against changes <br> l - Log changes   |
+| [4] if no Error - optional  | cOutputs  | -         | Bit mask of locked accessory outputs    |
+
+Reply: None
 
 <h3 id="dummy">Dummy</h3>
 
