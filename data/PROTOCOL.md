@@ -9,11 +9,14 @@ This document is a rewrite of the original [document](https://github.com/ZIMO-El
     <li><a href="#communication-basics">Communication basics</a></li>
     <li><a href="#flow-control">Flow control</a></li>
     <li><a href="#the-new-binary-communication">The new binary communication</a></li>
+    <li><a href="#frame-structure">Frame structure</a></li>
     <ul>
-      <li><a href="#header-info">Header info</a></li>
-      <li><a href="#frame-structure">Frame structure</a></li>
+      <li><a href="#prefix-and-suffix">Prefix and Suffix</a></li>
+      <li><a href="#header">Header</a></li>
+      <li><a href="#message">Message</a></li>
+      <li><a href="#crc">CRC</a></li>
     </ul>
-      <li><a href="messages">Messages</a></li>
+    <li><a href="#messages">Messages</a></li>
     <ul>
       <li><a href="#short-frame-protocol-primary-messages">Short frame protocol primary messages</a></li>
       <li><a href="#short-frame-protocol-reply-messages">Short frame protocol reply messages</a></li>
@@ -22,11 +25,13 @@ This document is a rewrite of the original [document](https://github.com/ZIMO-El
     </ul>
     <li><a href="#protocol-details">Protocol details</a></li>
     <ul>
+      <li><a href="#header-info-byte">Header info byte</a></li>
       <li><a href="#address-format">Address format</a></li>
       <li><a href="#speed-step-system">Speed step system</a></li>
       <li><a href="#error-codes">Error codes</a></li>
       <li><a href="#data-flow-information">Data flow information</a></li>
     </ul>
+    <li><a href="#missing-information">Missing information</a></li>
   </ol>
 </details>
 
@@ -40,15 +45,21 @@ wires which also connects the RTS and CTS lines between PC and command station. 
 control can be disabled by setting CV13 to 0. Default value is 1 (hardware flow control enabled).
 
 ## The new binary communication
-The new binary communication consists of data frames with the following structure: 
+The first byte of each header is the unique sequence-ID of the frame and must not be identical in two different consecutive frames. If a frame has to be repeated the sequence-ID remains unchanged. The second byte specifies the message type and the meaning of additional header bytes. Most messages are identified by the contents if the 2nd and 3rd header byte. The 2nd byte provides some kind of routing information the 3rd byte identifies a specific message. Together these two bytes might be considered as unique 16 bit message identifier.
 
-- Short frames: [`SOH`-`SOH`-`Header`-`Message`-`CRC8`-`EOT`]
+Each data frame is immediately acknowledged by the receiver (level 1 reply). This reply may contain the appropriate data if it's immediately available in the command station. Otherwise the request is passed on via the CAN bus (to another station for example) and the subsequent incoming data is returned (level 2 reply).
 
-- Long frames: [`SOH`-`SOH`-`Header`-`Message`-`CRC16`-`EOT`]
+> Note: Future expansions of single messages may involve additional bytes added to the frame.
+
+## Frame structure
+The first byte of each header is the unique sequence-ID of the frame and must not be identical in two different consecutive frames. If a frame has to be repeated the sequence-ID remains unchanged. The second byte specifies the message type and the meaning of additional header bytes. Most messages are identified by the contents if the 2nd and 3rd header byte. The 2nd byte provides some kind of routing information the 3rd byte identifies a specific message. Together these two bytes might be considered as unique 16 bit message identifier.
 
 To establish a data transmission independent of content, all data (including headerinfo and check-
 sum) characters identical to control characters have to be protected with the additional escape char-
-acter prefix <DLE> and the character itself is XOR'ed with `0x20`.
+acter prefix `DLE` and the character itself is XOR'ed with `0x20`.
+
+> [Warning]
+> Worst case, this may result in an encoded frame almost double the size of the actual frame. 
 
 | Control character | Value  | Replacement within data | Description           |
 | :---------------: | ------ | ----------------------- | --------------------- |
@@ -56,37 +67,46 @@ acter prefix <DLE> and the character itself is XOR'ed with `0x20`.
 | `EOT`             | `0x17` | `DLE`(`EOT` \^ `0x20`)  | End of a data frame   | 
 | `DLE`             | `0x10` | `DLE`(`DLE` \^ `0x20`)  | Escape character      | 
 
-Each data frame is immediately acknowledged by the receiver (level 1 reply). This reply may contain
-the appropriate data if it's immediately available in the command station. Otherwise the request is
-passed on via the CAN bus (to another station for example) and the subsequent incoming data is re-
-turned (level 2 reply).
+Each frame has one of the following layouts: 
 
-Please note: Future expansions of single messages may involve additional bytes added to the frame.
+- Short frames: [`SOH`-`SOH`-`Header`-`Message`-`CRC8`-`EOT`]
 
-### Header info
-The header info describes the meaning of the data content of a frame. The length of the header info
-is between 2 and 15 bytes. The first byte is the unique sequence-ID of the frame and must not be
-identical in two different consecutive frames. If a frame has to be repeated the sequence-ID remains
-unchanged. The second byte specifies the message type and the meaning of additional header
-bytes. Most messages are identified by the contents if the 2nd and 3rd header byte. The 2nd byte pro-
-vides some kind of routing information the 3rd byte identifies a specific message. Together these two
-bytes might be considered as unique 16 bit message identifier.
+- Long frames: [`SOH`-`SOH`-`Header`-`Message`-`CRC16`-`EOT`]
 
-#### Common information in header byte 2: 
+### Prefix and Suffix
+Each frame has a marked `Start` and `End`. The `Start` is marked by two consecutive `SOF` bytes, the `End` is marked by one `EOF` byte. Those bytes are never encoded. 
 
-| Bit(s) | Value                      | Description |
-| :----: | -------------------------- | ----------- |
-| [7]    | 0 <br> 1                   | Short frame <br> Long frame |
-| [6..5] | 00 <br> 10 <br> 01 <br> 11 | Primary message <br> Ack / Reply level 1 <br> Reply level 2 <br> Ack (for Reply level 2) |
-| [4]    | 0 <br> 1                   | Sent by command station <br> Sent by PC |
-| [3..0] | 0 <br> 1 <br> 2            | Target is command station (MX1) <br> Target is accessory module (MX8) <br> Target is track section module (MX9) |
+### Header
+The header marks the start of encoded data in a frame. Generally, for each of the two frame types, a header structure is defined. 
 
-Bits 4-0 may alternatively considered to be a 5 bit part of the unique message identifier. It should not
-be taken for granted that “useless” bit combinations involving bit 4 strictly interpreted as origin identi-
-fier that are not used at this stage might not be assigned some other meaning some day.
+#### Short Frames
+| Header byte(s)  | Value   | Description                       |
+| :-------------- | ------- | --------------------------------- |
+| [0]             | 0..255  | Unique sequence-ID                |
+| [1]             | I       | [Header info](#header-info-byte)  |
+| [2]             | C       | Message code (C)                  |
 
-### Frame structure
-Generally, each frame is split into a 3 / 5 byte header and N byte message. Additionally, the Frame is prefixed with 2 byte \<SOF\> and suffixed with the CRC8 / CRC16 and 1 byte \<EOF\>. 
+#### Long Frames
+| Header byte(s)  | Value     | Description                                                                 |
+| :-------------- | --------- | --------------------------------------------------------------------------- |
+| [0]             | 0..255    | Unique sequence-ID                                                          |
+| [1]             | I         | [Header info](#header-info-byte)                                            |
+| [2]             | C         | Message code (C)                                                            |
+| [3]             | dd00nnnn  | dd - [Flow information](#data-flow-information) <br> n..n Length of header  |
+
+### Message
+Most frames hold a message in addition to the header. This message is context-sensitive and its length may vary depending on this conetext. 
+
+### CRC
+The CRC for each frame is calculated over the encoded data, not including the Prefix / Suffix. If the CRC contains escape characters, they are encoded as well. 
+
+Short frames contain a CRC8. Init: `0xFF`   Poly: ***x<sup>8</sup> + x<sup>5</sup> + x<sup>4</sup> + 1***
+
+Long frames contain a CRC16. Init: `0xFFFF` Poly: ***x<sup>16</sup> + x<sup>12</sup> + x<sup>5</sup> + 1***
+
+
+
+Generally, each frame is split into a 3 / 4 byte header and N byte message. Additionally, the Frame is prefixed with 2 byte `SOF` and suffixed with the CRC8 / CRC16 and 1 byte `EOF`. 
 
 The Unique sequence-ID (uSID) is upward counting and can is counted seperatly for PC and Module. 
 
@@ -94,28 +114,12 @@ The message code identifies the implied instruction, as well as the structure / 
 
 Message bytes marked with `optional` are handled if present. Bytes marked with `if no error` are only present, if no error occurred. This implies, that the sturcture of messages can change depending on message values. 
 
-#### Short Frames
-Short message frames are secured with a CRC8. The CRC is initialized with `0xFF` and is represented with the polynom ***x<sup>8</sup> + x<sup>5</sup> + x<sup>4</sup> + 1***. The header is structured as follows: 
 
-| Header byte(s)  | Value   | Description           |
-| :-------------- | ------- | --------------------- |
-| [0]             | 0..255  | Unique sequence-ID    |
-| [1]             | I       | Header Info byte (I)  |
-| [2]             | C       | Message code (C)      |
-
-Short frames can hold up to 15 bytes (unencoded) of data (including the header). This includes header and message, but not `SOF`, `EOF` and CRC. 
-
-#### Long Frames
-Long message frames are secured with a CRC16. The CRC is initialized with `0xFFFF` and is represented with the polynom ***x<sup>16</sup> + x<sup>12</sup> + x<sup>5</sup> + 1***. The header is structured as follows: 
-
-| Header byte(s)  | Value     | Description                                                                 |
-| :-------------- | --------- | --------------------------------------------------------------------------- |
-| [0]             | 0..255    | Unique sequence-ID                                                          |
-| [1]             | I         | Header Info byte (I)                                                        |
-| [2]             | C         | Message code (C)                                                            |
-| [3]             | dd00nnnn  | dd - [Flow information](#data-flow-information) <br> n..n Length of header  |
 
 ## Messages
+Message data is context-sensitive. Depending on the header, message data may have different length and / or meaning. To give context, all message descriptors are written following the format 
+
+`Name` : `Message Code` - `Type` - `Context`
 
 ### Short frame protocol primary messages
 
@@ -131,10 +135,12 @@ Message to control the state of the track. Instructions should be handled immedi
 | :-------------- | ------- | ---------------------- | ----------- |
 | [0]             | cAction | 0 <br> 1 <br> 2 <br> 3 | Broadcast stop (Stop all locos) <br> Switch track voltage OFF <br> Switch track voltage ON <br> Query track status |
 
+> An `cAction` of `2` also ends Service Mode if applicable. 
+
 Reply: [Ack Level 1](#generic_ack)
 
 <h4 id="loco-control_pri">Loco Control : Code 3 - Primary - Command station</h4>
-Message to control a single loco on the track. 
+Message to control a single loco on the track.
 
 | Message byte(s) | Name   | Value             | Description                                        |
 | :-------------- | ------ | ----------------- | -------------------------------------------------- |
@@ -145,6 +151,8 @@ Message to control a single loco on the track.
 | [5] optional    | cData3 | -                 | [3..0] F9..F12 (DCC only)                          |
 | [6] optional    | cData4 | -                 | [7..0] F13..F20 (DCC only)                         | 
 | [7] optional    | cData5 | -                 | [7..0] F21..F28 (DCC only)                         |
+
+> An addressed (`Address` != 0) message of this type implicitly ends Service Mode if applicable.  
 
 Reply: [Reply level 1](#loco-control_re)
 
@@ -512,6 +520,19 @@ The Device IDs are predfined values. The possible values are listed below:
 Reply: None
 
 ## Protocol details
+Some details are used at multiple points withing the protocol. As such, they are defined here. 
+
+### Header info byte
+The second byte of each header (short and long frames), contains a bitfield of metadata narrowing the context of the following message. 
+
+| Bit(s) | Value                      | Description |
+| :----: | -------------------------- | ----------- |
+| [7]    | 0 <br> 1                   | Short frame <br> Long frame |
+| [6..5] | 00 <br> 10 <br> 01 <br> 11 | Primary message <br> Ack / Reply level 1 <br> Reply level 2 <br> Ack (for Reply level 2) |
+| [4]    | 0 <br> 1                   | Sent by command station <br> Sent by PC |
+| [3..0] | 0 <br> 1 <br> 2            | Target is command station (MX1) <br> Target is accessory module (MX8) <br> Target is track section module (MX9) |
+
+Bits 4-0 may alternatively considered to be a 5 bit part of the unique message identifier. It should not be taken for granted that “useless” bit combinations involving bit 4 strictly interpreted as origin identifier that are not used at this stage might not be assigned some other meaning some day.
 
 ### Address format
 The decoder address (usually `cAdr`) byte of a message contains a 2 bit address type identifier. The structure of this identifier changes depending on the message context. 
@@ -600,5 +621,16 @@ scribes whether there will be any consecutive frames with data.
 | 0 1  | More data will follow          |
 | 1 0  | More data will possibly follow |
 | 1 1  | `Reserved`                     |
+
+## Missing information
+ - In the original protocol, no explicit "leave Service Mode" trigger was defined. Here, i defined, that on the first addressed [Loco Control](#loco-control_pri) or on a [Track Control](#track-control_pri) message, the Service Mode is ended, but this needs to be checked.
+
+ - If [Track Control](#track-control_pri) results in the track being powered off, should that happen immediatly or is it alright to finish a running query? May result in up to 1s shutoff time (absolute worst case scenario)
+
+ - If Track is off, should [Read / Write CV](#read-set-decoder-cv_pri) be responded with an error since there is no way a query can be handled without track power or should the track just be switched on again? 
+
+ - Since there is no way to just respond with ***"HELP, I don't know this command!!!"***, should every unsupported / unknown command be [Nak'd](#generic_nak) or [Ack'd](#generic_ack)
+
+ - In the Long frame header, does the length of header really just mean the header length? Since the original document mixes frame, message and header pretty freely, this needs to be checked. It would probably make more sense to catch the message length itself. 
 
 

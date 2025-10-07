@@ -1,5 +1,7 @@
 # MX1Bin
 
+[![build](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml) [![tests](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml) [![license](https://img.shields.io/github/license/ZIMO-Elektronik/ULF_MX1BIN)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/raw/master/LICENSE)
+
 ULF_MX1Bin is one of several [ULF_COM](https://github.com/ZIMO-Elektronik/ULF_COM) protocols. It is used to control a running command station from e.g. PC. This can be done during normal operation and in addition to a present interface on the command station. 
 
 <details>
@@ -18,11 +20,12 @@ ULF_MX1Bin is one of several [ULF_COM](https://github.com/ZIMO-Elektronik/ULF_CO
 
 ## Protocol 
 
-The protocol is based on type-sized messages, that can be roughly categorized into long/short and primary/reply messages. As a general rule, each primary message must generate at least a synchronous reply (Level1). Additionally, depending on the primary message, an additional, asynchronous message (Level2) can be transmitted.
+The protocol is based on type-sized messages, that can be roughly categorized into long/short and primary/reply messages. As a general rule, each primary message must generate at least a synchronous reply (Level 1). Additionally, depending on the primary message, an additional, asynchronous message (Level 2) can be transmitted.
 
 The stream representation is encoded before and after transfer. Hence, the actual message size may differ from the stream size. 
 
 Diagrams
+
 :construction:
 
 ## Getting Started
