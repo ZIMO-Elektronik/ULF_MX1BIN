@@ -1,0 +1,24 @@
+@startuml
+
+participant Host as H
+participant Device as D
+
+H -> D: Read Addr 3 CV 8
+note over D
+  No active query, accept and execute
+end note
+D --> H: Ack level 1
+
+H -> D: Read CV Addr 4 CV 8
+note over D
+  Currently busy with earlier query
+end note
+D --> H: Reply level 1 - Busy
+
+note over D
+  Done with query, forward Result
+end note
+D -> H: Reply level 2 - Result / Error 
+H --> D: Ack level 1
+
+@enduml
