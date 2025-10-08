@@ -75,7 +75,7 @@ struct Encoder {
   /// \warning UB if out of space
   template<typename T>
   requires ConvertibleTo<T, uint8_t>
-  void uint8(T&& t) {
+  inline void uint8(T const t) {
     auto const v{static_cast<uint8_t>(t)};
     if (is_control_char(v)) {
       *_iter++ = dle;
@@ -101,7 +101,7 @@ struct Encoder {
   /// \warning UB if out of space
   template<typename T>
   requires ConvertibleTo<T, uint16_t>
-  void uint16(T&& t) {
+  inline void uint16(T const t) {
     auto const v{static_cast<uint16_t>(t)};
     uint8(static_cast<uint8_t>((v & 0xFF00u) >> 8u));
     uint8(static_cast<uint8_t>((v & 0x00FFu) >> 0u));
@@ -114,7 +114,7 @@ struct Encoder {
   /// \see Encoder::uint16(uint16_t)
   template<typename T>
   requires OptionalConvertibleTo<T, uint16_t>
-  inline void uint16(std::optional<uint16_t> v) {
+  inline void uint16(T&& v) {
     if (v) return uint16(*v);
   }
 
