@@ -1,16 +1,16 @@
 include(GoogleTest)
 
 file(GLOB_RECURSE SRC *.cpp)
-add_executable(MX1BinTests ${SRC})
+add_executable(ULF_MX1BINTests ${SRC})
 
 sanitize(address,undefined)
 
-target_common_warnings(MX1BinTests PRIVATE)
+target_common_warnings(ULF_MX1BINTests PRIVATE)
+target_common_errors(ULF_MX1BINTests PRIVATE -Werror)
 
-cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.8.1")
 cpmaddpackage(URI "gh:google/googletest#main" OPTIONS "INSTALL_GTEST OFF")
 
-target_link_libraries(MX1BinTests PRIVATE ULF::MX1Bin ctre::ctre
-                                          GTest::gtest_main GTest::gmock)
+target_link_libraries(ULF_MX1BINTests PRIVATE ULF::MX1BIN GTest::gtest_main
+                                              GTest::gmock)
 
-gtest_discover_tests(MX1BinTests)
+gtest_discover_tests(ULF_MX1BINTests)

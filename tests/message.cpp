@@ -25,7 +25,7 @@ constexpr ulf::mx1bin::Packet encode(E& e) {
   ulf::mx1bin::Packet result;
   ulf::mx1bin::detail::Encoder en{result};
   en = e.encode(en);
-  result.resize(en.difference());
+  result.resize(static_cast<decltype(result)::size_type>(en.difference()));
   return result;
 }
 

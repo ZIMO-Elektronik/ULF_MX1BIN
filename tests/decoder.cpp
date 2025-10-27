@@ -35,11 +35,11 @@ TEST(decoder, s) {
   ulf::mx1bin::detail::Encoder e{q_v};
   e.addSOF();
   q.encode(e);
-  q_v.resize(e.difference());
+  q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
   e.uint8(ulf::mx1bin::crc8(std::span<uint8_t const>{q_v}.subspan(2uz)));
   e.addEOT();
 
-  q_v.resize(e.difference());
+  q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
 
   ulf::mx1bin::detail::Decoder d{q_v};
   d.strip();

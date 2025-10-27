@@ -21,8 +21,8 @@ constexpr uint16_t mask{0x8000u};
 struct CRC16 : detail::CRCBase<uint16_t, 0xFFFFu> {
   constexpr void next(uint8_t byte) {
     for (uint8_t i{0x80u}; i; i >>= 1) {
-      bool flag{(_crc & detail::mask) ? true : false};
-      _crc <<= 1u;
+      auto flag{static_cast<bool>(_crc & detail::mask)};
+      _crc = static_cast<decltype(_crc)>(_crc << 1u);
       if (byte & i) flag = !flag;
       if (flag) _crc ^= detail::poly;
     }

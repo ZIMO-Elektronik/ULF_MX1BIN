@@ -66,7 +66,9 @@ struct Encoder {
 
   void addEOT() { *_iter++ = eot; }
 
-  size_t difference() { return std::distance(_begin, _iter); }
+  size_t difference() {
+    return static_cast<size_t>(std::distance(_begin, _iter));
+  }
 
   /// Encode uint8
   ///

@@ -21,10 +21,10 @@
       ]
     },
     {
-      "name": "Debug MX1BinTests",
+      "name": "Debug ULF_MX1BINTests",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/tests/MX1BinTests",
+      "program": "${workspaceFolder}/build/tests/ULF_MX1BINTests",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
