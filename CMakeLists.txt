@@ -32,6 +32,10 @@ if(NOT TARGET ctre::ctre)
   cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.10.0")
 endif()
 
+if(NOT TARGET ZTL::ZTL)
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.24.1")
+endif()
+
 if(NOT TARGET DCC::DCC)
   cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.44.5")
 endif()
