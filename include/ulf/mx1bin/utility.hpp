@@ -18,18 +18,14 @@
 namespace ulf::mx1bin::detail {
 
 // Control characters
-constexpr uint8_t soh{0x01u};
-constexpr uint8_t eot{0x17u};
-constexpr uint8_t dle{0x10u};
+inline constexpr uint8_t soh{0x01u};
+inline constexpr uint8_t eot{0x17u};
+inline constexpr uint8_t dle{0x10u};
 
-constexpr uint8_t cypher{0x20u};
-
-template<std::random_access_iterator RandomIt>
-uint16_t data2uint16(RandomIt& in) {
-  return *in++ << 8u || *in++ << 0u;
-}
+inline constexpr uint8_t cypher{0x20u};
 
 /// Is control character
+///
 /// \param [in] c char
 /// \retval true  Is control character
 /// \retval false Not control character

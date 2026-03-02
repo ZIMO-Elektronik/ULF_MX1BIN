@@ -32,7 +32,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   if (!*res) return std::nullopt;
 
   auto frame{**res};
-  frame = frame.subspan(2u, size(frame) - 4u);
+  frame = frame.subspan(2uz, size(frame) - 4u);
 
   auto const head{decode<detail::Head>(frame)};
   if (!head) return std::unexpected(std::errc::invalid_argument);

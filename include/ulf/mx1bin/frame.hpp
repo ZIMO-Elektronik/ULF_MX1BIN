@@ -35,21 +35,21 @@ verify(std::span<uint8_t const> frame) {
   auto m{ctre::starts_with<pattern>(frame)};
   if (!m) return std::unexpected(std::errc::invalid_argument);
   // Match
-  m = ctre::match<pattern>(frame.subspan(0uz, m.size()));
+  m = ctre::match<pattern>(frame.subspan(0uz, size(m)));
   if (!m) return std::nullopt;
   // CRC
-  if (frame[m.size() - 3uz] == dle) {
+  if (frame[size(m) - 3uz] == dle) {
     // Encoded CRC8
-    if (crc8(frame.subspan(2uz, m.size() - 5uz)) ^ (frame[m.size() - 2uz]) ^
+    if (crc8(frame.subspan(2uz, size(m) - 5uz)) ^ (frame[size(m) - 2uz]) ^
         cypher)
       return std::unexpected(std::errc::bad_message);
   } else {
     // Non-encoded CRC8
-    if (crc8(frame.subspan(2uz, m.size() - 4uz)) ^ frame[m.size() - 2uz])
+    if (crc8(frame.subspan(2uz, size(m) - 4uz)) ^ frame[size(m) - 2uz])
       return std::unexpected(std::errc::bad_message);
   }
 
-  return frame.subspan(0u, m.size());
+  return frame.subspan(0uz, size(m));
 }
 
 } // namespace ulf::mx1bin::detail

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <span>
 #include "utility.hpp"
 
@@ -38,6 +39,7 @@ struct Decoder {
   ///
   /// \return Decoder reference
   Decoder& strip() {
+    assert(_iter != _end);
     while (*_iter == soh) _iter++;
     while (*(_end - 1) == eot) _end--;
     return *this;
@@ -105,7 +107,7 @@ struct Decoder {
         if (iter++ == _end) break; // Decode error
         size += 2uz;
       } else {
-        // Non-encoded}
+        // Non-encoded
         size++;
       }
     }
@@ -120,7 +122,6 @@ struct Decoder {
   bool has_at_least(size_t const n) const {
     auto iter{_iter};
     size_t size{0uz};
-
     while (iter != _end && size < n) {
       if (*iter++ == dle) {
         // Encoded
