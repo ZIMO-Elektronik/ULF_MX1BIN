@@ -11,8 +11,11 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
 #include <optional>
+#include <ranges>
 #include <span>
+#include <system_error>
 #include <variant>
 #include <ztl/inplace_vector.hpp>
 #include "bitfields.hpp"
@@ -89,7 +92,7 @@ struct Reset : public detail::Head {
 
 struct TrackControl : public detail::Head {
   struct Reply : public detail::ReplyHead {
-    struct bitfields::TrackStatus statusBits{}; ///< Track status
+    bitfields::TrackStatus statusBits{}; ///< Track status
     template<detail::encoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);

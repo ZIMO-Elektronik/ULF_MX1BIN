@@ -1,10 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <array>
 #include <ctre.hpp>
-#include <vector>
-
+#include <ranges>
 #include <ulf/mx1bin.hpp>
-
 #include <ulf/mx1bin/crc16.hpp>
 #include <ulf/mx1bin/crc8.hpp>
 #include <vector>

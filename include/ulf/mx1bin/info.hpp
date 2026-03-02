@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <span>
+#include <utility>
 
 namespace ulf::mx1bin {
 

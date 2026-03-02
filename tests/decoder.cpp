@@ -1,6 +1,5 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
 #include <ulf/mx1bin.hpp>
 #include <ulf/mx1bin/decoder.hpp>
 #include <vector>

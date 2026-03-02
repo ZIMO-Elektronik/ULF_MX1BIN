@@ -2,7 +2,7 @@
 
 [![build](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml) [![tests](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml) [![license](https://img.shields.io/github/license/ZIMO-Elektronik/ULF_MX1BIN)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/raw/master/LICENSE)
 
-ULF_MX1Bin is one of several [ULF_COM](https://github.com/ZIMO-Elektronik/ULF_COM) protocols. It is used to control a running command station from e.g. PC. This can be done during normal operation and in addition to a present interface on the command station. 
+ULF_MX1BIN is one of several [ULF_COM](https://github.com/ZIMO-Elektronik/ULF_COM) protocols. It is used to control a running command station from e.g. PC. This can be done during normal operation and in addition to a present interface on the command station. 
 
 <details>
   <summary>Table of Contents</summary>
@@ -38,14 +38,14 @@ This library is meant to be consumed with CMake.
 
 ```cmake
 #Either by including it with CPM
-cpmaddpackage("gh:ZIMO-Elektronik/ULF_MX1Bin@0.1.0")
+cpmaddpackage("gh:ZIMO-Elektronik/ULF_MX1BIN@0.1.0")
 
 # or the FetchContent module
 FetchContent_Declare(
-  ULF_MX1Bin
-  GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/ULF_MX1Bin"
+  ULF_MX1BIN
+  GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/ULF_MX1BIN"
   GIT_TAG 0.1.0)
-FetchContent_MakeAvailable(ULF_MX1Bin)
+FetchContent_MakeAvailable(ULF_MX1BIN)
 
 target_link_libraries(YourTarget PRIVATE ULF::MX1Bin)
 ```

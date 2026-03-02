@@ -16,6 +16,8 @@
 #include <optional>
 #include <span>
 #include <system_error>
+#include "crc8.hpp"
+#include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
 

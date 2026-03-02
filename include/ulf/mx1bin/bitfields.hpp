@@ -13,16 +13,20 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 #include <type_traits>
+#include <ztl/bits.hpp>
+#include "frame.hpp"
+#include "info.hpp"
 #include "types.hpp"
+#include "utility.hpp"
 
 namespace ulf::mx1bin::bitfields {
 
 /// Get concurrent bits from bitfield
-/// @tparam P LSB position
-/// @tparam N Bit count
-/// @tparam T Type of Field
-/// @param t Field
-/// @return bits P .. P+N as value
+/// \tparam P LSB position
+/// \tparam N Bit count
+/// \tparam T Type of Field
+/// \param  t Field
+/// \return bits P .. P+N as value
 template<std::size_t P, std::size_t N, std::unsigned_integral T>
 requires((N + P) <= (sizeof(T) * 8))
 constexpr T bits(T const t) {

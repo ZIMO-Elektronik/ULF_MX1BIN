@@ -30,19 +30,19 @@ uint16_t data2uint16(RandomIt& in) {
 }
 
 /// Is control character
-/// @param [in] c char
-/// @retval true  Is control character
-/// @retval false Not control character
+/// \param [in] c char
+/// \retval true  Is control character
+/// \retval false Not control character
 constexpr bool is_control_char(uint8_t c) {
   return c == soh || c == eot || c == dle;
 }
 
 /// Encode character if applicable
 ///
-/// @tparam OutputIt Output iterator
-/// @param [in] c    Char
-/// @param [in] out  Output iterator
-/// @return   Output iterator
+/// \tparam OutputIt Output iterator
+/// \param [in] c    Char
+/// \param [in] out  Output iterator
+/// \return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
 [[maybe_unused]] constexpr auto encode_8(uint8_t const c, OutputIt& out) {
   if (is_control_char(c)) {
@@ -54,10 +54,10 @@ template<std::output_iterator<uint8_t> OutputIt>
 
 /// Encode 2 byte value if applicable
 ///
-/// @tparam OutputIt Output iterator
-/// @param v         Value
-/// @param out       Output iterator
-/// @return   Output iterator
+/// \tparam OutputIt Output iterator
+/// \param v         Value
+/// \param out       Output iterator
+/// \return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
 [[maybe_unused]] constexpr auto encode_16(uint16_t const v, OutputIt& out) {
   out = encode_8(static_cast<uint8_t>((v & 0xFF00u) >> 8u), out);
@@ -66,9 +66,9 @@ template<std::output_iterator<uint8_t> OutputIt>
 
 /// Decode character if applicable
 ///
-/// @tparam InputIt Input iterator
-/// @param in Input iterator
-/// @return  Decoded char
+/// \tparam InputIt Input iterator
+/// \param in Input iterator
+/// \return  Decoded char
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 [[maybe_unused]] constexpr auto decode_8(InputIt& in) {
@@ -80,10 +80,10 @@ requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 
 /// Decode 2 byte value if applicable
 ///
-/// @tparam InputIt Input iterator
-/// @param v        Value
-/// @param in       Input iterator
-/// @return  Decoded value
+/// \tparam InputIt Input iterator
+/// \param v        Value
+/// \param in       Input iterator
+/// \return  Decoded value
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 [[maybe_unused]] constexpr auto decode_16(InputIt& in) {

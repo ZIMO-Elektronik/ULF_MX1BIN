@@ -36,7 +36,7 @@ struct Decoder {
 
   /// Strips SOH and EOH
   ///
-  /// @return Decoder reference
+  /// \return Decoder reference
   Decoder& strip() {
     while (*_iter == soh) _iter++;
     while (*(_end - 1) == eot) _end--;
@@ -45,8 +45,8 @@ struct Decoder {
 
   /// Decode next uint8
   ///
-  /// @warning  UB if out of data
-  /// @return   Decoded value
+  /// \warning  UB if out of data
+  /// \return   Decoded value
   uint8_t uint8() {
     if (*_iter == dle) {
       // Encoded
@@ -59,8 +59,8 @@ struct Decoder {
 
   /// Decode next uint8 - checked
   ///
-  /// @retval std::nullopt  Out of data
-  /// @retval uint8_t       Decoded value
+  /// \retval std::nullopt  Out of data
+  /// \retval uint8_t       Decoded value
   std::optional<uint8_t> s_uint8() {
     if (_iter == _end) return std::nullopt;
     if (*_iter == dle) {
@@ -76,16 +76,16 @@ struct Decoder {
 
   /// Decode next uint16
   ///
-  /// @warning  UB if out of data
-  /// @return   Decoded value
+  /// \warning  UB if out of data
+  /// \return   Decoded value
   uint16_t uint16() {
     return static_cast<uint16_t>(uint8() << 8u | uint8() << 0u);
   }
 
   /// Decode next uint16 - checked
   ///
-  /// @retval std::nullopt  Out of data
-  /// @retval uint16        Decoded value
+  /// \retval std::nullopt  Out of data
+  /// \retval uint16        Decoded value
   std::optional<uint16_t> s_uint16() {
     if (auto const hi{s_uint8()})
       if (auto const lo{s_uint8()})
@@ -95,7 +95,7 @@ struct Decoder {
 
   /// Calculate remaining size
   ///
-  /// @return Remaining message size
+  /// \return Remaining message size
   size_t remaining() const {
     auto iter{_iter};
     size_t size{0uz};
@@ -114,9 +114,9 @@ struct Decoder {
 
   /// Check, if message has at least n byte left
   ///
-  /// @param n Minimum size to check
-  /// @retval true  At least n bytes left
-  /// @retval false Not enough bytes left
+  /// \param n Minimum size to check
+  /// \retval true  At least n bytes left
+  /// \retval false Not enough bytes left
   bool has_at_least(size_t const n) const {
     auto iter{_iter};
     size_t size{0uz};

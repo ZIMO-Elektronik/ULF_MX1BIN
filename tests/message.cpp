@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-
-#include "ulf/mx1bin.hpp"
+#include <ulf/mx1bin.hpp>
 
 #define CODABLE(type)                                                          \
   static_assert(ulf::mx1bin::Encodable<type>);                                 \

@@ -11,12 +11,15 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
 #include <span>
+#include <system_error>
 #include <ztl/inplace_vector.hpp>
 #include "bitfields.hpp"
 #include "commands.hpp"
 #include "decoder.hpp"
 #include "encoder.hpp"
+#include "error.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
