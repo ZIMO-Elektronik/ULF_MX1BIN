@@ -59,7 +59,7 @@ struct Encoder {
   // Encoder tag
   using encoder_tag = void;
 
-  // Construct/copy/destroy
+  // Construct
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
              std::convertible_to<std::ranges::sentinel_t<R>, S>
@@ -67,7 +67,6 @@ struct Encoder {
     : _iter{std::ranges::begin(r)}, _begin{std::ranges::begin(r)},
       _end{std::ranges::end(r)} {}
   Encoder(I iter, S end) : _iter{iter}, _begin{iter}, _end{end} {}
-  Encoder(Encoder const& d) = default;
 
   void addSOF() {
     *_iter++ = soh;

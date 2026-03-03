@@ -36,9 +36,9 @@ TEST(Message, Ack) {
                         .code{ulf::mx1bin::Command::Track_Ctrl},
                         .reply_uSID{0x03}}};
 
-  CODE(ack);
+  CODE(ack)
 
-  MATCH_HEAD(ack);
+  MATCH_HEAD(ack)
   ASSERT_EQ(ack.reply_uSID, d_ack.reply_uSID);
 }
 
@@ -87,9 +87,9 @@ TEST(Message, TrackControl_Reply) {
      .reply_uSID{0x03}}};
   reply.statusBits = 0x55u;
 
-  CODE(reply);
+  CODE(reply)
 
-  MATCH_HEAD(reply);
+  MATCH_HEAD(reply)
   ASSERT_EQ(reply.statusBits, d_reply.statusBits);
 }
 
@@ -104,9 +104,9 @@ TEST(Message, DecoderControl) {
   ctrl.cData2 = 0xAAu;
   ctrl.cData3 = 0x55u;
 
-  CODE(ctrl);
+  CODE(ctrl)
 
-  MATCH_HEAD(ctrl);
+  MATCH_HEAD(ctrl)
   ASSERT_EQ(ctrl.cAdr, d_ctrl.cAdr);
   ASSERT_EQ(ctrl.cSpeed, d_ctrl.cSpeed);
   ASSERT_EQ(*ctrl.cData1, *d_ctrl.cData1);
@@ -127,9 +127,9 @@ TEST(Message, DecoderControl_Reply) {
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
-  CODE(reply);
+  CODE(reply)
 
-  MATCH_HEAD(reply);
+  MATCH_HEAD(reply)
   ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);

@@ -42,11 +42,11 @@ TEST(decoder, s) {
 
   ulf::mx1bin::detail::Decoder d{q_v};
   d.strip();
-  auto head{ulf::mx1bin::detail::Head::decode(d)};
+  [[maybe_unused]] auto head{ulf::mx1bin::detail::Head::decode(d)};
 
   std::span<uint8_t const> sp{q_v};
 
-  auto message{ulf::mx1bin::mx1bin_2message(sp)};
+  [[maybe_unused]] auto message{ulf::mx1bin::mx1bin_2message(sp)};
 
   // ASSERT_TRUE(false);
 }
@@ -72,7 +72,8 @@ TEST(decoder, y) {
     0x17,
   };
 
-  auto message{ulf::mx1bin::mx1bin_2message(v)};
+  [[maybe_unused]] auto message{ulf::mx1bin::mx1bin_2message(v)};
+
   ASSERT_TRUE(true);
 }
 

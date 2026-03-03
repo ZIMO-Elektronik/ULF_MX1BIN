@@ -56,12 +56,12 @@ struct Info {
   }
   constexpr Info& operator=(uint8_t const val) { return *new (this) Info(val); }
   constexpr explicit operator uint8_t() const {
-    return {static_cast<uint8_t>(
+    return static_cast<uint8_t>(
       ztl::map_value_to<ztl::mask<7u>>(std::to_underlying(frameType)) |
       ztl::map_value_to<ztl::mask<6u, 5u>>(std::to_underlying(messageType)) |
       ztl::map_value_to<ztl::mask<4u>>(std::to_underlying(sender)) |
       ztl::map_value_to<ztl::mask<3u, 2u, 1u, 0u>>(
-        std::to_underlying(stationType)))};
+        std::to_underlying(stationType)));
   }
   constexpr bool operator==(Info const&) const = default;
 };
@@ -92,12 +92,12 @@ struct TrackStatus {
     return *new (this) TrackStatus(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {
-      static_cast<uint8_t>(ztl::map_value_to<ztl::mask<7u>>(dcc) |
-                           ztl::map_value_to<ztl::mask<6u>>(motorola) |
-                           ztl::map_value_to<ztl::mask<2u>>(ues) |
-                           ztl::map_value_to<ztl::mask<1u>>(trackVoltage) |
-                           ztl::map_value_to<ztl::mask<0u>>(broadcastStop))};
+    return static_cast<uint8_t>(
+      ztl::map_value_to<ztl::mask<7u>>(dcc) |
+      ztl::map_value_to<ztl::mask<6u>>(motorola) |
+      ztl::map_value_to<ztl::mask<2u>>(ues) |
+      ztl::map_value_to<ztl::mask<1u>>(trackVoltage) |
+      ztl::map_value_to<ztl::mask<0u>>(broadcastStop));
   }
   constexpr bool operator==(TrackStatus const&) const = default;
 };
@@ -118,9 +118,9 @@ struct ControlSpeed {
     return *new (this) ControlSpeed(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {static_cast<uint8_t>(
+    return static_cast<uint8_t>(
       ztl::map_value_to<ztl::mask<7u>>(stop) |
-      ztl::map_value_to<ztl::mask<6u, 5u, 4u, 3u, 2u, 1u, 0u>>(speed))};
+      ztl::map_value_to<ztl::mask<6u, 5u, 4u, 3u, 2u, 1u, 0u>>(speed));
   }
   constexpr bool operator==(ControlSpeed const&) const = default;
 };
@@ -154,13 +154,13 @@ struct ControlData {
     return *new (this) ControlData(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {
-      static_cast<uint8_t>(ztl::map_value_to<ztl::mask<7u>>(manual) |
-                           ztl::map_value_to<ztl::mask<5u>>(direction) |
-                           ztl::map_value_to<ztl::mask<4u>>(headlights) |
-                           ztl::map_value_to<ztl::mask<3u, 2u>>(speed_step) |
-                           ztl::map_value_to<ztl::mask<1u>>(az_enable) |
-                           ztl::map_value_to<ztl::mask<0u>>(bz_enable))};
+    return static_cast<uint8_t>(
+      ztl::map_value_to<ztl::mask<7u>>(manual) |
+      ztl::map_value_to<ztl::mask<5u>>(direction) |
+      ztl::map_value_to<ztl::mask<4u>>(headlights) |
+      ztl::map_value_to<ztl::mask<3u, 2u>>(speed_step) |
+      ztl::map_value_to<ztl::mask<1u>>(az_enable) |
+      ztl::map_value_to<ztl::mask<0u>>(bz_enable));
   }
   constexpr bool operator==(ControlData const&) const = default;
 };
@@ -185,10 +185,10 @@ struct ControlPayload {
     return *new (this) ControlPayload(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {static_cast<uint8_t>(
+    return static_cast<uint8_t>(
       ztl::map_value_to<ztl::mask<7u, 6u>>(format) |
       (ztl::map_value_to<ztl::mask<3u, 2u>>(std::to_underlying(speedStep)) |
-       ztl::map_value_to<ztl::mask<0u>>(trackState)))};
+       ztl::map_value_to<ztl::mask<0u>>(trackState)));
   }
   constexpr bool operator==(ControlPayload const&) const = default;
 };
@@ -215,10 +215,10 @@ struct AddressControl_Control {
     return *new (this) AddressControl_Control(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {static_cast<uint8_t>(ztl::map_value_to<ztl::mask<7u>>(set) |
-                                 ztl::map_value_to<ztl::mask<5u>>(type) |
-                                 ztl::map_value_to<ztl::mask<1u>>(lock) |
-                                 ztl::map_value_to<ztl::mask<0u>>(log))};
+    return static_cast<uint8_t>(ztl::map_value_to<ztl::mask<7u>>(set) |
+                                ztl::map_value_to<ztl::mask<5u>>(type) |
+                                ztl::map_value_to<ztl::mask<1u>>(lock) |
+                                ztl::map_value_to<ztl::mask<0u>>(log));
   }
   constexpr bool operator==(AddressControl_Control const&) const = default;
 };
@@ -250,12 +250,12 @@ struct AddressControl_Payload {
     return *new (this) AddressControl_Payload(val);
   }
   constexpr explicit operator uint8_t() const {
-    return {
-      static_cast<uint8_t>(ztl::map_value_to<ztl::mask<7u, 6u>>(format) |
-                           ztl::map_value_to<ztl::mask<5u>>(type) |
-                           ztl::map_value_to<ztl::mask<3u, 2u>>(speedStep) |
-                           ztl::map_value_to<ztl::mask<1u>>(lock) |
-                           ztl::map_value_to<ztl::mask<0u>>(log))};
+    return static_cast<uint8_t>(
+      ztl::map_value_to<ztl::mask<7u, 6u>>(format) |
+      ztl::map_value_to<ztl::mask<5u>>(type) |
+      ztl::map_value_to<ztl::mask<3u, 2u>>(speedStep) |
+      ztl::map_value_to<ztl::mask<1u>>(lock) |
+      ztl::map_value_to<ztl::mask<0u>>(log));
   }
   constexpr bool operator==(AddressControl_Payload const&) const = default;
 };
@@ -278,11 +278,11 @@ struct DecoderAddress {
     return *new (this) DecoderAddress(val);
   }
   constexpr explicit operator uint16_t() const {
-    return {static_cast<uint16_t>(
+    return static_cast<uint16_t>(
       ztl::map_value_to<ztl::mask<15u, 14u>>(format) |
       ztl::map_value_to<
         ztl::mask<13u, 12u, 11u, 10u, 9u, 8u, 7u, 6u, 5u, 4u, 3u, 2u, 1u, 0u>>(
-        address))};
+        address));
   }
   constexpr bool operator==(DecoderAddress const&) const = default;
 };

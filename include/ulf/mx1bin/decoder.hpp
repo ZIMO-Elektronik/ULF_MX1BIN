@@ -26,14 +26,13 @@ struct Decoder {
   // Decoder tag
   using decoder_tag = void;
 
-  // Construct/copy/destroy
+  // Construct
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
              std::convertible_to<std::ranges::sentinel_t<R>, S>
   Decoder(R const& r)
     : _iter{std::ranges::cbegin(r)}, _end{std::ranges::cend(r)} {}
   Decoder(I iter, S end) : _iter{iter}, _end{end} {}
-  Decoder(Decoder const& d) = default;
 
   /// Strips SOH and EOH
   ///
