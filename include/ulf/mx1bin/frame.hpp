@@ -21,7 +21,7 @@
 
 namespace ulf::mx1bin::detail {
 
-constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
+inline constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
 
 /// Verify frame
 ///

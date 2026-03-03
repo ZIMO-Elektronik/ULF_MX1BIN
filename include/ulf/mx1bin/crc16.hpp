@@ -17,30 +17,27 @@
 
 namespace ulf::mx1bin {
 
-namespace detail {
-
-/// Polynomial representation for CRC
-constexpr uint16_t poly{0x1021u};
-
-/// Condition mask
-constexpr uint16_t mask{0x8000u};
-
-} // namespace detail
-
 /// CRC16 CCITT with polynomial representation 0x1021
 struct CRC16 : detail::CRCBase<uint16_t, 0xFFFFu> {
   constexpr void next(uint8_t byte) {
     for (uint8_t i{0x80u}; i; i >>= 1) {
-      auto flag{static_cast<bool>(_crc & detail::mask)};
+      auto flag{static_cast<bool>(_crc & _mask)};
       _crc = static_cast<decltype(_crc)>(_crc << 1u);
       if (byte & i) flag = !flag;
-      if (flag) _crc ^= detail::poly;
+      if (flag) _crc ^= _poly;
     }
   }
 
   constexpr void next(std::span<uint8_t const> bytes) {
     std::ranges::for_each(bytes, [this](uint8_t byte) { next(byte); });
   }
+
+private:
+  /// Polynomial representation for CRC
+  static constexpr uint16_t _poly{0x1021u};
+
+  /// Condition mask
+  static constexpr uint16_t _mask{0x8000u};
 };
 
 /// Calculate CRC16 (CCITT)

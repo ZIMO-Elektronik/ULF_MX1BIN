@@ -32,15 +32,15 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   if (!*res) return std::nullopt;
 
   auto frame{**res};
-  frame = frame.subspan(2uz, size(frame) - 4u);
+  frame = frame.subspan(2uz, size(frame) - 4uz);
 
   auto const head{decode<detail::Head>(frame)};
   if (!head) return std::unexpected(std::errc::invalid_argument);
 
-  auto const type{(*head).info.messageType};
+  auto const type{head->info.messageType};
 
   /// \todo Usually, we need to differentiate between message types
-  switch ((*head).code) {
+  switch (head->code) {
     case Command::Reset: return decode<Reset>(frame);
     case Command::Track_Ctrl: return decode<TrackControl>(frame);
     case Command::Loco_Ctrl: return decode<DecoderControl>(frame);
