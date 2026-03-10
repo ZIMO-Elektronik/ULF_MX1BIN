@@ -16,16 +16,27 @@
 
 namespace ulf::mx1bin {
 
-/// Decoder concept
+/// Field decoder
 template<typename T>
-concept decoder = requires { typename T::decoder_tag; };
+concept FieldDecoder = requires(T t) {
+  { t.uint8() } -> std::same_as<uint8_t>;
+  { t.uint16() } -> std::same_as<uint16_t>;
+};
+
+/// Optional field decoder
+template<typename T>
+concept OptionalFieldDecoder = requires(T t) {
+  { t.s_uint8() } -> std::same_as<std::optional<uint8_t>>;
+  { t.s_uint16() } -> std::same_as<std::optional<uint16_t>>;
+};
+
+/// Is Decoder
+template<typename T>
+concept IsDecoder = FieldDecoder<T> && OptionalFieldDecoder<T>;
 
 /// MX1Bin message stream decoder
 template<std::input_iterator I, std::sentinel_for<I> S>
 struct Decoder {
-  // Decoder tag
-  using decoder_tag = void;
-
   // Construct
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&

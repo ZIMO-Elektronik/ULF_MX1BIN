@@ -49,16 +49,28 @@ concept OptionalConvertibleTo =
   convertible_to<typename optional_inner_type<std::remove_cvref_t<T>>::type,
                  To>;
 
-/// Encoder concept
+/// Field encoder
 template<typename T>
-concept encoder = requires { typename T::encoder_tag; };
+concept FieldEncoder = requires(T t, uint8_t const u8, uint16_t const u16) {
+  { t.uint8(u8) } -> std::same_as<void>;
+  { t.uint16(u16) } -> std::same_as<void>;
+};
+
+/// Optional field encoder
+template<typename T>
+concept OptionalFieldEncoder = requires(
+  T t, std::optional<uint8_t> const o_u8, std::optional<uint16_t> const o_u16) {
+  { t.uint8(o_u8) } -> std::same_as<void>;
+  { t.uint16(o_u16) } -> std::same_as<void>;
+};
+
+/// Is Encoder
+template<typename T>
+concept IsEncoder = FieldEncoder<T> && OptionalFieldEncoder<T>;
 
 /// MX1Bin message stream encoder
 template<std::output_iterator<uint8_t> I, std::sentinel_for<I> S>
 struct Encoder {
-  // Encoder tag
-  using encoder_tag = void;
-
   // Construct
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&

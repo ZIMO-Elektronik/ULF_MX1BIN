@@ -35,7 +35,7 @@ concept Encodable = requires {
 ///
 /// \note This is safe, since return is checked against the actual type
 template<typename T>
-concept Decodable = requires(T t, Decoder<char const*, char const*> const& d) {
+concept Decodable = requires(T t, Decoder<char const*, char const*>& d) {
   { T::decode(d) } -> std::same_as<std::expected<T, std::errc>>;
 };
 
@@ -53,11 +53,11 @@ constexpr std::expected<T, std::errc> decode(R const& r) {
 }
 
 struct Ack : public detail::ReplyHead {
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return ReplyHead::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<Ack, std::errc> decode(D& d) {
     if (auto const base{ReplyHead::decode(d)}) return Ack{*base};
     else return std::unexpected(base.error());
@@ -65,11 +65,11 @@ struct Ack : public detail::ReplyHead {
 };
 
 struct Nak : public detail::Head {
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return Head::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<Nak, std::errc> decode(D& d) {
     if (auto const result{Head::decode(d)}) return Nak{*result};
     else return std::unexpected(result.error());
@@ -77,11 +77,11 @@ struct Nak : public detail::Head {
 };
 
 struct Reset : public detail::Head {
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return Head::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<Reset, std::errc> decode(D& d) {
     if (auto const result{Head::decode(d)}) return Reset{*result};
     else return std::unexpected(result.error());
@@ -91,13 +91,13 @@ struct Reset : public detail::Head {
 struct TrackControl : public detail::Head {
   struct Reply : public detail::ReplyHead {
     bitfields::TrackStatus statusBits{}; ///< Track status
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint8(statusBits);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base || !d.has_at_least(sizeof(cAction)))
@@ -114,13 +114,13 @@ struct TrackControl : public detail::Head {
     TrackOn = 2u,
     Query = 3u
   } cAction{}; ///> Action
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = Head::encode(e);
     e.uint8(cAction);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<TrackControl, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
     if (!base || !d.has_at_least(sizeof(cAction)))
@@ -133,11 +133,11 @@ struct TrackControl : public detail::Head {
 
 struct DecoderControl : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       if (auto const result{ReplyDecoderControlBase::decode(d)})
         return Reply{*result};
@@ -151,7 +151,7 @@ struct DecoderControl : public detail::DecoderControlBase {
   std::optional<uint8_t> cData3{};                ///> F9..12
   std::optional<uint8_t> cData4{};                ///> F13..20
   std::optional<uint8_t> cData5{};                ///> F21..28
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cSpeed);
@@ -162,7 +162,7 @@ struct DecoderControl : public detail::DecoderControlBase {
     e.uint8(cData5);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<DecoderControl, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(cSpeed)))
@@ -181,11 +181,11 @@ struct DecoderControl : public detail::DecoderControlBase {
 
 struct InvertFunctionBits : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       if (auto const base{ReplyDecoderControlBase::decode(d)})
         return Reply{*base};
@@ -198,7 +198,7 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
   uint8_t cData3{};                ///> F9..12
   uint8_t cData4{};                ///> F13..20
   uint8_t cData5{};                ///> F21..28
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cData1);
@@ -208,7 +208,7 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
     e.uint8(cData5);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<InvertFunctionBits, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base ||
@@ -227,11 +227,11 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
 
 struct Acceleration : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       if (auto const base{ReplyDecoderControlBase::decode(d)})
         return Reply{*base};
@@ -240,13 +240,13 @@ struct Acceleration : public detail::DecoderControlBase {
   };
 
   uint8_t cAzBz{}; ///> Accel / Break time
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cAzBz);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<Acceleration, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(cAzBz)))
@@ -259,11 +259,11 @@ struct Acceleration : public detail::DecoderControlBase {
 
 struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       if (auto const base{ReplyDecoderControlBase::decode(d)})
         return Reply{*base};
@@ -271,11 +271,11 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
     }
   };
 
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return ShuttleTrain_Accessory_Base::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<ShuttleTrain, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})
       return ShuttleTrain{*base};
@@ -285,11 +285,11 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
 
 struct Accessory : public detail::ShuttleTrain_Accessory_Base {
   struct Reply : public detail::ReplyDecoderControlBase {
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       if (auto const base{ReplyDecoderControlBase::decode(d)})
         return Reply{*base};
@@ -297,11 +297,11 @@ struct Accessory : public detail::ShuttleTrain_Accessory_Base {
     }
   };
 
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return ShuttleTrain_Accessory_Base::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<Accessory, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})
       return Accessory{*base};
@@ -320,7 +320,7 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
     uint8_t cStatus{};                ///< Active / inactive
     uint8_t cData4{};                 ///< F13..20
     uint8_t cData5{};                 ///< F21..28
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyErrorBase::encode(e);
       e.uint16(cAdr);
@@ -334,7 +334,7 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
       e.uint8(cData5);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyErrorBase::decode(d)};
       if (!base ||
@@ -356,11 +356,11 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
     }
   };
 
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return DecoderControlBase::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<LocoMemoryQuery, std::errc> decode(D& d) {
     if (auto const base{DecoderControlBase::decode(d)})
       return LocoMemoryQuery{*base};
@@ -373,7 +373,7 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
     bitfields::DecoderAddress cAdr{};
     uint8_t cPair{};    ///<
     uint8_t cOutputs{}; ///< Acc decoder outputs
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyErrorBase::encode(e);
       e.uint16(cAdr);
@@ -381,7 +381,7 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
       e.uint8(cOutputs);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyErrorBase::decode(d)};
       if (!base ||
@@ -395,11 +395,11 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
     }
   };
 
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return DecoderControlBase::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<AccessoryMemoryQuery, std::errc> decode(D& d) {
     if (auto const base{DecoderControlBase::decode(d)})
       return AccessoryMemoryQuery{*base};
@@ -411,14 +411,14 @@ struct AddressControl : public detail::DecoderControlBase {
   struct Reply : public detail::ReplyHead {
     bitfields::AddressControl_Payload payload{}; ///< Control params
     uint8_t cOutputs{};                          ///< Acc decoder outputs
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint8(payload);
       e.uint8(cOutputs);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base || !d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
@@ -432,14 +432,14 @@ struct AddressControl : public detail::DecoderControlBase {
 
   bitfields::AddressControl_Control cControl{}; ///> Control parameters
   std::optional<uint8_t> cOutputs{};            ///> Acc decoder outputs
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cControl);
     e.uint8(cOutputs);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<AddressControl, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(cControl)))
@@ -460,7 +460,7 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
     uint16_t cCurrent2{};
     uint8_t cVoltage2{};
     uint8_t cAux{};
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint8(values);
@@ -471,7 +471,7 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
       e.uint8(cAux);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base || !d.has_at_least(sizeof(values) + sizeof(cCurrent1) +
@@ -488,11 +488,11 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
       return result;
     }
   };
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return CommandStationQueryBase::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<CommandStationIOQuery, std::errc> decode(D& d) {
     if (auto const base{CommandStationQueryBase::decode(d)})
       return CommandStationIOQuery{*base};
@@ -503,13 +503,13 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
 struct CommandStationCvManip : public detail::Head {
   struct Reply : public detail::ReplyErrorBase {
     uint8_t value{};
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyErrorBase::encode(e);
       e.uint8(value);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyErrorBase::decode(d)};
       if (!base || !d.has_at_least(sizeof(value)))
@@ -522,14 +522,14 @@ struct CommandStationCvManip : public detail::Head {
 
   uint16_t variable{};            ///> Cv Address
   std::optional<uint8_t> value{}; ///> Cv Value
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = Head::encode(e);
     e.uint16(variable);
     e.uint8(value);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<CommandStationCvManip, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
     if (!base || !d.has_at_least(sizeof(variable)))
@@ -563,7 +563,7 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
     std::optional<uint8_t> cSerNum_mh{}; ///> Serial Number [1]
     std::optional<uint8_t> cSerNum_ml{}; ///> Serial Number [2]
     std::optional<uint8_t> cSerNum_lo{}; ///> Serial Number [3]
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyLongHead::encode(e);
       e.uint16(cAddress);
@@ -589,11 +589,11 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
     }
   };
 
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     return CommandStationQueryBase::encode(e);
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<CommandStationEquipmentQuery, std::errc> decode(D& d) {
     if (auto const base{CommandStationQueryBase::decode(d)})
       return CommandStationEquipmentQuery{*base};
@@ -604,14 +604,14 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
 struct SerialInfo : public detail::Head {
   uint8_t toolID{}; ///> Tool ID
   uint8_t action{}; ///>
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = Head::encode(e);
     e.uint8(toolID);
     e.uint8(action);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<SerialInfo, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
     if (!base || !d.has_at_least(sizeof(toolID) + sizeof(action)))
@@ -629,7 +629,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     uint16_t variable{};
     uint8_t cValue{};
     uint8_t cError{};
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint16(cAdr);
@@ -638,7 +638,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
       e.uint8(cError);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
@@ -660,7 +660,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     std::optional<uint8_t> activeUSID{};
     std::optional<bitfields::DecoderAddress> activeAddr{};
     std::optional<uint16_t> activeCv{};
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint8(busy);
@@ -671,7 +671,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
       e.uint16(activeCv);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Busy, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base ||
@@ -691,14 +691,14 @@ struct DecoderCvManip : public detail::DecoderControlBase {
   struct Error : public detail::ReplyHead {
     bitfields::DecoderAddress cAdr{};
     uint8_t cError{};
-    template<encoder E>
+    template<IsEncoder E>
     auto encode(E e) const {
       e = ReplyHead::encode(e);
       e.uint16(cAdr);
       e.uint8(cError);
       return e;
     }
-    template<decoder D>
+    template<IsDecoder D>
     static std::expected<Error, std::errc> decode(D& d) {
       auto const base{ReplyHead::decode(d)};
       if (!base || d.has_at_least(sizeof(cAdr) + sizeof(cError)))
@@ -712,14 +712,14 @@ struct DecoderCvManip : public detail::DecoderControlBase {
 
   uint16_t variable{};            ///> Cv Address
   std::optional<uint8_t> value{}; ///> Cv Value
-  template<encoder E>
+  template<IsEncoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint16(variable);
     e.uint8(value);
     return e;
   }
-  template<decoder D>
+  template<IsDecoder D>
   static std::expected<DecoderCvManip, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(variable)))
