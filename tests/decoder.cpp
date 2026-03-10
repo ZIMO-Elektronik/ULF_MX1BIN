@@ -4,89 +4,129 @@
 #include <ulf/mx1bin/decoder.hpp>
 #include <vector>
 
-TEST(decoder, strip) {
-  std::vector<uint8_t> proc{
-    0x39, 0x10, 0x30, 0x13, 0x80, 0x03, 0x00, 0x1d, 0xea};
+using testing::_;
 
-  std::vector<uint8_t> raw{0x01, 0x01};
-  std::ranges::copy(proc, std::back_inserter(raw));
-  raw.push_back(0x17);
+TEST(decoder, strip) {
+  std::vector<uint8_t> message{
+    0x39u, 0x10u, 0x13u, 0x80u, 0x03u, 0x00u, 0x1Du, 0xEAu};
+
+  std::vector<uint8_t> encoded_message{
+    0x39u, 0x10u, 0x30u, 0x13u, 0x80u, 0x03u, 0x00u, 0x1Du, 0xEAu};
+
+  std::vector<uint8_t> frame{0x01u, 0x01u};
+  std::ranges::copy(encoded_message, std::back_inserter(frame));
+  frame.push_back(0x17u);
 
   std::vector<uint8_t> result{};
 
-  ulf::mx1bin::Decoder d{raw};
+  ulf::mx1bin::Decoder d{frame};
   d.strip();
+
   while (auto const val{d.s_uint8()}) { result.push_back(*val); }
-
-  // ASSERT_TRUE(false);
+  ASSERT_EQ(message, result);
 }
 
-TEST(decoder, s) {
-  ulf::mx1bin::CommandStationEquipmentQuery q{};
-  q.code = ulf::mx1bin::Command::Station_Equipment_Query;
-  q.info.frameType = ulf::mx1bin::FrameType::Short;
-  q.info.messageType = ulf::mx1bin::MessageType::Primary;
-  q.info.sender = ulf::mx1bin::Sender::PC;
-  q.info.stationType = ulf::mx1bin::StationType::MX1;
+TEST(decoder, strip_no_escaped) {
+  std::vector<uint8_t> const message{0x80u, 0x00u, 0x00u, 0x62u};
 
-  ztl::inplace_vector<uint8_t, 80u> q_v{};
+  std::vector<uint8_t> frame{0x01u, 0x01u};
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(0x17u);
 
-  ulf::mx1bin::Encoder e{q_v};
-  e.addSOF();
-  q.encode(e);
-  q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
-  e.uint8(ulf::mx1bin::crc8(std::span<uint8_t const>{q_v}.subspan(2uz)));
-  e.addEOT();
+  std::vector<uint8_t> result{};
 
-  q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
-
-  ulf::mx1bin::Decoder d{q_v};
+  ulf::mx1bin::Decoder d{frame};
   d.strip();
-  [[maybe_unused]] auto head{ulf::mx1bin::detail::Head::decode(d)};
 
-  std::span<uint8_t const> sp{q_v};
-
-  [[maybe_unused]] auto message{ulf::mx1bin::mx1bin_2message(sp)};
-
-  // ASSERT_TRUE(false);
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
 }
 
-TEST(decoder, y) {
-  std::vector<uint8_t> v{
-    0x01,
-    0x01,
-    0x0a,
-    0x10,
-    0x30,
-    0x03,
-    0x80,
-    0x03,
-    0x00,
-    0x0c,
-    0x10,
-    0x21,
-    0x00,
-    0x00,
-    0x00,
-    0x86,
-    0x17,
-  };
+TEST(decoder, strip_empty_range_assert) {
+  std::vector<uint8_t> frame{};
 
-  [[maybe_unused]] auto message{ulf::mx1bin::mx1bin_2message(v)};
+  ulf::mx1bin::Decoder d{frame};
 
-  ASSERT_TRUE(true);
+  EXPECT_DEATH(d.strip(), _);
 }
 
-TEST(bitfield, y) {
-  ulf::mx1bin::bitfields::Info info{};
-  info.frameType = ulf::mx1bin::FrameType::Long;
-  info.messageType = ulf::mx1bin::MessageType::Primary;
-  info.sender = ulf::mx1bin::Sender::PC;
-  info.stationType = ulf::mx1bin::StationType::MX1;
+TEST(decoder, decode_uint8) {
+  uint8_t const value{0x80u};
 
-  auto value{static_cast<uint8_t>(info)};
-  ASSERT_EQ(value, 0b10010000u);
+  std::vector<uint8_t> frame{value};
+  ulf::mx1bin::Decoder d{frame};
 
-  ulf::mx1bin::bitfields::Info result{value};
-  ASSERT_EQ(result, info);
+  ASSERT_EQ(d.uint8(), value);
+}
+
+TEST(decoder, decode_escaped_uint8) {
+  uint8_t const value{0x10};
+
+  std::vector<uint8_t> frame{ulf::mx1bin::detail::dle,
+                             value ^ ulf::mx1bin::detail::cypher};
+  ulf::mx1bin::Decoder d{frame};
+
+  ASSERT_EQ(d.uint8(), value);
+}
+
+TEST(decoder, decode_uint16) {
+  uint16_t const value{0x8080u};
+
+  std::vector<uint8_t> frame{static_cast<uint8_t>(value >> 8u),
+                             static_cast<uint8_t>(value >> 0u)};
+  ulf::mx1bin::Decoder d{frame};
+
+  ASSERT_EQ(d.uint16(), value);
+}
+
+TEST(decoder, decode_escaped_uint16) {
+  uint16_t const value{0x1010u};
+
+  std::vector<uint8_t> frame{
+    ulf::mx1bin::detail::dle,
+    static_cast<uint8_t>(value >> 8u ^ ulf::mx1bin::detail::cypher),
+    ulf::mx1bin::detail::dle,
+    static_cast<uint8_t>(value >> 0u ^ ulf::mx1bin::detail::cypher)};
+  ulf::mx1bin::Decoder d{frame};
+
+  ASSERT_EQ(d.uint16(), value);
+}
+
+TEST(decoder, decode_optional_uint8) {
+  uint8_t const value{0x80u};
+
+  std::vector<uint8_t> frame{value};
+  ulf::mx1bin::Decoder d{frame};
+
+  auto const result{d.s_uint8()};
+
+  ASSERT_TRUE(result);
+  ASSERT_EQ(*result, value);
+}
+
+TEST(decoder, decode_optional_uint8_empty) {
+  std::vector<uint8_t> frame{};
+  ulf::mx1bin::Decoder d{frame};
+
+  ASSERT_FALSE(d.s_uint8());
+}
+
+TEST(decoder, decode_optional_uint16) {
+  uint16_t const value{0x8080u};
+
+  std::vector<uint8_t> frame{static_cast<uint8_t>(value >> 8u),
+                             static_cast<uint8_t>(value >> 0u)};
+  ulf::mx1bin::Decoder d{frame};
+
+  auto const result{d.s_uint16()};
+
+  ASSERT_TRUE(result);
+  ASSERT_EQ(*result, value);
+}
+
+TEST(decoder, decode_optional_uint16_empty) {
+  std::vector<uint8_t> frame{};
+  ulf::mx1bin::Decoder d{frame};
+
+  ASSERT_FALSE(d.s_uint16());
 }
