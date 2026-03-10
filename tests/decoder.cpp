@@ -14,7 +14,7 @@ TEST(decoder, strip) {
 
   std::vector<uint8_t> result{};
 
-  ulf::mx1bin::detail::Decoder d{raw};
+  ulf::mx1bin::Decoder d{raw};
   d.strip();
   while (auto const val{d.s_uint8()}) { result.push_back(*val); }
 
@@ -31,7 +31,7 @@ TEST(decoder, s) {
 
   ztl::inplace_vector<uint8_t, 80u> q_v{};
 
-  ulf::mx1bin::detail::Encoder e{q_v};
+  ulf::mx1bin::Encoder e{q_v};
   e.addSOF();
   q.encode(e);
   q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
@@ -40,7 +40,7 @@ TEST(decoder, s) {
 
   q_v.resize(static_cast<decltype(q_v)::size_type>(e.difference()));
 
-  ulf::mx1bin::detail::Decoder d{q_v};
+  ulf::mx1bin::Decoder d{q_v};
   d.strip();
   [[maybe_unused]] auto head{ulf::mx1bin::detail::Head::decode(d)};
 

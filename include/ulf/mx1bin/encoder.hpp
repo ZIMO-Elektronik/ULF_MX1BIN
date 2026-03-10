@@ -14,7 +14,7 @@
 #include <ztl/ztl.hpp>
 #include "utility.hpp"
 
-namespace ulf::mx1bin::detail {
+namespace ulf::mx1bin {
 
 template<typename T>
 struct is_std_optional : std::false_type {};
@@ -69,11 +69,11 @@ struct Encoder {
   Encoder(I iter, S end) : _iter{iter}, _begin{iter}, _end{end} {}
 
   void addSOF() {
-    *_iter++ = soh;
-    *_iter++ = soh;
+    *_iter++ = detail::soh;
+    *_iter++ = detail::soh;
   }
 
-  void addEOT() { *_iter++ = eot; }
+  void addEOT() { *_iter++ = detail::eot; }
 
   size_t difference() {
     return static_cast<size_t>(std::distance(_begin, _iter));
@@ -88,9 +88,9 @@ struct Encoder {
   requires ConvertibleTo<T, uint8_t>
   inline void uint8(T const t) {
     auto const v{static_cast<uint8_t>(t)};
-    if (is_control_char(v)) {
-      *_iter++ = dle;
-      *_iter++ = v ^ cypher;
+    if (detail::is_control_char(v)) {
+      *_iter++ = detail::dle;
+      *_iter++ = v ^ detail::cypher;
     } else *_iter++ = v;
   }
 
@@ -143,4 +143,4 @@ template<std::ranges::input_range R>
 Encoder(R&&) -> Encoder<decltype(std::ranges::begin(std::declval<R&>())),
                         decltype(std::ranges::end(std::declval<R&>()))>;
 
-} // namespace ulf::mx1bin::detail
+} // namespace ulf::mx1bin

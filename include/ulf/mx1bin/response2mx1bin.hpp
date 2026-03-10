@@ -20,7 +20,7 @@ namespace ulf::mx1bin {
 template<Encodable E>
 constexpr Packet response2mx1bin(E& re) {
   Packet result{};
-  detail::Encoder e{result};
+  Encoder e{result};
   e.addSOF();
 
   e = re.encode(e);

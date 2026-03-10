@@ -14,7 +14,7 @@
 #include <span>
 #include "utility.hpp"
 
-namespace ulf::mx1bin::detail {
+namespace ulf::mx1bin {
 
 /// Decoder concept
 template<typename T>
@@ -39,8 +39,8 @@ struct Decoder {
   /// \return Decoder reference
   Decoder& strip() {
     assert(_iter != _end);
-    while (*_iter == soh) _iter++;
-    while (*(_end - 1) == eot) _end--;
+    while (*_iter == detail::soh) _iter++;
+    while (*(_end - 1) == detail::eot) _end--;
     return *this;
   }
 
@@ -49,10 +49,10 @@ struct Decoder {
   /// \warning  UB if out of data
   /// \return   Decoded value
   uint8_t uint8() {
-    if (*_iter == dle) {
+    if (*_iter == detail::dle) {
       // Encoded
       _iter++;
-      return static_cast<uint8_t>(*_iter++ ^ cypher);
+      return static_cast<uint8_t>(*_iter++ ^ detail::cypher);
     }
     // Non-encoded
     return static_cast<uint8_t>(*_iter++);
@@ -64,12 +64,12 @@ struct Decoder {
   /// \retval uint8_t       Decoded value
   std::optional<uint8_t> s_uint8() {
     if (_iter == _end) return std::nullopt;
-    if (*_iter == dle) {
+    if (*_iter == detail::dle) {
       // Encoded
       _iter++;
-      return _iter != _end
-               ? std::make_optional(static_cast<uint8_t>(*_iter++ ^ cypher))
-               : std::nullopt;
+      return _iter != _end ? std::make_optional(
+                               static_cast<uint8_t>(*_iter++ ^ detail::cypher))
+                           : std::nullopt;
     }
     // Non-encoded
     return std::make_optional(static_cast<uint8_t>(*_iter++));
@@ -101,7 +101,7 @@ struct Decoder {
     auto iter{_iter};
     size_t size{0uz};
     while (iter != _end) {
-      if (*iter++ == dle) {
+      if (*iter++ == detail::dle) {
         // Encoded
         if (iter++ == _end) break; // Decode error
         size += 2uz;
@@ -122,7 +122,7 @@ struct Decoder {
     auto iter{_iter};
     size_t size{0uz};
     while (iter != _end && size < n) {
-      if (*iter++ == dle) {
+      if (*iter++ == detail::dle) {
         // Encoded
         if (iter++ == _end) break; // Decode error
         size += 2uz;
@@ -150,4 +150,4 @@ template<std::ranges::input_range R>
 Decoder(R const&) -> Decoder<decltype(std::declval<R const&>().cbegin()),
                              decltype(std::declval<R const&>().cend())>;
 
-} // namespace ulf::mx1bin::detail
+} // namespace ulf::mx1bin
