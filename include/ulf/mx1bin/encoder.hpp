@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <span>
 #include <ztl/ztl.hpp>
 #include "utility.hpp"
@@ -69,16 +70,13 @@ template<typename T>
 concept IsEncoder = FieldEncoder<T> && OptionalFieldEncoder<T>;
 
 /// MX1Bin message stream encoder
-template<std::output_iterator<uint8_t> I, std::sentinel_for<I> S>
+template<std::ranges::output_range<uint8_t> R>
+requires std::constructible_from<std::back_insert_iterator<R>, R&>
 struct Encoder {
   // Construct
-  template<std::ranges::input_range R>
-  requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
-             std::convertible_to<std::ranges::sentinel_t<R>, S>
-  Encoder(R&& r)
-    : _iter{std::ranges::begin(r)}, _begin{std::ranges::begin(r)},
-      _end{std::ranges::end(r)} {}
-  Encoder(I iter, S end) : _iter{iter}, _begin{iter}, _end{end} {}
+  Encoder(R& r) : _iter{std::back_inserter(r)} {}
+
+  Encoder(std::back_insert_iterator<R> iter) : _iter{iter} {}
 
   void addSOF() {
     *_iter++ = detail::soh;
@@ -86,10 +84,6 @@ struct Encoder {
   }
 
   void addEOT() { *_iter++ = detail::eot; }
-
-  size_t difference() {
-    return static_cast<size_t>(std::distance(_begin, _iter));
-  }
 
   /// Encode uint8
   ///
@@ -142,17 +136,7 @@ struct Encoder {
   }
 
 private:
-  I _iter;  ///> Iterator
-  I _begin; ///> Begin
-  S _end;   ///> End
+  std::back_insert_iterator<R> _iter; ///> Iterator
 };
-
-// Deduction guides
-template<std::output_iterator<uint8_t> I, std::sentinel_for<I> S>
-Encoder(I, S) -> Encoder<I, S>;
-
-template<std::ranges::input_range R>
-Encoder(R&&) -> Encoder<decltype(std::ranges::begin(std::declval<R&>())),
-                        decltype(std::ranges::end(std::declval<R&>()))>;
 
 } // namespace ulf::mx1bin

@@ -25,8 +25,6 @@ constexpr Packet response2mx1bin(E& re) {
 
   e = re.encode(e);
 
-  result.resize(static_cast<Packet::size_type>(e.difference()));
-
   if constexpr (Long<E>) {
     e.uint16(crc16(std::span<uint8_t const>{result}.subspan(2uz)));
   } else {
@@ -34,8 +32,6 @@ constexpr Packet response2mx1bin(E& re) {
   }
 
   e.addEOT();
-
-  result.resize(static_cast<Packet::size_type>(e.difference()));
 
   return result;
 }

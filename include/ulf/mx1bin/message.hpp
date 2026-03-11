@@ -26,7 +26,7 @@
 namespace ulf::mx1bin {
 
 /// Encodable concept
-template<typename T, typename E = Encoder<unsigned char*, unsigned char*>>
+template<typename T, typename E = Encoder<std::vector<uint8_t>>>
 concept Encodable = requires {
   { &T::template encode<E> } -> std::same_as<E (T::*)(E) const>;
 };
