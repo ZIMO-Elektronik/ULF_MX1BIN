@@ -16,7 +16,11 @@
 #include <optional>
 #include <span>
 #include <system_error>
+#include "bitfields.hpp"
+#include "crc16.hpp"
 #include "crc8.hpp"
+#include "decoder.hpp"
+#include "info.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin::detail {
@@ -37,15 +41,44 @@ verify(std::span<uint8_t const> frame) {
   // Match
   m = ctre::match<pattern>(frame.subspan(0uz, size(m)));
   if (!m) return std::nullopt;
-  // CRC
-  if (frame[size(m) - 3uz] == dle) {
-    // Encoded CRC8
-    if (crc8(frame.subspan(2uz, size(m) - 5uz)) ^ (frame[size(m) - 2uz]) ^
-        cypher)
+
+  // Long or Short frame
+  Decoder d{frame.subspan(0uz, size(m))};
+  d.strip();
+  d.uint8(); // Skip uSID
+  bitfields::Info info{d.uint8()};
+
+  if (info.frameType == FrameType::Long) {
+    // Long Frame - CRC16
+    auto rit{++frame.rbegin()}; // Skip EOT
+    uint16_t crc{};
+    for (auto i{0u}; i < sizeof(uint16_t); i++) {
+      auto const byte{*rit++};
+      if (*rit == dle) {
+        crc |= static_cast<uint16_t>((byte ^ cypher) << (8u * i));
+        rit++;
+      } else {
+        crc |= static_cast<uint16_t>(byte << (8u * i));
+      }
+    }
+    if (crc16(frame.subspan(2uz,
+                            static_cast<std::size_t>(std::distance(
+                              frame.begin() + 2uz, rit.base())))) ^
+        crc)
       return std::unexpected(std::errc::bad_message);
+
   } else {
-    // Non-encoded CRC8
-    if (crc8(frame.subspan(2uz, size(m) - 4uz)) ^ frame[size(m) - 2uz])
+    // Short Frame - CRC8
+    auto rit{++frame.rbegin()}; // Skip EOT
+    uint8_t crc{*rit++};
+    if (*rit == dle) {
+      crc ^= cypher; // Decode CRC
+      rit++;         // Adjust Iterator
+    }
+    if (crc8(frame.subspan(2uz,
+                           static_cast<std::size_t>(
+                             std::distance(frame.begin() + 2uz, rit.base())))) ^
+        crc)
       return std::unexpected(std::errc::bad_message);
   }
 
