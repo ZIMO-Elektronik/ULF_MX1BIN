@@ -32,23 +32,23 @@ concept OptionalFieldDecoder = requires(T t) {
 
 /// Is Decoder
 template<typename T>
-concept IsDecoder = FieldDecoder<T> && OptionalFieldDecoder<T>;
+concept Decoder = FieldDecoder<T> && OptionalFieldDecoder<T>;
 
 /// MX1Bin message stream decoder
 template<std::input_iterator I, std::sentinel_for<I> S>
-struct Decoder {
+struct StreamDecoder {
   // Construct
   template<std::ranges::input_range R>
   requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
              std::convertible_to<std::ranges::sentinel_t<R>, S>
-  Decoder(R const& r)
+  StreamDecoder(R const& r)
     : _iter{std::ranges::cbegin(r)}, _end{std::ranges::cend(r)} {}
-  Decoder(I iter, S end) : _iter{iter}, _end{end} {}
+  StreamDecoder(I iter, S end) : _iter{iter}, _end{end} {}
 
   /// Strips SOH and EOH
   ///
-  /// \return Decoder reference
-  Decoder& strip() {
+  /// \return StreamDecoder reference
+  StreamDecoder& strip() {
     assert(_iter != _end);
     while (*_iter == detail::soh) _iter++;
     while (*(_end - 1) == detail::eot) _end--;
@@ -155,10 +155,11 @@ private:
 
 // Deduction guides
 template<std::input_iterator I, std::sentinel_for<I> S>
-Decoder(I, S) -> Decoder<I, S>;
+StreamDecoder(I, S) -> StreamDecoder<I, S>;
 
 template<std::ranges::input_range R>
-Decoder(R const&) -> Decoder<decltype(std::declval<R const&>().cbegin()),
-                             decltype(std::declval<R const&>().cend())>;
+StreamDecoder(R const&)
+  -> StreamDecoder<decltype(std::declval<R const&>().cbegin()),
+                   decltype(std::declval<R const&>().cend())>;
 
 } // namespace ulf::mx1bin

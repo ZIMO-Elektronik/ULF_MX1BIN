@@ -10,7 +10,7 @@ TEST(encoder, sof) {
                                 ulf::mx1bin::detail::soh};
 
   std::vector<uint8_t> result{};
-  ulf::mx1bin::Encoder encoder{std::back_inserter(result)};
+  ulf::mx1bin::StreamEncoder encoder{std::back_inserter(result)};
 
   encoder.addSOF();
   ASSERT_EQ(result, expected);
@@ -21,7 +21,7 @@ TEST(encoder, eoh) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.addEOT();
   ASSERT_EQ(result, expected);
@@ -33,7 +33,7 @@ TEST(encoder, encode_uint8) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint8(value);
   ASSERT_EQ(result, expected);
@@ -45,7 +45,7 @@ TEST(encoder, encode_uint8_optional) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint8(opt_value);
   encoder.uint8(nopt_value);
@@ -59,7 +59,7 @@ TEST(encoder, encode_uint8_escaped) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint8(value);
   ASSERT_EQ(result, expected);
@@ -71,7 +71,7 @@ TEST(encoder, encode_uint16) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint16(value);
   ASSERT_EQ(result, expected);
@@ -83,7 +83,7 @@ TEST(encoder, encode_uint16_optional) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint16(opt_value);
   encoder.uint16(nopt_value);
@@ -99,7 +99,7 @@ TEST(encoder, encode_uint16_escaped) {
 
   std::vector<uint8_t> result{};
   result.reserve(16u);
-  ulf::mx1bin::Encoder encoder{result};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.uint16(value);
   ASSERT_EQ(result, expected);

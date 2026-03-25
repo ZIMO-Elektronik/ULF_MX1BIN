@@ -49,16 +49,16 @@ concept OptionalFieldEncoder = requires(
 
 /// Is Encoder
 template<typename T>
-concept IsEncoder = FieldEncoder<T> && OptionalFieldEncoder<T>;
+concept Encoder = FieldEncoder<T> && OptionalFieldEncoder<T>;
 
 /// MX1Bin message stream encoder
 template<std::ranges::output_range<uint8_t> R>
 requires std::constructible_from<std::back_insert_iterator<R>, R&>
-struct Encoder {
+struct StreamEncoder {
   // Construct
-  Encoder(R& r) : _iter{std::back_inserter(r)} {}
+  StreamEncoder(R& r) : _iter{std::back_inserter(r)} {}
 
-  Encoder(std::back_insert_iterator<R> iter) : _iter{iter} {}
+  StreamEncoder(std::back_insert_iterator<R> iter) : _iter{iter} {}
 
   void addSOF() {
     *_iter++ = detail::soh;
@@ -86,7 +86,7 @@ struct Encoder {
   ///
   /// \tparam T Optional type
   /// \param  v Optional value
-  /// \see Encoder::uint8(uint8_t)
+  /// \see StreamEncoder::uint8(uint8_t)
   template<typename T>
   requires OptionalConvertibleTo<T, uint8_t>
   void uint8(T&& t) {
@@ -110,7 +110,7 @@ struct Encoder {
   ///
   /// \tparam T Optional type
   /// \param  v Optional value
-  /// \see Encoder::uint16(uint16_t)
+  /// \see StreamEncoder::uint16(uint16_t)
   template<typename T>
   requires OptionalConvertibleTo<T, uint16_t>
   void uint16(T&& v) {

@@ -28,14 +28,14 @@ struct Head {
   uint8_t uSID{};         ///> Unique Service ID
   bitfields::Info info{}; ///> Header info byte
   Command code{};         ///> Command code
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
     e.uint8(static_cast<uint8_t>(info));
     e.uint8(std::to_underlying(code));
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<Head, std::errc> decode(D& d) {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code)))
       return std::unexpected{std::errc::invalid_argument};
@@ -47,13 +47,13 @@ struct Head {
 
 struct DecoderControlBase : public Head {
   bitfields::DecoderAddress cAdr{}; ///> Decoder Address
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
     e.uint16(cAdr);
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<DecoderControlBase, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
     if (!base || !d.has_at_least(sizeof(cAdr)))
@@ -66,13 +66,13 @@ struct DecoderControlBase : public Head {
 
 struct ShuttleTrain_Accessory_Base : public DecoderControlBase {
   uint8_t cData{}; ///>
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
     e.uint8(cData);
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<ShuttleTrain_Accessory_Base, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(cData)))
@@ -85,13 +85,13 @@ struct ShuttleTrain_Accessory_Base : public DecoderControlBase {
 
 struct CommandStationQueryBase : public detail::Head {
   uint8_t zero{}; ///>
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
     e.uint8(zero);
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<CommandStationQueryBase, std::errc> decode(D& d) {
     auto const base{Head::decode(d)};
     if (!base || !d.has_at_least(sizeof(zero)))
@@ -107,7 +107,7 @@ struct ReplyHead {
   bitfields::Info info{}; ///> Header info byte
   Command code{};         ///> Command code
   uint8_t reply_uSID{};   ///> Reply uSID reference
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
     e.uint8(static_cast<uint8_t>(info));
@@ -115,7 +115,7 @@ struct ReplyHead {
     e.uint8(reply_uSID);
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<ReplyHead, std::errc> decode(D& d) {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(Command) +
                         sizeof(reply_uSID)))
@@ -133,7 +133,7 @@ struct ReplyLongHead {
   Command code{};           ///> Command code
   uint8_t lengthOfHeader{}; ///> Length of header
   uint8_t reply_uSID{};     ///> Reply uSID reference
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
     e.uint8(static_cast<uint8_t>(info));
@@ -142,7 +142,7 @@ struct ReplyLongHead {
     e.uint8(reply_uSID);
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<ReplyLongHead, std::errc> decode(D& d) {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code) +
                         sizeof(lengthOfHeader) + sizeof(reply_uSID)))
@@ -157,13 +157,13 @@ struct ReplyLongHead {
 
 struct ReplyErrorBase : public ReplyHead {
   Error error{}; ///> Error
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e = ReplyHead::encode(e);
     e.uint8(std::to_underlying(error));
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<ReplyErrorBase, std::errc> decode(D& d) {
     auto const base{ReplyHead::decode(d)};
     if (!base || !d.has_at_least(sizeof(error)))
@@ -176,13 +176,13 @@ struct ReplyErrorBase : public ReplyHead {
 
 struct ReplyDecoderControlBase : public ReplyErrorBase {
   bitfields::ControlPayload payload{}; ///> Payload
-  template<IsEncoder E>
+  template<Encoder E>
   auto encode(E e) const {
     e = ReplyErrorBase::encode(e);
     e.uint8(static_cast<uint8_t>(payload));
     return e;
   }
-  template<IsDecoder D>
+  template<Decoder D>
   static std::expected<ReplyDecoderControlBase, std::errc> decode(D& d) {
     auto const base{ReplyErrorBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(payload)))

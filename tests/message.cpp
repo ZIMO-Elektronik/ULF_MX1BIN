@@ -22,7 +22,7 @@
 template<ulf::mx1bin::Encodable E>
 constexpr ulf::mx1bin::Packet encode(E& e) {
   ulf::mx1bin::Packet result;
-  ulf::mx1bin::Encoder en{result};
+  ulf::mx1bin::StreamEncoder en{result};
   en = e.encode(en);
   return result;
 }

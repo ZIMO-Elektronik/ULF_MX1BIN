@@ -19,7 +19,7 @@ TEST(decoder, strip) {
 
   std::vector<uint8_t> result{};
 
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
   d.strip();
 
   while (auto const val{d.s_uint8()}) { result.push_back(*val); }
@@ -35,7 +35,7 @@ TEST(decoder, strip_no_escaped) {
 
   std::vector<uint8_t> result{};
 
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
   d.strip();
 
   while (auto const val{d.s_uint8()}) { result.push_back(*val); }
@@ -45,7 +45,7 @@ TEST(decoder, strip_no_escaped) {
 TEST(decoder, strip_empty_range_assert) {
   std::vector<uint8_t> frame{};
 
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   EXPECT_DEATH(d.strip(), _);
 }
@@ -54,7 +54,7 @@ TEST(decoder, decode_uint8) {
   uint8_t const value{0x80u};
 
   std::vector<uint8_t> frame{value};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_EQ(d.uint8(), value);
 }
@@ -64,7 +64,7 @@ TEST(decoder, decode_escaped_uint8) {
 
   std::vector<uint8_t> frame{ulf::mx1bin::detail::dle,
                              value ^ ulf::mx1bin::detail::cypher};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_EQ(d.uint8(), value);
 }
@@ -74,7 +74,7 @@ TEST(decoder, decode_uint16) {
 
   std::vector<uint8_t> frame{static_cast<uint8_t>(value >> 8u),
                              static_cast<uint8_t>(value >> 0u)};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_EQ(d.uint16(), value);
 }
@@ -87,7 +87,7 @@ TEST(decoder, decode_escaped_uint16) {
     static_cast<uint8_t>(value >> 8u ^ ulf::mx1bin::detail::cypher),
     ulf::mx1bin::detail::dle,
     static_cast<uint8_t>(value >> 0u ^ ulf::mx1bin::detail::cypher)};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_EQ(d.uint16(), value);
 }
@@ -96,7 +96,7 @@ TEST(decoder, decode_optional_uint8) {
   uint8_t const value{0x80u};
 
   std::vector<uint8_t> frame{value};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   auto const result{d.s_uint8()};
 
@@ -106,7 +106,7 @@ TEST(decoder, decode_optional_uint8) {
 
 TEST(decoder, decode_optional_uint8_empty) {
   std::vector<uint8_t> frame{};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_FALSE(d.s_uint8());
 }
@@ -116,7 +116,7 @@ TEST(decoder, decode_optional_uint16) {
 
   std::vector<uint8_t> frame{static_cast<uint8_t>(value >> 8u),
                              static_cast<uint8_t>(value >> 0u)};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   auto const result{d.s_uint16()};
 
@@ -126,7 +126,7 @@ TEST(decoder, decode_optional_uint16) {
 
 TEST(decoder, decode_optional_uint16_empty) {
   std::vector<uint8_t> frame{};
-  ulf::mx1bin::Decoder d{frame};
+  ulf::mx1bin::StreamDecoder d{frame};
 
   ASSERT_FALSE(d.s_uint16());
 }

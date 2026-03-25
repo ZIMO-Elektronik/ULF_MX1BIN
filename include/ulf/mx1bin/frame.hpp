@@ -43,7 +43,7 @@ verify(std::span<uint8_t const> frame) {
   if (!m) return std::nullopt;
 
   // Long or Short frame
-  Decoder d{frame.subspan(0uz, size(m))};
+  StreamDecoder d{frame.subspan(0uz, size(m))};
   d.strip();
   d.uint8(); // Skip uSID
   bitfields::Info info{d.uint8()};
