@@ -117,7 +117,7 @@ struct TrackControl : public detail::Head<Command::TrackControl> {
     TrackOff = 1u,
     TrackOn = 2u,
     Query = 3u
-  } cAction{}; ///> Action
+  } cAction{}; ///< Action
   template<Encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
@@ -149,12 +149,12 @@ struct LocoControl : public detail::DecoderControlBase<Command::LocoControl> {
     }
   };
 
-  bitfields::ControlSpeed cSpeed{};               ///> Speed
-  std::optional<bitfields::ControlData> cData1{}; ///> Control data
-  std::optional<uint8_t> cData2{};                ///> F1..8
-  std::optional<uint8_t> cData3{};                ///> F9..12
-  std::optional<uint8_t> cData4{};                ///> F13..20
-  std::optional<uint8_t> cData5{};                ///> F21..28
+  bitfields::ControlSpeed cSpeed{};               ///< Speed
+  std::optional<bitfields::ControlData> cData1{}; ///< Control data
+  std::optional<uint8_t> cData2{};                ///< F1..8
+  std::optional<uint8_t> cData3{};                ///< F9..12
+  std::optional<uint8_t> cData4{};                ///< F13..20
+  std::optional<uint8_t> cData5{};                ///< F21..28
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -199,11 +199,11 @@ struct InvertFunctionBits
     }
   };
 
-  bitfields::ControlData cData1{}; ///> Control data
-  uint8_t cData2{};                ///> F1..8
-  uint8_t cData3{};                ///> F9..12
-  uint8_t cData4{};                ///> F13..20
-  uint8_t cData5{};                ///> F21..28
+  bitfields::ControlData cData1{}; ///< Control data
+  uint8_t cData2{};                ///< F1..8
+  uint8_t cData3{};                ///< F9..12
+  uint8_t cData4{};                ///< F13..20
+  uint8_t cData5{};                ///< F21..28
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -245,7 +245,7 @@ struct Acceleration : public detail::DecoderControlBase<Command::Acceleration> {
     }
   };
 
-  uint8_t cAzBz{}; ///> Accel / Break time
+  uint8_t cAzBz{}; ///< Accel / Break time
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -442,8 +442,8 @@ struct AddressControl
     }
   };
 
-  bitfields::AddressControl_Control cControl{}; ///> Control parameters
-  std::optional<uint8_t> cOutputs{};            ///> Acc decoder outputs
+  bitfields::AddressControl_Control cControl{}; ///< Control parameters
+  std::optional<uint8_t> cOutputs{};            ///< Acc decoder outputs
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);
@@ -534,8 +534,8 @@ struct CommandStationCvManip
     }
   };
 
-  uint16_t variable{};            ///> Cv Address
-  std::optional<uint8_t> value{}; ///> Cv Value
+  uint16_t variable{};            ///< Cv Address
+  std::optional<uint8_t> value{}; ///< Cv Value
   template<Encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
@@ -560,25 +560,25 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase<
                                         Command::CommandStationEquipmentQuery> {
   struct Reply
     : public detail::ReplyLongHead<Command::CommandStationEquipmentQuery> {
-    uint16_t cAddress{};                 ///> CAN address
-    uint8_t cDevice{};                   ///> Device ID
-    uint8_t cRom_size{};                 ///> ROM size
-    uint8_t cRam_size{};                 ///> RAM size
-    uint16_t cPrintver{};                ///>
-    uint16_t cVersion{};                 ///> Version Major/Minor
-    uint8_t cDate_day{};                 ///> Software date Day
-    uint8_t cDate_month{};               ///> Software date Month
-    uint8_t cDate_century{};             ///> Software date Century
-    uint8_t cDate_year{};                ///> Software date Year
-    uint8_t cSwitches{};                 ///>
-    uint8_t cDevelopVersion{};           ///> Version Patch
-    uint16_t cBootRom{};                 ///>
-    uint8_t cBootRom_develop{};          ///>
-    uint8_t values{};                    ///>
-    std::optional<uint8_t> cSerNum_hi{}; ///> Serial Number [0]
-    std::optional<uint8_t> cSerNum_mh{}; ///> Serial Number [1]
-    std::optional<uint8_t> cSerNum_ml{}; ///> Serial Number [2]
-    std::optional<uint8_t> cSerNum_lo{}; ///> Serial Number [3]
+    uint16_t cAddress{};                 ///< CAN address
+    uint8_t cDevice{};                   ///< Device ID
+    uint8_t cRom_size{};                 ///< ROM size
+    uint8_t cRam_size{};                 ///< RAM size
+    uint16_t cPrintver{};                ///<
+    uint16_t cVersion{};                 ///< Version Major/Minor
+    uint8_t cDate_day{};                 ///< Software date Day
+    uint8_t cDate_month{};               ///< Software date Month
+    uint8_t cDate_century{};             ///< Software date Century
+    uint8_t cDate_year{};                ///< Software date Year
+    uint8_t cSwitches{};                 ///<
+    uint8_t cDevelopVersion{};           ///< Version Patch
+    uint16_t cBootRom{};                 ///<
+    uint8_t cBootRom_develop{};          ///<
+    uint8_t values{};                    ///<
+    std::optional<uint8_t> cSerNum_hi{}; ///< Serial Number [0]
+    std::optional<uint8_t> cSerNum_mh{}; ///< Serial Number [1]
+    std::optional<uint8_t> cSerNum_ml{}; ///< Serial Number [2]
+    std::optional<uint8_t> cSerNum_lo{}; ///< Serial Number [3]
     template<Encoder E>
     auto encode(E e) const {
       e = ReplyLongHead::encode(e);
@@ -618,8 +618,8 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase<
 };
 
 struct SerialInfo : public detail::Head<Command::SerialInfo> {
-  uint8_t toolID{}; ///> Tool ID
-  uint8_t action{}; ///>
+  uint8_t toolID{}; ///< Tool ID
+  uint8_t action{}; ///<
   template<Encoder E>
   auto encode(E e) const {
     e = Head::encode(e);
@@ -727,8 +727,8 @@ struct DecoderCvManip
     }
   };
 
-  uint16_t variable{};            ///> Cv Address
-  std::optional<uint8_t> value{}; ///> Cv Value
+  uint16_t variable{};            ///< Cv Address
+  std::optional<uint8_t> value{}; ///< Cv Value
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase::encode(e);

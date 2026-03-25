@@ -118,7 +118,7 @@ struct StreamEncoder {
   }
 
 private:
-  std::back_insert_iterator<R> _iter; ///> Iterator
+  std::back_insert_iterator<R> _iter; ///< Iterator
 };
 
 } // namespace ulf::mx1bin

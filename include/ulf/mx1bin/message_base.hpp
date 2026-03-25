@@ -26,9 +26,9 @@ namespace ulf::mx1bin::detail {
 
 template<Command C>
 struct Head {
-  uint8_t uSID{};         ///> Unique Service ID
-  bitfields::Info info{}; ///> Header info byte
-  Command const code{C};  ///> Command code
+  uint8_t uSID{};         ///< Unique Service ID
+  bitfields::Info info{}; ///< Header info byte
+  Command const code{C};  ///< Command code
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
@@ -50,7 +50,7 @@ struct Head {
 
 template<Command C>
 struct DecoderControlBase : public Head<C> {
-  bitfields::DecoderAddress cAdr{}; ///> Decoder Address
+  bitfields::DecoderAddress cAdr{}; ///< Decoder Address
   template<Encoder E>
   auto encode(E e) const {
     e = Head<C>::encode(e);
@@ -70,7 +70,7 @@ struct DecoderControlBase : public Head<C> {
 
 template<Command C>
 struct ShuttleTrain_Accessory_Base : public DecoderControlBase<C> {
-  uint8_t cData{}; ///>
+  uint8_t cData{}; ///<
   template<Encoder E>
   auto encode(E e) const {
     e = DecoderControlBase<C>::encode(e);
@@ -90,7 +90,7 @@ struct ShuttleTrain_Accessory_Base : public DecoderControlBase<C> {
 
 template<Command C>
 struct CommandStationQueryBase : public detail::Head<C> {
-  uint8_t const zero{}; ///>
+  uint8_t const zero{}; ///<
   template<Encoder E>
   auto encode(E e) const {
     e = Head<C>::encode(e);
@@ -110,10 +110,10 @@ struct CommandStationQueryBase : public detail::Head<C> {
 
 template<Command C>
 struct ReplyHead {
-  uint8_t uSID{};         ///> Unique Service ID
-  bitfields::Info info{}; ///> Header info byte
-  Command const code{C};  ///> Command code
-  uint8_t reply_uSID{};   ///> Reply uSID reference
+  uint8_t uSID{};         ///< Unique Service ID
+  bitfields::Info info{}; ///< Header info byte
+  Command const code{C};  ///< Command code
+  uint8_t reply_uSID{};   ///< Reply uSID reference
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
@@ -139,11 +139,11 @@ struct ReplyHead {
 
 template<Command C>
 struct ReplyLongHead {
-  uint8_t uSID{};           ///> Unique Service ID
-  bitfields::Info info{};   ///> Header info byte
-  Command const code{C};    ///> Command code
-  uint8_t lengthOfHeader{}; ///> Length of header
-  uint8_t reply_uSID{};     ///> Reply uSID reference
+  uint8_t uSID{};           ///< Unique Service ID
+  bitfields::Info info{};   ///< Header info byte
+  Command const code{C};    ///< Command code
+  uint8_t lengthOfHeader{}; ///< Length of header
+  uint8_t reply_uSID{};     ///< Reply uSID reference
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
@@ -171,7 +171,7 @@ struct ReplyLongHead {
 
 template<Command C>
 struct ReplyErrorBase : public ReplyHead<C> {
-  Error error{}; ///> Error
+  Error error{}; ///< Error
   template<Encoder E>
   auto encode(E e) const {
     e = ReplyHead<C>::encode(e);
@@ -191,7 +191,7 @@ struct ReplyErrorBase : public ReplyHead<C> {
 
 template<Command C>
 struct ReplyDecoderControlBase : public ReplyErrorBase<C> {
-  bitfields::ControlPayload payload{}; ///> Payload
+  bitfields::ControlPayload payload{}; ///< Payload
   template<Encoder E>
   auto encode(E e) const {
     e = ReplyErrorBase<C>::encode(e);
