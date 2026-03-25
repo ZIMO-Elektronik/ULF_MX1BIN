@@ -17,24 +17,6 @@
 
 namespace ulf::mx1bin {
 
-template<typename T>
-struct is_std_optional : std::false_type {};
-
-/// Is std::optional trait
-/// \tparam T Type
-template<typename T>
-struct is_std_optional<std::optional<T>> : std::true_type {};
-
-template<typename T>
-struct optional_inner_type {};
-
-/// Inner type of optional
-/// \tparam T Type
-template<typename T>
-struct optional_inner_type<std::optional<T>> {
-  using type = T;
-};
-
 /// Is implicitly or explicitly convertible to
 template<typename _From, typename _To>
 concept convertible_to = std::is_convertible_v<_From, _To> ||
@@ -46,9 +28,9 @@ concept ConvertibleTo = convertible_to<T, To>;
 /// Optional and is convertible to
 template<typename T, typename To>
 concept OptionalConvertibleTo =
-  is_std_optional<std::remove_cvref_t<T>>::value &&
-  convertible_to<typename optional_inner_type<std::remove_cvref_t<T>>::type,
-                 To>;
+  std::same_as<std::optional<typename std::remove_cvref_t<T>::value_type>,
+               typename std::remove_cvref_t<T>> &&
+  ConvertibleTo<typename std::remove_cvref_t<T>::value_type, To>;
 
 /// Field encoder
 template<typename T>
