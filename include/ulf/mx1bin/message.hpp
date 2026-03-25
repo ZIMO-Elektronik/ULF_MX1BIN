@@ -49,6 +49,7 @@ concept Decodable = requires(T t, Decoder<char const*, char const*>& d) {
 template<Decodable T, std::ranges::input_range R>
 constexpr std::expected<T, std::errc> decode(R const& r) {
   Decoder d(r);
+  d.strip();
   return T::decode(d);
 }
 

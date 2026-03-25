@@ -25,6 +25,9 @@ namespace ulf::mx1bin {
 ///
 /// \param bytes  MX1Bin frame
 /// \return       DCC Packet
+/// \warning
+/// Currently only handles short primary MX1 messages, with the exception of
+/// `Command 19 L1Ack`
 constexpr std::expected<std::optional<Message>, std::errc>
 mx1bin_2message(std::span<uint8_t const> bytes) {
   auto res{detail::verify(bytes)};
@@ -32,36 +35,39 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   if (!*res) return std::nullopt;
 
   auto frame{**res};
-  frame = frame.subspan(2uz, size(frame) - 4uz);
 
   auto const head{decode<detail::Head>(frame)};
   if (!head) return std::unexpected(std::errc::invalid_argument);
 
   auto const type{head->info.messageType};
+  if (type == MessageType::Primary) {
+    switch (head->code) {
+      case Command::Reset: return decode<Reset>(frame);
+      case Command::Track_Ctrl: return decode<TrackControl>(frame);
+      case Command::Loco_Ctrl: return decode<DecoderControl>(frame);
+      case Command::Invert_Fnkt: return decode<InvertFunctionBits>(frame);
+      case Command::Accelerate: return decode<Acceleration>(frame);
+      case Command::Shuttle_Train: return decode<ShuttleTrain>(frame);
+      case Command::Accessory_Cmd: return decode<Accessory>(frame);
+      case Command::Loco_Mem_Query: return decode<LocoMemoryQuery>(frame);
+      case Command::Accessory_Mem_Query:
+        return decode<AccessoryMemoryQuery>(frame);
+      case Command::Address_Ctrl: return decode<AddressControl>(frame);
+      case Command::Read_IO_State: return decode<CommandStationIOQuery>(frame);
+      case Command::Station_Cv_Manip:
+        return decode<CommandStationCvManip>(frame);
+      case Command::Station_Equipment_Query:
+        return decode<CommandStationEquipmentQuery>(frame);
+      case Command::Serial_Info: return decode<SerialInfo>(frame);
+      case Command::Cv_Manip: return decode<DecoderCvManip>(frame);
+      default: return std::unexpected(std::errc::invalid_argument);
+    }
 
-  /// \todo Usually, we need to differentiate between message types
-  switch (head->code) {
-    case Command::Reset: return decode<Reset>(frame);
-    case Command::Track_Ctrl: return decode<TrackControl>(frame);
-    case Command::Loco_Ctrl: return decode<DecoderControl>(frame);
-    case Command::Invert_Fnkt: return decode<InvertFunctionBits>(frame);
-    case Command::Accelerate: return decode<Acceleration>(frame);
-    case Command::Shuttle_Train: return decode<ShuttleTrain>(frame);
-    case Command::Accessory_Cmd: return decode<Accessory>(frame);
-    case Command::Loco_Mem_Query: return decode<LocoMemoryQuery>(frame);
-    case Command::Accessory_Mem_Query:
-      return decode<AccessoryMemoryQuery>(frame);
-    case Command::Address_Ctrl: return decode<AddressControl>(frame);
-    case Command::Read_IO_State: return decode<CommandStationIOQuery>(frame);
-    case Command::Station_Cv_Manip: return decode<CommandStationCvManip>(frame);
-    case Command::Station_Equipment_Query:
-      return decode<CommandStationEquipmentQuery>(frame);
-    case Command::Serial_Info: return decode<SerialInfo>(frame);
-    case Command::Cv_Manip:
-      if (type == MessageType::Primary) return decode<DecoderCvManip>(frame);
-      else if (type == MessageType::L1Ack) return decode<Ack>(frame);
-      break;
-    default: return std::unexpected(std::errc::invalid_argument);
+  } else if (type == MessageType::L1Ack) {
+    switch (head->code) {
+      case Command::Cv_Manip: return decode<Ack>(frame);
+      default: return std::unexpected(std::errc::invalid_argument);
+    }
   }
 
   return std::unexpected(std::errc::broken_pipe);

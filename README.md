@@ -56,7 +56,7 @@ target_link_libraries(YourTarget PRIVATE ULF::MX1Bin)
 ## Usage
 To convert a MX1Bin string to a message, `mx1bin_2message` can be used. In order to be able to distinguish between an error case and the case where the data is still incomplete, the return value of the functions is `std::expected<std::optional<Message>, std::errc>`. If the pattern is not recognized at all, i.e. in the event of an error, then a `std::errc` is returned. If something is found but the data is not yet complete, a `std::nullopt` is returned. Otherwise the found data is returned as a `Message` variant. The following snippet shows how `mx1bin_2message` can be used.
 > [!NOTE]  
-> As of now, this library contains mostly MX1 type short messages. Also, `mx1bin_2message` only works correctly for primary messages. 
+> As of now, this library contains mostly MX1 type short messages. Also, `mx1bin_2message` only works correctly for primary messages (with the exception of Command 19, L1Ack). 
 
 ```cpp
 // Get MX1Bin Message from MX1Bin string
