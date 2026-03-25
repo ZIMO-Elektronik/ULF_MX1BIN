@@ -19,6 +19,7 @@
 #include <variant>
 #include <ztl/inplace_vector.hpp>
 #include "bitfields.hpp"
+#include "commands.hpp"
 #include "decoder.hpp"
 #include "encoder.hpp"
 #include "message_base.hpp"
@@ -54,19 +55,20 @@ constexpr std::expected<T, std::errc> decode(R const& r) {
   return T::decode(d);
 }
 
-struct Ack : public detail::ReplyHead {
+template<Command C>
+struct Ack : public detail::ReplyHead<C> {
   template<Encoder E>
   auto encode(E e) const {
-    return ReplyHead::encode(e);
+    return detail::ReplyHead<C>::encode(e);
   }
   template<Decoder D>
-  static std::expected<Ack, std::errc> decode(D& d) {
-    if (auto const base{ReplyHead::decode(d)}) return Ack{*base};
+  static std::expected<Ack<C>, std::errc> decode(D& d) {
+    if (auto const base{detail::ReplyHead<C>::decode(d)}) return Ack<C>{*base};
     else return std::unexpected(base.error());
   }
 };
 
-struct Nak : public detail::Head {
+struct Nak : public detail::Head<Command::Nak> {
   template<Encoder E>
   auto encode(E e) const {
     return Head::encode(e);
@@ -78,7 +80,7 @@ struct Nak : public detail::Head {
   }
 };
 
-struct Reset : public detail::Head {
+struct Reset : public detail::Head<Command::Reset> {
   template<Encoder E>
   auto encode(E e) const {
     return Head::encode(e);
@@ -90,8 +92,8 @@ struct Reset : public detail::Head {
   }
 };
 
-struct TrackControl : public detail::Head {
-  struct Reply : public detail::ReplyHead {
+struct TrackControl : public detail::Head<Command::TrackControl> {
+  struct Reply : public detail::ReplyHead<Command::TrackControl> {
     bitfields::TrackStatus statusBits{}; ///< Track status
     template<Encoder E>
     auto encode(E e) const {
@@ -133,8 +135,8 @@ struct TrackControl : public detail::Head {
   }
 };
 
-struct DecoderControl : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {
+struct LocoControl : public detail::DecoderControlBase<Command::LocoControl> {
+  struct Reply : public detail::ReplyDecoderControlBase<Command::LocoControl> {
     template<Encoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
@@ -165,11 +167,11 @@ struct DecoderControl : public detail::DecoderControlBase {
     return e;
   }
   template<Decoder D>
-  static std::expected<DecoderControl, std::errc> decode(D& d) {
+  static std::expected<LocoControl, std::errc> decode(D& d) {
     auto const base{DecoderControlBase::decode(d)};
     if (!base || !d.has_at_least(sizeof(cSpeed)))
       return std::unexpected(std::errc::invalid_argument);
-    DecoderControl result{*base};
+    LocoControl result{*base};
     result.cSpeed = d.uint8();
     // Add optional data
     result.cData1 = d.s_uint8();
@@ -181,8 +183,10 @@ struct DecoderControl : public detail::DecoderControlBase {
   }
 };
 
-struct InvertFunctionBits : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {
+struct InvertFunctionBits
+  : public detail::DecoderControlBase<Command::InvertFunctionBits> {
+  struct Reply
+    : public detail::ReplyDecoderControlBase<Command::InvertFunctionBits> {
     template<Encoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
@@ -227,8 +231,8 @@ struct InvertFunctionBits : public detail::DecoderControlBase {
   }
 };
 
-struct Acceleration : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyDecoderControlBase {
+struct Acceleration : public detail::DecoderControlBase<Command::Acceleration> {
+  struct Reply : public detail::ReplyDecoderControlBase<Command::Acceleration> {
     template<Encoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
@@ -259,8 +263,9 @@ struct Acceleration : public detail::DecoderControlBase {
   }
 };
 
-struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
-  struct Reply : public detail::ReplyDecoderControlBase {
+struct ShuttleTrain
+  : public detail::ShuttleTrain_Accessory_Base<Command::ShuttleTrain> {
+  struct Reply : public detail::ReplyDecoderControlBase<Command::ShuttleTrain> {
     template<Encoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
@@ -285,8 +290,10 @@ struct ShuttleTrain : public detail::ShuttleTrain_Accessory_Base {
   }
 };
 
-struct Accessory : public detail::ShuttleTrain_Accessory_Base {
-  struct Reply : public detail::ReplyDecoderControlBase {
+struct AccessoryControl
+  : public detail::ShuttleTrain_Accessory_Base<Command::AccessoryControl> {
+  struct Reply
+    : public detail::ReplyDecoderControlBase<Command::AccessoryControl> {
     template<Encoder E>
     auto encode(E e) const {
       return ReplyDecoderControlBase::encode(e);
@@ -304,15 +311,16 @@ struct Accessory : public detail::ShuttleTrain_Accessory_Base {
     return ShuttleTrain_Accessory_Base::encode(e);
   }
   template<Decoder D>
-  static std::expected<Accessory, std::errc> decode(D& d) {
+  static std::expected<AccessoryControl, std::errc> decode(D& d) {
     if (auto const base{ShuttleTrain_Accessory_Base::decode(d)})
-      return Accessory{*base};
+      return AccessoryControl{*base};
     else return std::unexpected(base.error());
   }
 };
 
-struct LocoMemoryQuery : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyErrorBase {
+struct LocoMemoryQuery
+  : public detail::DecoderControlBase<Command::LocoMemoryQuery> {
+  struct Reply : public detail::ReplyErrorBase<Command::LocoMemoryQuery> {
     bitfields::DecoderAddress cAdr{}; ///< Address
     bitfields::ControlSpeed cSpeed{}; ///< Speed
     bitfields::ControlData cData1{};  ///< Control data
@@ -370,8 +378,9 @@ struct LocoMemoryQuery : public detail::DecoderControlBase {
   }
 };
 
-struct AccessoryMemoryQuery : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyErrorBase {
+struct AccessoryMemoryQuery
+  : public detail::DecoderControlBase<Command::AccessoryMemoryQuery> {
+  struct Reply : public detail::ReplyErrorBase<Command::AccessoryMemoryQuery> {
     bitfields::DecoderAddress cAdr{};
     uint8_t cPair{};    ///<
     uint8_t cOutputs{}; ///< Acc decoder outputs
@@ -409,8 +418,9 @@ struct AccessoryMemoryQuery : public detail::DecoderControlBase {
   }
 };
 
-struct AddressControl : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyHead {
+struct AddressControl
+  : public detail::DecoderControlBase<Command::AddressControl> {
+  struct Reply : public detail::ReplyHead<Command::AddressControl> {
     bitfields::AddressControl_Payload payload{}; ///< Control params
     uint8_t cOutputs{};                          ///< Acc decoder outputs
     template<Encoder E>
@@ -454,8 +464,9 @@ struct AddressControl : public detail::DecoderControlBase {
   }
 };
 
-struct CommandStationIOQuery : public detail::CommandStationQueryBase {
-  struct Reply : public detail::ReplyHead {
+struct CommandStationIOQuery
+  : public detail::CommandStationQueryBase<Command::CommandStationIOQuery> {
+  struct Reply : public detail::ReplyHead<Command::CommandStationIOQuery> {
     uint8_t values{};
     uint16_t cCurrent1{};
     uint8_t cVoltage1{};
@@ -502,8 +513,9 @@ struct CommandStationIOQuery : public detail::CommandStationQueryBase {
   }
 };
 
-struct CommandStationCvManip : public detail::Head {
-  struct Reply : public detail::ReplyErrorBase {
+struct CommandStationCvManip
+  : public detail::Head<Command::CommandStationCvManip> {
+  struct Reply : public detail::ReplyErrorBase<Command::CommandStationCvManip> {
     uint8_t value{};
     template<Encoder E>
     auto encode(E e) const {
@@ -544,8 +556,10 @@ struct CommandStationCvManip : public detail::Head {
   }
 };
 
-struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
-  struct Reply : public detail::ReplyLongHead {
+struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase<
+                                        Command::CommandStationEquipmentQuery> {
+  struct Reply
+    : public detail::ReplyLongHead<Command::CommandStationEquipmentQuery> {
     uint16_t cAddress{};                 ///> CAN address
     uint8_t cDevice{};                   ///> Device ID
     uint8_t cRom_size{};                 ///> ROM size
@@ -603,7 +617,7 @@ struct CommandStationEquipmentQuery : public detail::CommandStationQueryBase {
   }
 };
 
-struct SerialInfo : public detail::Head {
+struct SerialInfo : public detail::Head<Command::SerialInfo> {
   uint8_t toolID{}; ///> Tool ID
   uint8_t action{}; ///>
   template<Encoder E>
@@ -625,8 +639,9 @@ struct SerialInfo : public detail::Head {
   }
 };
 
-struct DecoderCvManip : public detail::DecoderControlBase {
-  struct Reply : public detail::ReplyHead {
+struct DecoderCvManip
+  : public detail::DecoderControlBase<Command::DecoderCvManip> {
+  struct Reply : public detail::ReplyHead<Command::DecoderCvManip> {
     bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
     uint8_t cValue{};
@@ -655,7 +670,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     }
   };
 
-  struct Busy : public detail::ReplyHead {
+  struct Busy : public detail::ReplyHead<Command::DecoderCvManip> {
     uint8_t const busy{0x04u};
     bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
@@ -690,7 +705,7 @@ struct DecoderCvManip : public detail::DecoderControlBase {
     }
   };
 
-  struct Error : public detail::ReplyHead {
+  struct Error : public detail::ReplyHead<Command::DecoderCvManip> {
     bitfields::DecoderAddress cAdr{};
     uint8_t cError{};
     template<Encoder E>
@@ -735,21 +750,21 @@ struct DecoderCvManip : public detail::DecoderControlBase {
 };
 
 /// Message
-using Message = std::variant<Ack,
+using Message = std::variant<Ack<Command::DecoderCvManip>,
                              Nak,
                              Reset,
                              TrackControl,
                              TrackControl::Reply,
-                             DecoderControl,
-                             DecoderControl::Reply,
+                             LocoControl,
+                             LocoControl::Reply,
                              InvertFunctionBits,
                              InvertFunctionBits::Reply,
                              Acceleration,
                              Acceleration::Reply,
                              ShuttleTrain,
                              ShuttleTrain::Reply,
-                             Accessory,
-                             Accessory::Reply,
+                             AccessoryControl,
+                             AccessoryControl::Reply,
                              LocoMemoryQuery,
                              LocoMemoryQuery::Reply,
                              AccessoryMemoryQuery,

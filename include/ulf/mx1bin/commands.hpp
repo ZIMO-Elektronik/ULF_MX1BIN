@@ -13,25 +13,26 @@
 #include <cstdint>
 
 namespace ulf::mx1bin {
+
 enum class Command : uint8_t {
-  Reset = 0u,                    // Status
-  Nak = 1u,                      //
-  Track_Ctrl = 2u,               // Track Control
-  Loco_Ctrl = 3u,                // Loco Control
-  Invert_Fnkt = 4u,              //
-  Accelerate = 5u,               //
-  Shuttle_Train = 6u,            //
-  Accessory_Cmd = 7u,            //
-  Loco_Mem_Query = 8u,           // Command Station Memory Query
-  Accessory_Mem_Query = 9u,      //
-  Address_Ctrl = 10u,            //
-  Read_IO_State = 11u,           //
-  Station_Cv_Manip = 12u,        //
-  Station_Equipment_Query = 13u, // Command Station Equipment Query
-  Serial_Info = 17u,             // Serial Info
-  Cv_Manip = 19u,                // Cv Manipulation
-  Loco_Mem = 255u,               // Decoder Memory Access
-  Accessory_Mem = 254u,          //
+  Reset = 0u,                         //
+  Nak = 1u,                           //
+  TrackControl = 2u,                  // Track Control
+  LocoControl = 3u,                   // Loco Control
+  InvertFunctionBits = 4u,            //
+  Acceleration = 5u,                  //
+  ShuttleTrain = 6u,                  // Shuttle Train
+  AccessoryControl = 7u,              // Accessory Control
+  LocoMemoryQuery = 8u,               // Loco Memory Query
+  AccessoryMemoryQuery = 9u,          // Accessory Memory Query
+  AddressControl = 10u,               // Decoder Address Control
+  CommandStationIOQuery = 11u,        // CommandStation IO state Query
+  CommandStationCvManip = 12u,        // CommandStation CV read / write
+  CommandStationEquipmentQuery = 13u, // CommandStation Equipment Query
+  SerialInfo = 17u,                   // Serial Info
+  DecoderCvManip = 19u,               // Cv Manipulation
+  LocoMemoryUpdate = 255u,            // Loco Memory Update
+  AccessoryMemoryUpdate = 254u,       // Accessory Memory Update
 };
 
 } // namespace ulf::mx1bin

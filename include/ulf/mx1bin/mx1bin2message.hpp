@@ -15,7 +15,9 @@
 #include <optional>
 #include <span>
 #include <system_error>
+#include "bitfields.hpp"
 #include "commands.hpp"
+#include "decoder.hpp"
 #include "frame.hpp"
 #include "message.hpp"
 
@@ -36,36 +38,46 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
 
   auto frame{**res};
 
-  auto const head{decode<detail::Head>(frame)};
-  if (!head) return std::unexpected(std::errc::invalid_argument);
+  StreamDecoder d{frame};
+  d.strip(); // Remove SOF
 
-  auto const type{head->info.messageType};
+  // Check if at least the head exists
+  if (!d.has_at_least(3u)) return std::unexpected(std::errc::invalid_argument);
+
+  d.uint8(); // Skip uSID
+  auto const info{bitfields::Info{d.uint8()}};
+  auto const code{static_cast<Command>(d.uint8())};
+
+  auto const type{info.messageType};
   if (type == MessageType::Primary) {
-    switch (head->code) {
+    switch (code) {
       case Command::Reset: return decode<Reset>(frame);
-      case Command::Track_Ctrl: return decode<TrackControl>(frame);
-      case Command::Loco_Ctrl: return decode<DecoderControl>(frame);
-      case Command::Invert_Fnkt: return decode<InvertFunctionBits>(frame);
-      case Command::Accelerate: return decode<Acceleration>(frame);
-      case Command::Shuttle_Train: return decode<ShuttleTrain>(frame);
-      case Command::Accessory_Cmd: return decode<Accessory>(frame);
-      case Command::Loco_Mem_Query: return decode<LocoMemoryQuery>(frame);
-      case Command::Accessory_Mem_Query:
+      case Command::TrackControl: return decode<TrackControl>(frame);
+      case Command::LocoControl: return decode<LocoControl>(frame);
+      case Command::InvertFunctionBits:
+        return decode<InvertFunctionBits>(frame);
+      case Command::Acceleration: return decode<Acceleration>(frame);
+      case Command::ShuttleTrain: return decode<ShuttleTrain>(frame);
+      case Command::AccessoryControl: return decode<AccessoryControl>(frame);
+      case Command::LocoMemoryQuery: return decode<LocoMemoryQuery>(frame);
+      case Command::AccessoryMemoryQuery:
         return decode<AccessoryMemoryQuery>(frame);
-      case Command::Address_Ctrl: return decode<AddressControl>(frame);
-      case Command::Read_IO_State: return decode<CommandStationIOQuery>(frame);
-      case Command::Station_Cv_Manip:
+      case Command::AddressControl: return decode<AddressControl>(frame);
+      case Command::CommandStationIOQuery:
+        return decode<CommandStationIOQuery>(frame);
+      case Command::CommandStationCvManip:
         return decode<CommandStationCvManip>(frame);
-      case Command::Station_Equipment_Query:
+      case Command::CommandStationEquipmentQuery:
         return decode<CommandStationEquipmentQuery>(frame);
-      case Command::Serial_Info: return decode<SerialInfo>(frame);
-      case Command::Cv_Manip: return decode<DecoderCvManip>(frame);
+      case Command::SerialInfo: return decode<SerialInfo>(frame);
+      case Command::DecoderCvManip: return decode<DecoderCvManip>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
 
   } else if (type == MessageType::L1Ack) {
-    switch (head->code) {
-      case Command::Cv_Manip: return decode<Ack>(frame);
+    switch (code) {
+      case Command::DecoderCvManip:
+        return decode<Ack<Command::DecoderCvManip>>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
   }
