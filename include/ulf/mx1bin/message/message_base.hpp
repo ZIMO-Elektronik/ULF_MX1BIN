@@ -4,7 +4,7 @@
 
 /// Message Base structs
 ///
-/// \file   ulf/mx1bin/message_base.hpp
+/// \file   ulf/mx1bin/message/message_base.hpp
 /// \author Jonas Gahlert
 /// \date   16/07/2025
 
@@ -24,11 +24,10 @@
 
 namespace ulf::mx1bin::detail {
 
-template<Command C>
 struct Head {
   uint8_t uSID{};         ///< Unique Service ID
   bitfields::Info info{}; ///< Header info byte
-  Command const code{C};  ///< Command code
+  Command code{};         ///< Command code
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
@@ -48,11 +47,10 @@ struct Head {
   }
 };
 
-template<Command C>
 struct ReplyHead {
   uint8_t uSID{};         ///< Unique Service ID
   bitfields::Info info{}; ///< Header info byte
-  Command const code{C};  ///< Command code
+  Command code{};         ///< Command code
   uint8_t reply_uSID{};   ///< Reply uSID reference
   template<Encoder E>
   auto encode(E e) const {
@@ -77,11 +75,10 @@ struct ReplyHead {
   }
 };
 
-template<Command C>
 struct ReplyLongHead {
   uint8_t uSID{};         ///< Unique Service ID
   bitfields::Info info{}; ///< Header info byte
-  Command const code{C};  ///< Command code
+  Command code{};         ///< Command code
   uint8_t const lengthOfHeader{
     5u}; ///< Length of header --- There surely is a reason why this is always 5
   uint8_t reply_uSID{}; ///< Reply uSID reference

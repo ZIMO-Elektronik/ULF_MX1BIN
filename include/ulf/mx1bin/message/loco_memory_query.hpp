@@ -1,3 +1,13 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// Loco Memory Query Message
+///
+/// \file   ulf/mx1bin/message/loco_memory_query.hpp
+/// \author Jonas Gahlert
+/// \date   26/03/2026
+
 #pragma once
 
 #include <cstdint>
