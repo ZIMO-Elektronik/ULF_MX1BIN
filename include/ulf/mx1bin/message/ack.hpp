@@ -20,9 +20,8 @@
 
 namespace ulf::mx1bin {
 
-template<Command C>
 struct Ack {
-  using Head = detail::ReplyHead<C>;
+  using Head = detail::ReplyHead;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::L1Ack,
                                     Sender::CommandStation,
@@ -32,8 +31,8 @@ struct Ack {
     return head.encode(e);
   }
   template<Decoder D>
-  static std::expected<Ack<C>, std::errc> decode(D& d) {
-    if (auto const head{Head::decode(d)}) return Ack<C>{.head = *head};
+  static std::expected<Ack, std::errc> decode(D& d) {
+    if (auto const head{Head::decode(d)}) return Ack{.head = *head};
     else return std::unexpected(head.error());
   }
 };

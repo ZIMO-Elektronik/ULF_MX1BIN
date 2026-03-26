@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct AccessoryMemoryQuery {
   struct Reply {
-    using Head = detail::ReplyHead<Command::AccessoryMemoryQuery>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::AccessoryMemoryQuery};
     Error error{Error::NO_ERROR};     ///< Error
     bitfields::DecoderAddress cAdr{}; ///< Address
     uint8_t cPair{};                  ///<
@@ -52,11 +53,12 @@ struct AccessoryMemoryQuery {
                    .cOutputs = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::AccessoryMemoryQuery>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::AccessoryMemoryQuery};
   bitfields::DecoderAddress cAdr{}; ///< Address
   template<Encoder E>
   E encode(E e) const {

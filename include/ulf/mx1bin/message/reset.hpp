@@ -21,11 +21,12 @@
 namespace ulf::mx1bin {
 
 struct Reset {
-  using Head = detail::Head<Command::Reset>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::L1Ack,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::Reset};
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e);

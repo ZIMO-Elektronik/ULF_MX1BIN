@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct CommandStationCvManip {
   struct Reply {
-    using Head = detail::ReplyHead<Command::CommandStationCvManip>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::CommandStationCvManip};
     Error error{Error::NO_ERROR}; ///< Error
     uint8_t value{};              ///< CV Value
     template<Encoder E>
@@ -43,11 +44,12 @@ struct CommandStationCvManip {
                    .value = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::CommandStationCvManip>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::CommandStationCvManip};
   uint16_t variable{};            ///< Cv Address
   std::optional<uint8_t> value{}; ///< Cv Value
   template<Encoder E>

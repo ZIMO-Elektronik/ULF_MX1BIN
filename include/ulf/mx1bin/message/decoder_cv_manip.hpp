@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct DecoderCvManip {
   struct Reply {
-    using Head = detail::ReplyHead<Command::DecoderCvManip>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::DecoderCvManip};
     bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
     uint8_t cValue{};
@@ -51,11 +52,12 @@ struct DecoderCvManip {
   };
 
   struct Busy {
-    using Head = detail::ReplyHead<Command::DecoderCvManip>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::DecoderCvManip};
     uint8_t const busy{0x04u};
     bitfields::DecoderAddress cAdr{};
     uint16_t variable{};
@@ -89,11 +91,12 @@ struct DecoderCvManip {
   };
 
   struct Error {
-    using Head = detail::ReplyHead<Command::DecoderCvManip>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::DecoderCvManip};
     bitfields::DecoderAddress cAdr{};
     uint8_t cError{};
     template<Encoder E>
@@ -108,11 +111,12 @@ struct DecoderCvManip {
       return Error{.head = *head, .cAdr = d.uint16(), .cError = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::DecoderCvManip>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::DecoderCvManip};
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint16_t variable{};              ///< Cv Address
   std::optional<uint8_t> value{};   ///< Cv Value

@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct AddressControl {
   struct Reply {
-    using Head = detail::ReplyHead<Command::AddressControl>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::AddressControl};
     bitfields::AddressControl_Payload payload{}; ///< Control params
     uint8_t cOutputs{};                          ///< Acc decoder outputs
     template<Encoder E>
@@ -41,11 +42,12 @@ struct AddressControl {
       return Reply{.head = *head, .payload = d.uint8(), .cOutputs = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::AddressControl>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::AddressControl};
   bitfields::DecoderAddress cAdr{};             ///< Address
   bitfields::AddressControl_Control cControl{}; ///< Control parameters
   std::optional<uint8_t> cOutputs{};            ///< Acc decoder outputs

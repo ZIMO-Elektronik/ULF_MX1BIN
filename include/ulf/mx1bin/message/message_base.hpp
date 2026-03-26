@@ -39,11 +39,9 @@ struct Head {
   static std::expected<Head, std::errc> decode(D& d) {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code)))
       return std::unexpected{std::errc::invalid_argument};
-    auto const result{Head{.uSID{d.uint8()}, .info{d.uint8()}}};
-
-    // Command code MUST match
-    assert(std::to_underlying(result.code) == d.uint8());
-    return result;
+    return Head{.uSID = d.uint8(),
+                .info = d.uint8(),
+                .code = static_cast<Command>(d.uint8())};
   }
 };
 
@@ -65,13 +63,10 @@ struct ReplyHead {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(Command) +
                         sizeof(reply_uSID)))
       return std::unexpected{std::errc::invalid_argument};
-    auto result{ReplyHead{.uSID{d.uint8()}, .info{d.uint8()}}};
-
-    // Command code MUST match
-    assert(std::to_underlying(result.code) == d.uint8());
-
-    result.reply_uSID = d.uint8();
-    return result;
+    return ReplyHead{.uSID = d.uint8(),
+                     .info = d.uint8(),
+                     .code = static_cast<Command>(d.uint8()),
+                     .reply_uSID = d.uint8()};
   }
 };
 
@@ -96,14 +91,11 @@ struct ReplyLongHead {
     if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code) +
                         sizeof(lengthOfHeader) + sizeof(reply_uSID)))
       return std::unexpected{std::errc::invalid_argument};
-    auto result{ReplyLongHead{.uSID{d.uint8()}, .info{d.uint8()}}};
-
-    // Command code MUST match
-    assert(std::to_underlying(result.code) == d.uint8());
-
-    result.lengthOfHeader = d.uint8();
-    result.reply_uSID = d.uint8();
-    return result;
+    return ReplyLongHead{.uSID = d.uint8(),
+                         .info = d.uint8(),
+                         .code = static_cast<Command>(d.uint8()),
+                         .lengthOfHeader = d.uint8(),
+                         .reply_uSID = d.uint8()};
   }
 };
 

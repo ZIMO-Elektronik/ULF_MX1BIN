@@ -28,9 +28,9 @@ constexpr ulf::mx1bin::Packet encode(E& e) {
 }
 
 TEST(Message, Ack) {
-  CODABLE(ulf::mx1bin::Ack<ulf::mx1bin::Command::DecoderCvManip>)
+  CODABLE(ulf::mx1bin::Ack)
 
-  ulf::mx1bin::Ack<ulf::mx1bin::Command::DecoderCvManip> ack{};
+  ulf::mx1bin::Ack ack{};
   ack.head.reply_uSID = 0x03u;
 
   CODE(ack)

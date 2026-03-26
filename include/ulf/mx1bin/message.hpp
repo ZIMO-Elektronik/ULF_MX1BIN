@@ -74,7 +74,7 @@ constexpr std::expected<T, std::errc> decode(R const& r) {
 }
 
 /// Message
-using Message = std::variant<Ack<Command::DecoderCvManip>,
+using Message = std::variant<Ack,
                              Nak,
                              Reset,
                              TrackControl,

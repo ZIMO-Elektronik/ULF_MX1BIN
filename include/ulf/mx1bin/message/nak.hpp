@@ -21,11 +21,12 @@
 namespace ulf::mx1bin {
 
 struct Nak {
-  using Head = detail::Head<Command::Nak>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::L1Ack,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::Nak};
 
   template<Encoder E>
   E encode(E e) const {

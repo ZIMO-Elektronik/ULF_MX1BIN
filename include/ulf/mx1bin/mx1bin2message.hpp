@@ -76,8 +76,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
 
   } else if (type == MessageType::L1Ack) {
     switch (code) {
-      case Command::DecoderCvManip:
-        return decode<Ack<Command::DecoderCvManip>>(frame);
+      case Command::DecoderCvManip: return decode<Ack>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
   }

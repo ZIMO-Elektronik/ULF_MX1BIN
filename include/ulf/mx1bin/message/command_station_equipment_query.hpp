@@ -23,11 +23,12 @@ namespace ulf::mx1bin {
 /// \todo Finally write the decoder for this
 struct CommandStationEquipmentQuery {
   struct Reply {
-    using Head = detail::ReplyLongHead<Command::CommandStationEquipmentQuery>;
+    using Head = detail::ReplyLongHead;
     Head head{.info = bitfields::Info{FrameType::Long,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::CommandStationEquipmentQuery};
     uint16_t cAddress{};                 ///< CAN address
     uint8_t cDevice{};                   ///< Device ID
     uint8_t cRom_size{};                 ///< ROM size
@@ -71,11 +72,12 @@ struct CommandStationEquipmentQuery {
         .uint8(cSerNum_lo);
     }
   };
-  using Head = detail::Head<Command::CommandStationEquipmentQuery>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::CommandStationEquipmentQuery};
   uint8_t const zero{}; ///< Zero --- Yes, zero..
   template<Encoder E>
   E encode(E e) const {

@@ -21,11 +21,12 @@
 namespace ulf::mx1bin {
 
 struct SerialInfo {
-  using Head = detail::Head<Command::SerialInfo>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::SerialInfo};
   uint8_t toolID{}; ///< Tool ID
   uint8_t action{}; ///<
   template<Encoder E>

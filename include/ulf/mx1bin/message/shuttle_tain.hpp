@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct ShuttleTrain {
   struct Reply {
-    using Head = detail::ReplyHead<Command::ShuttleTrain>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::ShuttleTrain};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
     template<Encoder E>
@@ -43,11 +44,12 @@ struct ShuttleTrain {
                    .payload = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::ShuttleTrain>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::ShuttleTrain};
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint8_t cData{};                  ///< Data
   template<Encoder E>

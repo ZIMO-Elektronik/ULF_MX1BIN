@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct TrackControl {
   struct Reply {
-    using Head = detail::ReplyHead<Command::TrackControl>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::TrackControl};
     bitfields::TrackStatus statusBits{}; ///< Track status
     template<Encoder E>
     E encode(E e) const {
@@ -42,11 +43,12 @@ struct TrackControl {
       return Reply{.head = *base, .statusBits = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::TrackControl>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::TrackControl};
 
   enum Action : uint8_t {
     StopBroadcast = 0u,

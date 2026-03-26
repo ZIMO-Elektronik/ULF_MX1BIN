@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct InvertFunctionBits {
   struct Reply {
-    using Head = detail::ReplyHead<Command::InvertFunctionBits>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::InvertFunctionBits};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
     template<Encoder E>
@@ -43,11 +44,12 @@ struct InvertFunctionBits {
                    .payload = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::InvertFunctionBits>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::InvertFunctionBits};
   bitfields::DecoderAddress cAdr{}; ///< Address
   bitfields::ControlData cData1{};  ///< Control data
   uint8_t cData2{};                 ///< F1..8

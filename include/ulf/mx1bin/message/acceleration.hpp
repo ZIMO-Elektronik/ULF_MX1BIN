@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct Acceleration {
   struct Reply {
-    using Head = detail::ReplyHead<Command::Acceleration>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::Acceleration};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
     template<Encoder E>
@@ -44,11 +45,12 @@ struct Acceleration {
     }
   };
 
-  using Head = detail::Head<Command::Acceleration>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::Acceleration};
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint8_t cAzBz{};                  ///< Accel / Break time
   template<Encoder E>

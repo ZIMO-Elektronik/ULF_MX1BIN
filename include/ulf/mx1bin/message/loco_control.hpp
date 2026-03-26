@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct LocoControl {
   struct Reply {
-    using Head = detail::ReplyHead<Command::LocoControl>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::LocoControl};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
 
@@ -44,11 +45,12 @@ struct LocoControl {
                    .payload = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::LocoControl>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::LocoControl};
   bitfields::DecoderAddress cAdr{};               ///< Address
   bitfields::ControlSpeed cSpeed{};               ///< Speed
   std::optional<bitfields::ControlData> cData1{}; ///< Control data

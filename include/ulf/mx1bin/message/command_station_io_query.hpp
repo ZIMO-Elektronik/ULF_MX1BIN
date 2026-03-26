@@ -22,11 +22,12 @@ namespace ulf::mx1bin {
 
 struct CommandStationIOQuery {
   struct Reply {
-    using Head = detail::ReplyHead<Command::CommandStationIOQuery>;
+    using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       Sender::CommandStation,
-                                      StationType::MX1}};
+                                      StationType::MX1},
+              .code = Command::CommandStationIOQuery};
     uint8_t values{};
     uint16_t cCurrent1{};
     uint8_t cVoltage1{};
@@ -59,11 +60,12 @@ struct CommandStationIOQuery {
                    .cAux = d.uint8()};
     }
   };
-  using Head = detail::Head<Command::CommandStationIOQuery>;
+  using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code = Command::CommandStationIOQuery};
   uint8_t const zero{};
   template<Encoder E>
   E encode(E e) const {
