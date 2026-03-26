@@ -12,12 +12,12 @@
   auto const d_##var{*decoded};
 
 #define MATCH_HEAD(var)                                                        \
-  ASSERT_EQ(var.uSID, d_##var.uSID);                                           \
-  ASSERT_EQ(var.info.frameType, d_##var.info.frameType);                       \
-  ASSERT_EQ(var.info.messageType, d_##var.info.messageType);                   \
-  ASSERT_EQ(var.info.sender, d_##var.info.sender);                             \
-  ASSERT_EQ(var.info.stationType, d_##var.info.stationType);                   \
-  ASSERT_EQ(var.code, d_##var.code);
+  ASSERT_EQ(var.head.uSID, d_##var.head.uSID);                                 \
+  ASSERT_EQ(var.head.info.frameType, d_##var.head.info.frameType);             \
+  ASSERT_EQ(var.head.info.messageType, d_##var.head.info.messageType);         \
+  ASSERT_EQ(var.head.info.sender, d_##var.head.info.sender);                   \
+  ASSERT_EQ(var.head.info.stationType, d_##var.head.info.stationType);         \
+  ASSERT_EQ(var.head.code, d_##var.head.code);
 
 template<ulf::mx1bin::Encodable E>
 constexpr ulf::mx1bin::Packet encode(E& e) {
@@ -30,19 +30,19 @@ constexpr ulf::mx1bin::Packet encode(E& e) {
 TEST(Message, Ack) {
   CODABLE(ulf::mx1bin::Ack<ulf::mx1bin::Command::DecoderCvManip>)
 
-  ulf::mx1bin::Ack<ulf::mx1bin::Command::DecoderCvManip> ack{
-    {.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}};
+  ulf::mx1bin::Ack<ulf::mx1bin::Command::DecoderCvManip> ack{};
+  ack.head.reply_uSID = 0x03u;
 
   CODE(ack)
 
   MATCH_HEAD(ack)
-  ASSERT_EQ(ack.reply_uSID, d_ack.reply_uSID);
+  ASSERT_EQ(ack.head.reply_uSID, d_ack.head.reply_uSID);
 }
 
 TEST(Message, Nak) {
   CODABLE(ulf::mx1bin::Nak)
 
-  ulf::mx1bin::Nak nak{{.uSID = 0x00u, .info = 0x01u}};
+  ulf::mx1bin::Nak nak{};
 
   CODE(nak)
 
@@ -52,7 +52,7 @@ TEST(Message, Nak) {
 TEST(Message, Reset) {
   CODABLE(ulf::mx1bin::Reset)
 
-  ulf::mx1bin::Reset reset{{.uSID = 0x00u, .info = 0x01u}};
+  ulf::mx1bin::Reset reset{};
 
   CODE(reset)
 
@@ -62,8 +62,7 @@ TEST(Message, Reset) {
 TEST(Message, TrackControl) {
   CODABLE(ulf::mx1bin::TrackControl)
 
-  ulf::mx1bin::TrackControl ctrl{{.uSID = 0x00u, .info = 0x01u}};
-  ctrl.cAction = decltype(ctrl)::Action::TrackOn;
+  ulf::mx1bin::TrackControl ctrl{.cAction = decltype(ctrl)::Action::TrackOn};
 
   CODE(ctrl)
 
@@ -74,8 +73,8 @@ TEST(Message, TrackControl) {
 TEST(Message, TrackControl_Reply) {
   CODABLE(ulf::mx1bin::TrackControl::Reply)
 
-  ulf::mx1bin::TrackControl::Reply reply{
-    {.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}};
+  ulf::mx1bin::TrackControl::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.statusBits = 0x55u;
 
   CODE(reply)
@@ -87,7 +86,7 @@ TEST(Message, TrackControl_Reply) {
 TEST(Message, LocoControl) {
   CODABLE(ulf::mx1bin::LocoControl)
 
-  ulf::mx1bin::LocoControl ctrl{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::LocoControl ctrl{};
   ctrl.cAdr = 0x8003u;
   ctrl.cSpeed = 0xAAu;
   ctrl.cData1 = 0x55u;
@@ -109,15 +108,15 @@ TEST(Message, LocoControl) {
 TEST(Message, LocoControl_Reply) {
   CODABLE(ulf::mx1bin::LocoControl::Reply)
 
-  ulf::mx1bin::LocoControl::Reply reply{
-    {{{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}}};
+  ulf::mx1bin::LocoControl::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);
 }
@@ -125,7 +124,7 @@ TEST(Message, LocoControl_Reply) {
 TEST(Message, InvertFunctionBits) {
   CODABLE(ulf::mx1bin::InvertFunctionBits)
 
-  ulf::mx1bin::InvertFunctionBits msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::InvertFunctionBits msg{};
 
   msg.cAdr = 0x8003u;
   msg.cData1 = 0x55u;
@@ -148,15 +147,15 @@ TEST(Message, InvertFunctionBits) {
 TEST(Message, InvertFunctionBits_Reply) {
   CODABLE(ulf::mx1bin::InvertFunctionBits::Reply)
 
-  ulf::mx1bin::InvertFunctionBits::Reply reply{
-    {{{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}}};
+  ulf::mx1bin::InvertFunctionBits::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);
 }
@@ -164,7 +163,7 @@ TEST(Message, InvertFunctionBits_Reply) {
 TEST(Message, Acceleration) {
   CODABLE(ulf::mx1bin::Acceleration)
 
-  ulf::mx1bin::Acceleration msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::Acceleration msg{};
 
   msg.cAdr = 0x8003u;
   msg.cAzBz = 0x55u;
@@ -179,15 +178,15 @@ TEST(Message, Acceleration) {
 TEST(Message, Acceleration_Reply) {
   CODABLE(ulf::mx1bin::Acceleration::Reply)
 
-  ulf::mx1bin::Acceleration::Reply reply{
-    {{{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}}};
+  ulf::mx1bin::Acceleration::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);
 }
@@ -195,7 +194,7 @@ TEST(Message, Acceleration_Reply) {
 TEST(Message, ShuttleTrain) {
   CODABLE(ulf::mx1bin::ShuttleTrain)
 
-  ulf::mx1bin::ShuttleTrain msg{{{{.uSID = 0x00u, .info = 0x01u}}}};
+  ulf::mx1bin::ShuttleTrain msg{};
 
   msg.cAdr = 0x8003u;
   msg.cData = 0x55u;
@@ -210,15 +209,15 @@ TEST(Message, ShuttleTrain) {
 TEST(Message, ShuttleTrain_Reply) {
   CODABLE(ulf::mx1bin::ShuttleTrain::Reply)
 
-  ulf::mx1bin::ShuttleTrain::Reply reply{
-    {{{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}}};
+  ulf::mx1bin::ShuttleTrain::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);
 }
@@ -226,7 +225,7 @@ TEST(Message, ShuttleTrain_Reply) {
 TEST(Message, AccessoryControl) {
   CODABLE(ulf::mx1bin::AccessoryControl)
 
-  ulf::mx1bin::AccessoryControl msg{{{{.uSID = 0x00u, .info = 0x01u}}}};
+  ulf::mx1bin::AccessoryControl msg{};
 
   msg.cAdr = 0x8003u;
   msg.cData = 0x55u;
@@ -241,15 +240,15 @@ TEST(Message, AccessoryControl) {
 TEST(Message, AccessoryControl_Reply) {
   CODABLE(ulf::mx1bin::AccessoryControl::Reply)
 
-  ulf::mx1bin::AccessoryControl::Reply reply{
-    {{{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}}};
+  ulf::mx1bin::AccessoryControl::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.payload = 0x8Cu;
 
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.payload, d_reply.payload);
 }
@@ -257,7 +256,7 @@ TEST(Message, AccessoryControl_Reply) {
 TEST(Message, LocoMemoryQuery) {
   CODABLE(ulf::mx1bin::LocoMemoryQuery)
 
-  ulf::mx1bin::LocoMemoryQuery msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::LocoMemoryQuery msg{};
 
   msg.cAdr = 0x8003u;
 
@@ -270,8 +269,8 @@ TEST(Message, LocoMemoryQuery) {
 TEST(Message, LocoMemoryQuery_Reply) {
   CODABLE(ulf::mx1bin::LocoMemoryQuery::Reply)
 
-  ulf::mx1bin::LocoMemoryQuery::Reply reply{
-    {{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x03u}}};
+  ulf::mx1bin::LocoMemoryQuery::Reply reply{};
+  reply.head.reply_uSID = 0x03u;
   reply.error = ulf::mx1bin::Error::NO_ERROR;
   reply.cAdr = 0x8003u;
   reply.cSpeed = 0x02u;
@@ -286,7 +285,7 @@ TEST(Message, LocoMemoryQuery_Reply) {
   CODE(reply)
 
   MATCH_HEAD(reply)
-  ASSERT_EQ(reply.reply_uSID, d_reply.reply_uSID);
+  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
   ASSERT_EQ(reply.error, d_reply.error);
   ASSERT_EQ(reply.cAdr, d_reply.cAdr);
   ASSERT_EQ(reply.cSpeed, d_reply.cSpeed);
@@ -302,7 +301,7 @@ TEST(Message, LocoMemoryQuery_Reply) {
 TEST(Message, AccessoryMemoryQuery) {
   CODABLE(ulf::mx1bin::AccessoryMemoryQuery)
 
-  ulf::mx1bin::AccessoryMemoryQuery msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::AccessoryMemoryQuery msg{};
 
   msg.cAdr = 0x8003u;
 
@@ -315,8 +314,8 @@ TEST(Message, AccessoryMemoryQuery) {
 TEST(Message, AccessoryMemoryQuery_Reply) {
   CODABLE(ulf::mx1bin::AccessoryMemoryQuery::Reply)
 
-  ulf::mx1bin::AccessoryMemoryQuery::Reply msg{
-    {{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x04u}}};
+  ulf::mx1bin::AccessoryMemoryQuery::Reply msg{};
+  msg.head.reply_uSID = 0x03u;
 
   msg.error = ulf::mx1bin::Error::NO_ERROR;
   msg.cAdr = 0x8003u;
@@ -326,6 +325,7 @@ TEST(Message, AccessoryMemoryQuery_Reply) {
   CODE(msg)
 
   MATCH_HEAD(msg)
+  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
   ASSERT_EQ(msg.error, d_msg.error);
   ASSERT_EQ(msg.cAdr, d_msg.cAdr);
   ASSERT_EQ(msg.cPair, d_msg.cPair);
@@ -335,7 +335,7 @@ TEST(Message, AccessoryMemoryQuery_Reply) {
 TEST(Message, AddressControl) {
   CODABLE(ulf::mx1bin::AddressControl)
 
-  ulf::mx1bin::AddressControl msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::AddressControl msg{};
 
   msg.cAdr = 0x8003u;
   msg.cControl = 0x55u;
@@ -352,8 +352,8 @@ TEST(Message, AddressControl) {
 TEST(Message, AddressControl_Reply) {
   CODABLE(ulf::mx1bin::AddressControl::Reply)
 
-  ulf::mx1bin::AddressControl::Reply msg{
-    {.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x04u}};
+  ulf::mx1bin::AddressControl::Reply msg{};
+  msg.head.reply_uSID = 0x03u;
 
   msg.payload = 0x55u;
   msg.cOutputs = 0xAAu;
@@ -361,6 +361,7 @@ TEST(Message, AddressControl_Reply) {
   CODE(msg)
 
   MATCH_HEAD(msg)
+  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
   ASSERT_EQ(msg.payload, d_msg.payload);
   ASSERT_EQ(msg.cOutputs, d_msg.cOutputs);
 }
@@ -368,7 +369,7 @@ TEST(Message, AddressControl_Reply) {
 TEST(Message, CommandStationIOQuery) {
   CODABLE(ulf::mx1bin::CommandStationIOQuery)
 
-  ulf::mx1bin::CommandStationIOQuery msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::CommandStationIOQuery msg{};
 
   CODE(msg)
 
@@ -379,8 +380,8 @@ TEST(Message, CommandStationIOQuery) {
 TEST(Message, CommandStationIOQuery_Reply) {
   CODABLE(ulf::mx1bin::CommandStationIOQuery::Reply)
 
-  ulf::mx1bin::CommandStationIOQuery::Reply msg{
-    {.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x04u}};
+  ulf::mx1bin::CommandStationIOQuery::Reply msg{};
+  msg.head.reply_uSID = 0x03u;
 
   msg.cCurrent1 = 0x55u;
   msg.cVoltage1 = 0xAAu;
@@ -391,6 +392,7 @@ TEST(Message, CommandStationIOQuery_Reply) {
   CODE(msg)
 
   MATCH_HEAD(msg)
+  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
   ASSERT_EQ(msg.cCurrent1, d_msg.cCurrent1);
   ASSERT_EQ(msg.cVoltage1, d_msg.cVoltage1);
   ASSERT_EQ(msg.cCurrent2, d_msg.cCurrent2);
@@ -401,7 +403,7 @@ TEST(Message, CommandStationIOQuery_Reply) {
 TEST(Message, CommandStationCvManip) {
   CODABLE(ulf::mx1bin::CommandStationCvManip)
 
-  ulf::mx1bin::CommandStationCvManip msg{{.uSID = 0x00u, .info = 0x01u}};
+  ulf::mx1bin::CommandStationCvManip msg{};
 
   msg.variable = 0x55u;
   msg.value = 0xAAu;
@@ -416,8 +418,8 @@ TEST(Message, CommandStationCvManip) {
 TEST(Message, CommandStationCvManip_Reply) {
   CODABLE(ulf::mx1bin::CommandStationCvManip::Reply)
 
-  ulf::mx1bin::CommandStationCvManip::Reply msg{
-    {{.uSID = 0x00u, .info = 0x01u, .reply_uSID = 0x04u}}};
+  ulf::mx1bin::CommandStationCvManip::Reply msg{};
+  msg.head.reply_uSID = 0x03u;
 
   msg.error = ulf::mx1bin::Error::NO_ERROR;
   msg.value = 0x55u;
@@ -425,6 +427,7 @@ TEST(Message, CommandStationCvManip_Reply) {
   CODE(msg)
 
   MATCH_HEAD(msg)
+  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
   ASSERT_EQ(msg.error, d_msg.error);
   ASSERT_EQ(msg.value, d_msg.value);
 }
@@ -432,8 +435,7 @@ TEST(Message, CommandStationCvManip_Reply) {
 TEST(Message, CommandStationEquipmentQuery) {
   CODABLE(ulf::mx1bin::CommandStationEquipmentQuery)
 
-  ulf::mx1bin::CommandStationEquipmentQuery msg{
-    {{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::CommandStationEquipmentQuery msg{};
 
   CODE(msg)
 
@@ -461,7 +463,7 @@ TEST(Message, SerialInfo) {
 TEST(Message, DecoderCvManip) {
   CODABLE(ulf::mx1bin::DecoderCvManip)
 
-  ulf::mx1bin::DecoderCvManip msg{{{.uSID = 0x00u, .info = 0x01u}}};
+  ulf::mx1bin::DecoderCvManip msg{};
 
   msg.cAdr = 0x8003u;
   msg.variable = 0x55u;

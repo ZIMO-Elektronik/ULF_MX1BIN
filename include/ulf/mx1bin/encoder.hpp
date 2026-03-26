@@ -35,16 +35,16 @@ concept OptionalConvertibleTo =
 /// Field encoder
 template<typename T>
 concept FieldEncoder = requires(T t, uint8_t const u8, uint16_t const u16) {
-  { t.uint8(u8) } -> std::same_as<void>;
-  { t.uint16(u16) } -> std::same_as<void>;
+  { t.uint8(u8) } -> std::same_as<T&>;
+  { t.uint16(u16) } -> std::same_as<T&>;
 };
 
 /// Optional field encoder
 template<typename T>
 concept OptionalFieldEncoder = requires(
   T t, std::optional<uint8_t> const o_u8, std::optional<uint16_t> const o_u16) {
-  { t.uint8(o_u8) } -> std::same_as<void>;
-  { t.uint16(o_u16) } -> std::same_as<void>;
+  { t.uint8(o_u8) } -> std::same_as<T&>;
+  { t.uint16(o_u16) } -> std::same_as<T&>;
 };
 
 /// Is Encoder
@@ -60,12 +60,16 @@ struct StreamEncoder {
 
   StreamEncoder(std::back_insert_iterator<R> iter) : _iter{iter} {}
 
-  void addSOF() {
+  StreamEncoder& addSOF() {
     *_iter++ = detail::soh;
     *_iter++ = detail::soh;
+    return *this;
   }
 
-  void addEOT() { *_iter++ = detail::eot; }
+  StreamEncoder& addEOT() {
+    *_iter++ = detail::eot;
+    return *this;
+  }
 
   /// Encode uint8
   ///
@@ -74,12 +78,13 @@ struct StreamEncoder {
   /// \warning UB if out of space
   template<typename T>
   requires ConvertibleTo<T, uint8_t>
-  void uint8(T const t) {
+  StreamEncoder& uint8(T const t) {
     auto const v{static_cast<uint8_t>(t)};
     if (detail::is_control_char(v)) {
       *_iter++ = detail::dle;
       *_iter++ = v ^ detail::cypher;
     } else *_iter++ = v;
+    return *this;
   }
 
   /// Overloaded Encode uint8
@@ -89,8 +94,9 @@ struct StreamEncoder {
   /// \see StreamEncoder::uint8(uint8_t)
   template<typename T>
   requires OptionalConvertibleTo<T, uint8_t>
-  void uint8(T&& t) {
+  StreamEncoder& uint8(T&& t) {
     if (t) return uint8(static_cast<uint8_t>(*t));
+    else return *this;
   }
 
   /// Encode uint16
@@ -100,10 +106,11 @@ struct StreamEncoder {
   /// \warning UB if out of space
   template<typename T>
   requires ConvertibleTo<T, uint16_t>
-  void uint16(T const t) {
+  StreamEncoder& uint16(T const t) {
     auto const v{static_cast<uint16_t>(t)};
     uint8(static_cast<uint8_t>((v & 0xFF00u) >> 8u));
     uint8(static_cast<uint8_t>((v & 0x00FFu) >> 0u));
+    return *this;
   }
 
   /// Overloaded Encode uint16
@@ -113,8 +120,9 @@ struct StreamEncoder {
   /// \see StreamEncoder::uint16(uint16_t)
   template<typename T>
   requires OptionalConvertibleTo<T, uint16_t>
-  void uint16(T&& v) {
+  StreamEncoder& uint16(T&& v) {
     if (v) return uint16(*v);
+    else return *this;
   }
 
 private:
