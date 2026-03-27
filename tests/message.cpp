@@ -183,8 +183,8 @@ TEST(Message, ShuttleTrain_Reply) {
   static_assert(Codable<ulf::mx1bin::ShuttleTrain::Reply>);
 
   ulf::mx1bin::ShuttleTrain::Reply message{
-    reply.error = ulf::mx1bin::Error::NO_ERROR, reply.payload = 0x8Cu};
-  reply.head.reply_uSID = 0x03u;
+    .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
+  message.head.reply_uSID = 0x03u;
 
   auto const result{encode_and_decode(message)};
   match_head(message, result.message);
@@ -195,7 +195,7 @@ TEST(Message, ShuttleTrain_Reply) {
 TEST(Message, AccessoryControl) {
   static_assert(Codable<ulf::mx1bin::AccessoryControl>);
 
-  ulf::mx1bin::AccessoryControl message{msg.cAdr = 0x8003u, msg.cData = 0x55u};
+  ulf::mx1bin::AccessoryControl message{.cAdr = 0x8003u, .cData = 0x55u};
 
   auto const result{encode_and_decode(message)};
   match_head(message, result.message);
@@ -208,7 +208,7 @@ TEST(Message, AccessoryControl_Reply) {
 
   ulf::mx1bin::AccessoryControl::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
-  reply.head.reply_uSID = 0x03u;
+  message.head.reply_uSID = 0x03u;
 
   auto const result{encode_and_decode(message)};
   match_head(message, result.message);
@@ -227,214 +227,177 @@ TEST(Message, LocoMemoryQuery) {
 }
 
 TEST(Message, LocoMemoryQuery_Reply) {
-  CODABLE(ulf::mx1bin::LocoMemoryQuery::Reply)
+  static_assert(Codable<ulf::mx1bin::LocoMemoryQuery::Reply>);
 
-  ulf::mx1bin::LocoMemoryQuery::Reply reply{};
-  reply.head.reply_uSID = 0x03u;
-  reply.error = ulf::mx1bin::Error::NO_ERROR;
-  reply.cAdr = 0x8003u;
-  reply.cSpeed = 0x02u;
-  reply.cData1 = 0x05u;
-  reply.cData2 = 0x06u;
-  reply.cData3 = 0x07u;
-  reply.cAzBz = 0x00u;
-  reply.cStatus = 0x01u;
-  reply.cData4 = 0x08u;
-  reply.cData5 = 0x09u;
+  ulf::mx1bin::LocoMemoryQuery::Reply message{.cAdr = 0x8003u,
+                                              .cSpeed = 0x02u,
+                                              .cData1 = 0x05u,
+                                              .cData2 = 0x06u,
+                                              .cData3 = 0x07u,
+                                              .cAzBz = 0x00u,
+                                              .cStatus = 0x01u,
+                                              .cData4 = 0x08u,
+                                              .cData5 = 0x09u};
+  message.head.reply_uSID = 0x03u;
 
-  CODE(reply)
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
 
-  MATCH_HEAD(reply)
-  ASSERT_EQ(reply.head.reply_uSID, d_reply.head.reply_uSID);
-  ASSERT_EQ(reply.error, d_reply.error);
-  ASSERT_EQ(reply.cAdr, d_reply.cAdr);
-  ASSERT_EQ(reply.cSpeed, d_reply.cSpeed);
-  ASSERT_EQ(reply.cData1, d_reply.cData1);
-  ASSERT_EQ(reply.cData2, d_reply.cData2);
-  ASSERT_EQ(reply.cData3, d_reply.cData3);
-  ASSERT_EQ(reply.cAzBz, d_reply.cAzBz);
-  ASSERT_EQ(reply.cStatus, d_reply.cStatus);
-  ASSERT_EQ(reply.cData4, d_reply.cData4);
-  ASSERT_EQ(reply.cData5, d_reply.cData5);
+  ASSERT_EQ(message.error, result.message.error);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.cSpeed, result.message.cSpeed);
+  ASSERT_EQ(message.cData1, result.message.cData1);
+  ASSERT_EQ(message.cData2, result.message.cData2);
+  ASSERT_EQ(message.cData3, result.message.cData3);
+  ASSERT_EQ(message.cAzBz, result.message.cAzBz);
+  ASSERT_EQ(message.cStatus, result.message.cStatus);
+  ASSERT_EQ(message.cData4, result.message.cData4);
+  ASSERT_EQ(message.cData5, result.message.cData5);
 }
 
 TEST(Message, AccessoryMemoryQuery) {
-  CODABLE(ulf::mx1bin::AccessoryMemoryQuery)
+  static_assert(Codable<ulf::mx1bin::AccessoryMemoryQuery>);
 
-  ulf::mx1bin::AccessoryMemoryQuery msg{};
+  ulf::mx1bin::AccessoryMemoryQuery message{.cAdr = 0x8003u};
 
-  msg.cAdr = 0x8003u;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.cAdr, d_msg.cAdr);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
 }
 
 TEST(Message, AccessoryMemoryQuery_Reply) {
-  CODABLE(ulf::mx1bin::AccessoryMemoryQuery::Reply)
+  static_assert(Codable<ulf::mx1bin::AccessoryMemoryQuery::Reply>);
 
-  ulf::mx1bin::AccessoryMemoryQuery::Reply msg{};
-  msg.head.reply_uSID = 0x03u;
+  ulf::mx1bin::AccessoryMemoryQuery::Reply message{
+    .error = ulf::mx1bin::Error::NO_ERROR,
+    .cAdr = 0x8003u,
+    .cPair = 0x55u,
+    .cOutputs = 0xAAu};
+  message.head.reply_uSID = 0x03u;
 
-  msg.error = ulf::mx1bin::Error::NO_ERROR;
-  msg.cAdr = 0x8003u;
-  msg.cPair = 0x55u;
-  msg.cOutputs = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
-  ASSERT_EQ(msg.error, d_msg.error);
-  ASSERT_EQ(msg.cAdr, d_msg.cAdr);
-  ASSERT_EQ(msg.cPair, d_msg.cPair);
-  ASSERT_EQ(msg.cOutputs, d_msg.cOutputs);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.head.reply_uSID, result.message.head.reply_uSID);
+  ASSERT_EQ(message.error, result.message.error);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.cPair, result.message.cPair);
+  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
 }
 
 TEST(Message, AddressControl) {
-  CODABLE(ulf::mx1bin::AddressControl)
+  static_assert(Codable<ulf::mx1bin::AddressControl>);
 
-  ulf::mx1bin::AddressControl msg{};
+  ulf::mx1bin::AddressControl message{
+    .cAdr = 0x8003u, .cControl = 0x55u, .cOutputs = 0xAAu};
 
-  msg.cAdr = 0x8003u;
-  msg.cControl = 0x55u;
-  msg.cOutputs = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.cAdr, d_msg.cAdr);
-  ASSERT_EQ(msg.cControl, d_msg.cControl);
-  ASSERT_EQ(msg.cOutputs, d_msg.cOutputs);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.cControl, result.message.cControl);
+  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
 }
 
 TEST(Message, AddressControl_Reply) {
-  CODABLE(ulf::mx1bin::AddressControl::Reply)
+  static_assert(Codable<ulf::mx1bin::AddressControl::Reply>);
 
-  ulf::mx1bin::AddressControl::Reply msg{};
-  msg.head.reply_uSID = 0x03u;
+  ulf::mx1bin::AddressControl::Reply message{.payload = 0x55u,
+                                             .cOutputs = 0xAAu};
+  message.head.reply_uSID = 0x03u;
 
-  msg.payload = 0x55u;
-  msg.cOutputs = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
-  ASSERT_EQ(msg.payload, d_msg.payload);
-  ASSERT_EQ(msg.cOutputs, d_msg.cOutputs);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.payload, result.message.payload);
+  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
 }
 
 TEST(Message, CommandStationIOQuery) {
-  CODABLE(ulf::mx1bin::CommandStationIOQuery)
+  static_assert(Codable<ulf::mx1bin::CommandStationIOQuery>);
 
-  ulf::mx1bin::CommandStationIOQuery msg{};
+  ulf::mx1bin::CommandStationIOQuery message{};
 
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.zero, d_msg.zero);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.zero, result.message.zero);
 }
 
 TEST(Message, CommandStationIOQuery_Reply) {
-  CODABLE(ulf::mx1bin::CommandStationIOQuery::Reply)
+  static_assert(Codable<ulf::mx1bin::CommandStationIOQuery::Reply>);
 
-  ulf::mx1bin::CommandStationIOQuery::Reply msg{};
-  msg.head.reply_uSID = 0x03u;
+  ulf::mx1bin::CommandStationIOQuery::Reply message{.cCurrent1 = 0x55u,
+                                                    .cVoltage1 = 0xAAu,
+                                                    .cCurrent2 = 0x55u,
+                                                    .cVoltage2 = 0xAAu,
+                                                    .cAux = 0x55u};
+  message.head.reply_uSID = 0x03u;
 
-  msg.cCurrent1 = 0x55u;
-  msg.cVoltage1 = 0xAAu;
-  msg.cCurrent2 = 0x55u;
-  msg.cVoltage2 = 0xAAu;
-  msg.cAux = 0x55u;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
-  ASSERT_EQ(msg.cCurrent1, d_msg.cCurrent1);
-  ASSERT_EQ(msg.cVoltage1, d_msg.cVoltage1);
-  ASSERT_EQ(msg.cCurrent2, d_msg.cCurrent2);
-  ASSERT_EQ(msg.cVoltage2, d_msg.cVoltage2);
-  ASSERT_EQ(msg.cAux, d_msg.cAux);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cCurrent1, result.message.cCurrent1);
+  ASSERT_EQ(message.cVoltage1, result.message.cVoltage1);
+  ASSERT_EQ(message.cCurrent2, result.message.cCurrent2);
+  ASSERT_EQ(message.cVoltage2, result.message.cVoltage2);
+  ASSERT_EQ(message.cAux, result.message.cAux);
 }
 
 TEST(Message, CommandStationCvManip) {
-  CODABLE(ulf::mx1bin::CommandStationCvManip)
+  static_assert(Codable<ulf::mx1bin::CommandStationCvManip>);
 
-  ulf::mx1bin::CommandStationCvManip msg{};
+  ulf::mx1bin::CommandStationCvManip message{.variable = 0x55u, .value = 0xAAu};
 
-  msg.variable = 0x55u;
-  msg.value = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.variable, d_msg.variable);
-  ASSERT_EQ(*msg.value, *d_msg.value);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(*message.value, *result.message.value);
 }
 
 TEST(Message, CommandStationCvManip_Reply) {
-  CODABLE(ulf::mx1bin::CommandStationCvManip::Reply)
+  static_assert(Codable<ulf::mx1bin::CommandStationCvManip::Reply>);
 
-  ulf::mx1bin::CommandStationCvManip::Reply msg{};
-  msg.head.reply_uSID = 0x03u;
+  ulf::mx1bin::CommandStationCvManip::Reply message{
 
-  msg.error = ulf::mx1bin::Error::NO_ERROR;
-  msg.value = 0x55u;
+    .error = ulf::mx1bin::Error::NO_ERROR, .value = 0x55u};
+  message.head.reply_uSID = 0x03u;
 
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.head.reply_uSID, d_msg.head.reply_uSID);
-  ASSERT_EQ(msg.error, d_msg.error);
-  ASSERT_EQ(msg.value, d_msg.value);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.error, result.message.error);
+  ASSERT_EQ(message.value, result.message.value);
 }
 
 TEST(Message, CommandStationEquipmentQuery) {
-  CODABLE(ulf::mx1bin::CommandStationEquipmentQuery)
+  static_assert(Codable<ulf::mx1bin::CommandStationEquipmentQuery>);
 
-  ulf::mx1bin::CommandStationEquipmentQuery msg{};
+  ulf::mx1bin::CommandStationEquipmentQuery message{};
 
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.zero, d_msg.zero);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.zero, result.message.zero);
 }
 
 // TEST(Message, CommandStationEquipmentQuery_Reply) {}
 
 TEST(Message, SerialInfo) {
-  CODABLE(ulf::mx1bin::SerialInfo)
+  static_assert(Codable<ulf::mx1bin::SerialInfo>);
 
-  ulf::mx1bin::SerialInfo msg{{.uSID = 0x00u, .info = 0x01u}};
+  ulf::mx1bin::SerialInfo message{.toolID = 0xAAu, .action = 0x55u};
 
-  msg.action = 0x55u;
-  msg.toolID = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.action, d_msg.action);
-  ASSERT_EQ(msg.toolID, d_msg.toolID);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.action, result.message.action);
+  ASSERT_EQ(message.toolID, result.message.toolID);
 }
 
 TEST(Message, DecoderCvManip) {
-  CODABLE(ulf::mx1bin::DecoderCvManip)
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip>);
 
-  ulf::mx1bin::DecoderCvManip msg{};
+  ulf::mx1bin::DecoderCvManip message{
+    .cAdr = 0x8003u, .variable = 0x55u, .value = 0xAAu};
 
-  msg.cAdr = 0x8003u;
-  msg.variable = 0x55u;
-  msg.value = 0xAAu;
-
-  CODE(msg)
-
-  MATCH_HEAD(msg)
-  ASSERT_EQ(msg.cAdr, d_msg.cAdr);
-  ASSERT_EQ(msg.variable, d_msg.variable);
-  ASSERT_EQ(*msg.value, *d_msg.value);
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(*message.value, *result.message.value);
 }
 
 // TEST(Message, DecoderCvManip_Reply) {}
