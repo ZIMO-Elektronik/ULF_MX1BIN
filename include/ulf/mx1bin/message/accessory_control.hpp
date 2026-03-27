@@ -25,7 +25,7 @@ struct AccessoryControl {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::AccessoryControl};
     Error error{Error::NO_ERROR};
@@ -48,7 +48,7 @@ struct AccessoryControl {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::AccessoryControl};
   bitfields::DecoderAddress cAdr{}; ///< Address

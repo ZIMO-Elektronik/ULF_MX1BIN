@@ -27,7 +27,7 @@ struct DecoderCvManip {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::ReplyL2,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::DecoderCvManip};
     bitfields::DecoderAddress cAdr{};
@@ -57,7 +57,7 @@ struct DecoderCvManip {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::DecoderCvManip};
     uint8_t const busy{0x04u};
@@ -96,7 +96,7 @@ struct DecoderCvManip {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::ReplyL2,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::DecoderCvManip};
     bitfields::DecoderAddress cAdr{};
@@ -116,7 +116,7 @@ struct DecoderCvManip {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::DecoderCvManip};
   bitfields::DecoderAddress cAdr{}; ///< Address

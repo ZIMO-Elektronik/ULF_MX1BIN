@@ -38,17 +38,21 @@ This library is meant to be consumed with CMake.
 
 ```cmake
 #Either by including it with CPM
+## Use `COMMUNICATION MASTER ON` for Master
 cpmaddpackage("gh:ZIMO-Elektronik/ULF_MX1BIN@0.1.0")
 
 # or the FetchContent module
 FetchContent_Declare(
   ULF_MX1BIN
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/ULF_MX1BIN"
-  GIT_TAG 0.1.0)
+  GIT_TAG 0.1.0
+  )
 FetchContent_MakeAvailable(ULF_MX1BIN)
 
 target_link_libraries(YourTarget PRIVATE ULF::MX1Bin)
 ```
+
+To configure either Master or Slave, use the option `COMMUNICATION_MASTER` [`ON`/`OFF`]. This only influences default values, which can be set with either option.
 
 ### Build
 :construction:

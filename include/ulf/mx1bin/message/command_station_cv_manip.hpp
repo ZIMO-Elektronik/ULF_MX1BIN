@@ -25,7 +25,7 @@ struct CommandStationCvManip {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::CommandStationCvManip};
     Error error{Error::NO_ERROR}; ///< Error
@@ -47,7 +47,7 @@ struct CommandStationCvManip {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::CommandStationCvManip};
   uint16_t variable{};            ///< Cv Address

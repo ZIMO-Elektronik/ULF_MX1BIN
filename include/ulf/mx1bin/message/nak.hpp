@@ -24,7 +24,7 @@ struct Nak {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::Nak};
 

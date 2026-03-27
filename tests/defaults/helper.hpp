@@ -5,7 +5,7 @@
 
 template<Codable T>
 void check_info(T const& t) {
-  ASSERT_EQ(t.head.info.sender, ulf::mx1bin::Sender::CommandStation);
+  ASSERT_EQ(t.head.info.sender, ulf::mx1bin::detail::defaultSender);
   ASSERT_EQ(t.head.info.stationType, ulf::mx1bin::StationType::MX1);
 
   if constexpr (ulf::mx1bin::Long<T>) {

@@ -24,6 +24,14 @@
 
 namespace ulf::mx1bin::detail {
 
+constexpr Sender defaultSender{
+#if defined MASTER
+  Sender::PC
+#else
+  Sender::CommandStation
+#endif
+};
+
 struct Head {
   uint8_t uSID{};         ///< Unique Service ID
   bitfields::Info info{}; ///< Header info byte

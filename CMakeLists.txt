@@ -14,10 +14,14 @@ project(
   VERSION ${VERSION_FROM_GIT}
   LANGUAGES CXX)
 
+option(COMMUNICATION_MASTER "Communication master" OFF)
+
 add_library(ULF_MX1BIN INTERFACE)
 add_library(ULF::MX1BIN ALIAS ULF_MX1BIN)
 
 target_compile_features(ULF_MX1BIN INTERFACE cxx_std_23)
+
+target_compile_definitions(ULF_MX1BIN INTERFACE $<$<BOOL:${COMMUNICATION_MASTER}>:MASTER>)
 
 # https://github.com/espressif/esp-idf/issues/17773
 if(PROJECT_IS_TOP_LEVEL AND NOT ESP_PLATFORM)

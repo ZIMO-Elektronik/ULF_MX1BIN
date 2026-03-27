@@ -25,7 +25,7 @@ struct AddressControl {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::AddressControl};
     bitfields::AddressControl_Payload payload{}; ///< Control params
@@ -45,7 +45,7 @@ struct AddressControl {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::AddressControl};
   bitfields::DecoderAddress cAdr{};             ///< Address

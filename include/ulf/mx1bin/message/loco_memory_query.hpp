@@ -25,7 +25,7 @@ struct LocoMemoryQuery {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::LocoMemoryQuery};
     Error error{Error::NO_ERROR};
@@ -76,7 +76,7 @@ struct LocoMemoryQuery {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::LocoMemoryQuery};
   bitfields::DecoderAddress cAdr{}; ///< Address

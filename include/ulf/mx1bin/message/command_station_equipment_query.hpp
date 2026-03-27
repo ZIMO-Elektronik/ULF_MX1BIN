@@ -26,7 +26,7 @@ struct CommandStationEquipmentQuery {
     using Head = detail::ReplyLongHead;
     Head head{.info = bitfields::Info{FrameType::Long,
                                       MessageType::L1Ack,
-                                      Sender::CommandStation,
+                                      detail::defaultSender,
                                       StationType::MX1},
               .code = Command::CommandStationEquipmentQuery};
     uint16_t cAddress{};                 ///< CAN address
@@ -75,7 +75,7 @@ struct CommandStationEquipmentQuery {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,
-                                    Sender::CommandStation,
+                                    detail::defaultSender,
                                     StationType::MX1},
             .code = Command::CommandStationEquipmentQuery};
   uint8_t const zero{}; ///< Zero --- Yes, zero..
