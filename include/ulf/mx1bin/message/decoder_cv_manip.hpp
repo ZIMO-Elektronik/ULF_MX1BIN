@@ -16,15 +16,17 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "ack.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
 
 struct DecoderCvManip {
-  struct Reply {
+  using Reply = TAck<Command::DecoderCvManip>;
+  struct ReplyL2 {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
-                                      MessageType::L1Ack,
+                                      MessageType::ReplyL2,
                                       Sender::CommandStation,
                                       StationType::MX1},
               .code = Command::DecoderCvManip};
@@ -38,16 +40,16 @@ struct DecoderCvManip {
         cError);
     }
     template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
+    static std::expected<ReplyL2, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
       if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
                                    sizeof(cValue) + sizeof(cError)))
         return std::unexpected{std::errc::invalid_argument};
-      return Reply{.head = *head,
-                   .cAdr = d.uint16(),
-                   .variable = d.uint16(),
-                   .cValue = d.uint8(),
-                   .cError = d.uint8()};
+      return ReplyL2{.head = *head,
+                     .cAdr = d.uint16(),
+                     .variable = d.uint16(),
+                     .cValue = d.uint8(),
+                     .cError = d.uint8()};
     }
   };
 
@@ -93,7 +95,7 @@ struct DecoderCvManip {
   struct Error {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
-                                      MessageType::L1Ack,
+                                      MessageType::ReplyL2,
                                       Sender::CommandStation,
                                       StationType::MX1},
               .code = Command::DecoderCvManip};

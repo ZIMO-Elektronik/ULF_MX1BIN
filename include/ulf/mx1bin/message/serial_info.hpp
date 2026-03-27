@@ -16,11 +16,13 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "ack.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
 
 struct SerialInfo {
+  using Reply = TAck<Command::SerialInfo>;
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::Primary,

@@ -20,21 +20,29 @@
 
 namespace ulf::mx1bin {
 
-struct Ack {
+/// Templated Ack
+///
+/// @tparam C Command
+template<Command C>
+struct TAck {
   using Head = detail::ReplyHead;
   Head head{.info = bitfields::Info{FrameType::Short,
                                     MessageType::L1Ack,
                                     Sender::CommandStation,
-                                    StationType::MX1}};
+                                    StationType::MX1},
+            .code{C}};
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e);
   }
   template<Decoder D>
-  static std::expected<Ack, std::errc> decode(D& d) {
-    if (auto const head{Head::decode(d)}) return Ack{.head = *head};
+  static std::expected<TAck<C>, std::errc> decode(D& d) {
+    if (auto const head{Head::decode(d)}) return TAck<C>{.head = *head};
     else return std::unexpected(head.error());
   }
 };
+
+/// Ack definition when decoding, command must be filled manually
+using Ack = TAck<Command::Reset>;
 
 } // namespace ulf::mx1bin

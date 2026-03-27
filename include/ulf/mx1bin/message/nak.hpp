@@ -23,7 +23,7 @@ namespace ulf::mx1bin {
 struct Nak {
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
-                                    MessageType::L1Ack,
+                                    MessageType::Primary,
                                     Sender::CommandStation,
                                     StationType::MX1},
             .code = Command::Nak};

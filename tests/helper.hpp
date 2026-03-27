@@ -24,9 +24,23 @@ struct Result {
 
 /// Concept to check if a type is a primary message
 template<typename T>
-concept IsPrimary = requires {
-  typename T::Reply;
-} || std::same_as<T, ulf::mx1bin::Nak> || std::same_as<T, ulf::mx1bin::Reset>;
+concept IsPrimary =
+  (requires { typename T::Reply; } // Check for a type Reply
+   &&
+   !std::same_as<T, typename T::Reply>) // Make sure its not the class itself...
+  || std::same_as<T, ulf::mx1bin::Nak>  // Again with the special cases...
+  ;
+
+/// Concept to check if a type is a ReplyL2
+///
+/// \note Since this is rare, a list of types should suffice
+template<typename T>
+concept IsReplyL2 = std::same_as<T, ulf::mx1bin::DecoderCvManip::ReplyL2> ||
+                    std::same_as<T, ulf::mx1bin::DecoderCvManip::Error>;
+
+/// Concept to check if a type is a L1Ack
+template<typename T>
+concept IsL1Ack = !IsPrimary<T> && !IsReplyL2<T>;
 
 /// Checks if the type is `Encodable` AND `Decodable`
 template<typename T>
