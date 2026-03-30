@@ -25,7 +25,9 @@
 
 namespace ulf::mx1bin::detail {
 
+inline constexpr ctll::fixed_string start_pattern{"\x01\x01"};
 inline constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
+inline constexpr ctll::fixed_string end_pattern{"(.*?)\x17"};
 
 /// Verify frame
 ///
@@ -35,15 +37,27 @@ inline constexpr ctll::fixed_string pattern{"\x01\x01(.*?)\x17"};
 /// \retval std::span                   First found frame
 constexpr std::expected<std::optional<std::span<uint8_t const>>, std::errc>
 verify(std::span<uint8_t const> frame) {
-  // Any match
-  auto m{ctre::starts_with<pattern>(frame)};
-  if (!m) return std::unexpected(std::errc::invalid_argument);
-  // Match
-  m = ctre::match<pattern>(frame.subspan(0uz, size(m)));
-  if (!m) return std::nullopt;
+  // Check SOF
+  auto const start_match(ctre::starts_with<start_pattern>(frame));
+  if (!start_match) return std::unexpected(std::errc::invalid_argument);
+
+  // Find message withing stream
+  if (auto const match{ctre::match<pattern>(frame)}) {
+    // Whole match
+    frame = frame.subspan(0, match.size());
+  } else {
+    // Maybe we simply have too much data, search
+    if (auto const search_match{ctre::search<end_pattern>(frame)}) {
+      // Found it
+      frame = frame.subspan(0, search_match.size());
+    } else {
+      // Probably insufficient data
+      return std::nullopt;
+    }
+  }
 
   // Long or Short frame
-  StreamDecoder d{frame.subspan(0uz, size(m))};
+  StreamDecoder d{frame};
   d.strip();
   d.uint8(); // Skip uSID
   bitfields::Info info{d.uint8()};
@@ -82,7 +96,7 @@ verify(std::span<uint8_t const> frame) {
       return std::unexpected(std::errc::bad_message);
   }
 
-  return frame.subspan(0uz, size(m));
+  return frame;
 }
 
 } // namespace ulf::mx1bin::detail
