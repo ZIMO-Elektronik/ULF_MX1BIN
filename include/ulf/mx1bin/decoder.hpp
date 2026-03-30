@@ -55,6 +55,22 @@ struct StreamDecoder {
     return *this;
   }
 
+  /// Strips CRC
+  ///
+  /// @tparam type Type of CRC (uint8_t or uint16_t)
+  /// @return StreamDecoder reference
+  // template<std::unsigned_integral type>
+  //  requires std::same_as<type, uint8_t> || std::same_as<type, uint16_t>
+  template<typename type>
+  StreamDecoder& strip_crc() {
+    assert(_iter != _end);
+    for (uint8_t i{0u}; i++ < sizeof(type);) {
+      if (*(_end - 2) == detail::dle) _end--; // Catch encoded crc
+      _end--;
+    }
+    return *this;
+  }
+
   /// Decode next uint8
   ///
   /// \warning  UB if out of data

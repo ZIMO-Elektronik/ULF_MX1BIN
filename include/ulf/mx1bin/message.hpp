@@ -59,6 +59,17 @@ concept Decodable = requires(T t, StreamDecoder<char const*, char const*>& d) {
   { T::decode(d) } -> std::same_as<std::expected<T, std::errc>>;
 };
 
+/// Long frame message concept
+template<typename T>
+concept Long = requires(T t) {
+  requires std::same_as<std::remove_cv_t<std::remove_reference_t<T>>,
+                        CommandStationEquipmentQuery::Reply>;
+};
+
+/// Short frame message concept
+template<typename T>
+concept Short = requires(T t) { requires !Long<T>; };
+
 /// Decode helper
 ///
 /// \tparam T Decodable type
@@ -68,8 +79,11 @@ concept Decodable = requires(T t, StreamDecoder<char const*, char const*>& d) {
 /// \retval std::errc Malformed stream
 template<Decodable T, std::ranges::input_range R>
 constexpr std::expected<T, std::errc> decode(R const& r) {
+  using crc_type = std::conditional_t<Short<T>, uint8_t, uint16_t>;
+
   StreamDecoder d(r);
   d.strip();
+  d.template strip_crc<crc_type>();
   return T::decode(d);
 }
 
@@ -106,15 +120,6 @@ using Message = std::variant<Ack,
                              DecoderCvManip::Reply,
                              DecoderCvManip::Busy,
                              DecoderCvManip::Error>;
-
-template<typename T>
-concept Long = requires(T t) {
-  requires std::same_as<std::remove_cv_t<std::remove_reference_t<T>>,
-                        CommandStationEquipmentQuery::Reply>;
-};
-
-template<typename T>
-concept Short = requires(T t) { requires !Long<T>; };
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
 

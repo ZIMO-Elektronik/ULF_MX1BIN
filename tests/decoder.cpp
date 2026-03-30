@@ -50,6 +50,77 @@ TEST(decoder, strip_empty_range_assert) {
   EXPECT_DEATH(d.strip(), _);
 }
 
+TEST(decoder, strip_crc8) {
+  std::vector<uint8_t> message{0xAAu, 0x55u, 0xAAu}, frame, result;
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(0xFFu); // Dummy CRC8
+
+  ulf::mx1bin::StreamDecoder d{frame};
+  d.strip_crc<uint8_t>();
+
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
+}
+
+TEST(decoder, strip_encoded_crc8) {
+  std::vector<uint8_t> message{0xAAu, 0x55u, 0xAAu}, frame, result;
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(ulf::mx1bin::detail::dle);    //
+  frame.push_back(ulf::mx1bin::detail::soh ^    //
+                  ulf::mx1bin::detail::cypher); // Dummy CRC8
+
+  ulf::mx1bin::StreamDecoder d{frame};
+  d.strip_crc<uint8_t>();
+
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
+}
+
+TEST(decoder, strip_crc16) {
+  std::vector<uint8_t> message{0xAAu, 0x55u, 0xAAu}, frame, result;
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(0x11u); //
+  frame.push_back(0xFFu); // Dummy CRC16
+
+  ulf::mx1bin::StreamDecoder d{frame};
+  d.strip_crc<uint16_t>();
+
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
+}
+
+TEST(decoder, strip_half_encoded_crc16) {
+  std::vector<uint8_t> message{0xAAu, 0x55u, 0xAAu}, frame, result;
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(0xFFu);                       //
+  frame.push_back(ulf::mx1bin::detail::dle);    //
+  frame.push_back(ulf::mx1bin::detail::soh ^    //
+                  ulf::mx1bin::detail::cypher); // Dummy CRC16
+
+  ulf::mx1bin::StreamDecoder d{frame};
+  d.strip_crc<uint16_t>();
+
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
+}
+
+TEST(decoder, strip_encoded_crc16) {
+  std::vector<uint8_t> message{0xAAu, 0x55u, 0xAAu}, frame, result;
+  std::ranges::copy(message, std::back_inserter(frame));
+  frame.push_back(ulf::mx1bin::detail::dle);    //
+  frame.push_back(ulf::mx1bin::detail::soh ^    //
+                  ulf::mx1bin::detail::cypher); //
+  frame.push_back(ulf::mx1bin::detail::dle);    //
+  frame.push_back(ulf::mx1bin::detail::soh ^    //
+                  ulf::mx1bin::detail::cypher); // Dummy CRC16
+
+  ulf::mx1bin::StreamDecoder d{frame};
+  d.strip_crc<uint16_t>();
+
+  while (auto const val{d.s_uint8()}) { result.push_back(*val); }
+  ASSERT_EQ(message, result);
+}
+
 TEST(decoder, decode_uint8) {
   uint8_t const value{0x80u};
 
