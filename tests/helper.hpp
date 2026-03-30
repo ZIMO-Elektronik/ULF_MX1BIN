@@ -4,6 +4,13 @@
 #include <concepts>
 #include <ulf/mx1bin.hpp>
 
+/// Decode helper
+template<ulf::mx1bin::Decodable D, std::ranges::input_range S>
+constexpr auto decode(S const& s) {
+  ulf::mx1bin::StreamDecoder d{s};
+  return D::decode(d);
+}
+
 /// Encode helper
 template<ulf::mx1bin::Encodable E,
          std::ranges::output_range<uint8_t> S = std::vector<uint8_t>>
@@ -53,7 +60,7 @@ concept Codable = ulf::mx1bin::Encodable<T> && ulf::mx1bin::Decodable<T>;
 template<Codable T>
 constexpr Result<T> encode_and_decode(T const& in) {
   auto const encoded{encode(in)};
-  auto const decoded{ulf::mx1bin::decode<T>(encoded)};
+  auto const decoded{decode<T>(encoded)};
 
   assert(decoded); // GTest ASSERT won't compile here somehow..
   return Result{.message = *decoded, .stream = encoded};
