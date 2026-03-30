@@ -37,6 +37,8 @@ struct Nak {
     if (auto const head{Head::decode(d)}) return Nak{.head = *head};
     else return std::unexpected(head.error());
   }
+  constexpr bool operator==(Nak const&) const = default;
+  constexpr Nak& operator=(Nak const&) = default;
 };
 
 } // namespace ulf::mx1bin

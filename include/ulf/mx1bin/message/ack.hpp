@@ -40,6 +40,8 @@ struct TAck {
     if (auto const head{Head::decode(d)}) return TAck<C>{.head = *head};
     else return std::unexpected(head.error());
   }
+  constexpr bool operator==(TAck const&) const = default;
+  constexpr TAck& operator=(TAck const&) = default;
 };
 
 /// Ack definition when decoding, command must be filled manually

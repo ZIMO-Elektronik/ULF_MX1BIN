@@ -75,3 +75,33 @@ constexpr void match_head(T const& correct, T const& compare) {
     }
   }
 }
+
+template<Codable T>
+constexpr std::vector<uint8_t> encode_message(T const& t) {
+  std::vector<uint8_t> result{};
+  ulf::mx1bin::StreamEncoder e(result);
+  e.addSOF();
+  t.encode(e);
+  if constexpr (ulf::mx1bin::Long<T>) {
+    e.uint16(ulf::mx1bin::crc16(std::span<uint8_t const>{result}.subspan(2uz)));
+  } else {
+    e.uint8(ulf::mx1bin::crc8(std::span<uint8_t const>{result}.subspan(2uz)));
+  }
+  e.addEOT();
+  return result;
+}
+
+template<Codable T>
+constexpr std::vector<uint8_t> encode_message(T const& t, size_t crc) {
+  std::vector<uint8_t> result{};
+  ulf::mx1bin::StreamEncoder e(result);
+  e.addSOF();
+  t.encode(e);
+  if constexpr (ulf::mx1bin::Long<T>) {
+    e.uint16(static_cast<uint16_t>(crc));
+  } else {
+    e.uint8(static_cast<uint8_t>(crc));
+  }
+  e.addEOT();
+  return result;
+}

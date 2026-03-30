@@ -43,6 +43,8 @@ struct ShuttleTrain {
                    .error = static_cast<Error>(d.uint8()),
                    .payload = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -63,6 +65,8 @@ struct ShuttleTrain {
       return std::unexpected(std::errc::invalid_argument);
     return ShuttleTrain{.head = *head, .cAdr = d.uint16(), .cData = d.uint8()};
   }
+  constexpr bool operator==(ShuttleTrain const&) const = default;
+  constexpr ShuttleTrain& operator=(ShuttleTrain const&) = default;
 };
 
 } // namespace ulf::mx1bin

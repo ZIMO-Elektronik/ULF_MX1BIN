@@ -41,6 +41,8 @@ struct AddressControl {
         return std::unexpected{std::errc::invalid_argument};
       return Reply{.head = *head, .payload = d.uint8(), .cOutputs = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -66,6 +68,8 @@ struct AddressControl {
                           // Add optional data
                           .cOutputs = d.s_uint8()};
   }
+  constexpr bool operator==(AddressControl const&) const = default;
+  constexpr AddressControl& operator=(AddressControl const&) = default;
 };
 
 } // namespace ulf::mx1bin

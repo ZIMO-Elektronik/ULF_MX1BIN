@@ -51,6 +51,8 @@ struct DecoderCvManip {
                      .cValue = d.uint8(),
                      .cError = d.uint8()};
     }
+    constexpr bool operator==(ReplyL2 const&) const = default;
+    constexpr ReplyL2& operator=(ReplyL2 const&) = default;
   };
 
   struct Busy {
@@ -90,6 +92,8 @@ struct DecoderCvManip {
                   .activeAddr = d.s_uint8(),
                   .activeCv = d.s_uint8()};
     }
+    constexpr bool operator==(Busy const&) const = default;
+    constexpr Busy& operator=(Busy const&) = default;
   };
 
   struct Error {
@@ -112,6 +116,8 @@ struct DecoderCvManip {
         return std::unexpected{std::errc::invalid_argument};
       return Error{.head = *head, .cAdr = d.uint16(), .cError = d.uint8()};
     }
+    constexpr bool operator==(Error const&) const = default;
+    constexpr Error& operator=(Error const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -137,6 +143,8 @@ struct DecoderCvManip {
                           // Add optional data
                           .value = d.s_uint8()};
   }
+  constexpr bool operator==(DecoderCvManip const&) const = default;
+  constexpr DecoderCvManip& operator=(DecoderCvManip const&) = default;
 };
 
 } // namespace ulf::mx1bin

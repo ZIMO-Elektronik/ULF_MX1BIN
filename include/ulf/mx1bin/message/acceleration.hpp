@@ -43,6 +43,8 @@ struct Acceleration {
                    .error = static_cast<Error>(d.uint8()),
                    .payload = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
 
   using Head = detail::Head;
@@ -64,6 +66,8 @@ struct Acceleration {
       return std::unexpected(std::errc::invalid_argument);
     return Acceleration{.head = *head, .cAdr = d.uint16(), .cAzBz = d.uint8()};
   }
+  constexpr bool operator==(Acceleration const&) const = default;
+  constexpr Acceleration& operator=(Acceleration const&) = default;
 };
 
 } // namespace ulf::mx1bin

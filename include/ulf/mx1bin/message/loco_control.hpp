@@ -44,6 +44,8 @@ struct LocoControl {
                    .error = static_cast<Error>(d.uint8()),
                    .payload = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -84,6 +86,8 @@ struct LocoControl {
                        .cData4 = d.s_uint8(),
                        .cData5 = d.s_uint8()};
   }
+  constexpr bool operator==(LocoControl const&) const = default;
+  constexpr LocoControl& operator=(LocoControl const&) = default;
 };
 
 } // namespace ulf::mx1bin

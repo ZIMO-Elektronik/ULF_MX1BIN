@@ -72,6 +72,8 @@ struct LocoMemoryQuery {
                    .cData4 = d.uint8(),
                    .cData5 = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -91,5 +93,7 @@ struct LocoMemoryQuery {
       return std::unexpected(std::errc::invalid_argument);
     return LocoMemoryQuery{.head = *head, .cAdr = d.uint16()};
   }
+  constexpr bool operator==(LocoMemoryQuery const&) const = default;
+  constexpr LocoMemoryQuery& operator=(LocoMemoryQuery const&) = default;
 };
 } // namespace ulf::mx1bin

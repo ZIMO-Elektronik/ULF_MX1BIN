@@ -42,6 +42,8 @@ struct TrackControl {
         return std::unexpected(std::errc::invalid_argument);
       return Reply{.head = *base, .statusBits = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -68,6 +70,8 @@ struct TrackControl {
     return TrackControl{.head = *head,
                         .cAction = static_cast<Action>(d.uint8())};
   }
+  constexpr bool operator==(TrackControl const&) const = default;
+  constexpr TrackControl& operator=(TrackControl const&) = default;
 };
 
 } // namespace ulf::mx1bin

@@ -51,6 +51,8 @@ struct Head {
                 .info = d.uint8(),
                 .code = static_cast<Command>(d.uint8())};
   }
+  constexpr bool operator==(Head const&) const = default;
+  constexpr Head& operator=(Head const&) = default;
 };
 
 struct ReplyHead {
@@ -76,6 +78,8 @@ struct ReplyHead {
                      .code = static_cast<Command>(d.uint8()),
                      .reply_uSID = d.uint8()};
   }
+  constexpr bool operator==(ReplyHead const&) const = default;
+  constexpr ReplyHead& operator=(ReplyHead const&) = default;
 };
 
 struct ReplyLongHead {
@@ -105,6 +109,8 @@ struct ReplyLongHead {
                          .lengthOfHeader = d.uint8(),
                          .reply_uSID = d.uint8()};
   }
+  constexpr bool operator==(ReplyLongHead const&) const = default;
+  constexpr ReplyLongHead& operator=(ReplyLongHead const&) = default;
 };
 
 } // namespace ulf::mx1bin::detail

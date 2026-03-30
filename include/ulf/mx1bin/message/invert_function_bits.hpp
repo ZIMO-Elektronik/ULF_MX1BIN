@@ -43,6 +43,8 @@ struct InvertFunctionBits {
                    .error = static_cast<Error>(d.uint8()),
                    .payload = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -81,6 +83,8 @@ struct InvertFunctionBits {
                               .cData4 = d.uint8(),
                               .cData5 = d.uint8()};
   }
+  constexpr bool operator==(InvertFunctionBits const&) const = default;
+  constexpr InvertFunctionBits& operator=(InvertFunctionBits const&) = default;
 };
 
 } // namespace ulf::mx1bin

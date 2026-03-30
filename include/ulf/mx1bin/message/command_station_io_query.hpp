@@ -59,6 +59,8 @@ struct CommandStationIOQuery {
                    .cVoltage2 = d.uint8(),
                    .cAux = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -78,6 +80,9 @@ struct CommandStationIOQuery {
       return std::unexpected(std::errc::invalid_argument);
     return CommandStationIOQuery{.head = *head, .zero = d.uint8()};
   }
+  constexpr bool operator==(CommandStationIOQuery const&) const = default;
+  constexpr CommandStationIOQuery&
+  operator=(CommandStationIOQuery const&) = default;
 };
 
 } // namespace ulf::mx1bin

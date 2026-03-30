@@ -43,6 +43,8 @@ struct AccessoryControl {
                    .error = static_cast<Error>(d.uint8()),
                    .payload = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
 
   using Head = detail::Head;
@@ -65,6 +67,8 @@ struct AccessoryControl {
     return AccessoryControl{
       .head = *head, .cAdr = d.uint16(), .cData = d.uint8()};
   }
+  constexpr bool operator==(AccessoryControl const&) const = default;
+  constexpr AccessoryControl& operator=(AccessoryControl const&) = default;
 };
 
 } // namespace ulf::mx1bin

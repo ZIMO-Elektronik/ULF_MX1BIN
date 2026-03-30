@@ -71,6 +71,8 @@ struct CommandStationEquipmentQuery {
         .uint8(cSerNum_ml)
         .uint8(cSerNum_lo);
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -90,6 +92,10 @@ struct CommandStationEquipmentQuery {
       return std::unexpected(std::errc::invalid_argument);
     return CommandStationEquipmentQuery{.head = *head, .zero = d.uint8()};
   }
+  constexpr bool
+  operator==(CommandStationEquipmentQuery const&) const = default;
+  constexpr CommandStationEquipmentQuery&
+  operator=(CommandStationEquipmentQuery const&) = default;
 };
 
 } // namespace ulf::mx1bin

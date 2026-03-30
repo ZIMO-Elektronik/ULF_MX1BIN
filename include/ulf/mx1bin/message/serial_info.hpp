@@ -42,6 +42,8 @@ struct SerialInfo {
       return std::unexpected(std::errc::invalid_argument);
     return SerialInfo{.head = *head, .toolID = d.uint8(), .action = d.uint8()};
   }
+  constexpr bool operator==(SerialInfo const&) const = default;
+  constexpr SerialInfo& operator=(SerialInfo const&) = default;
 };
 
 } // namespace ulf::mx1bin

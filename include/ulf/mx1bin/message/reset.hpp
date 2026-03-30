@@ -38,6 +38,8 @@ struct Reset {
     if (auto const head{Head::decode(d)}) return Reset{.head = *head};
     else return std::unexpected(head.error());
   }
+  constexpr bool operator==(Reset const&) const = default;
+  constexpr Reset& operator=(Reset const&) = default;
 };
 
 } // namespace ulf::mx1bin

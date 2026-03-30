@@ -20,18 +20,6 @@
 
 namespace ulf::mx1bin::bitfields {
 
-/// Get concurrent bits from bitfield
-/// \tparam P LSB position
-/// \tparam N Bit count
-/// \tparam T Type of Field
-/// \param  t Field
-/// \return bits P .. P+N as value
-template<std::size_t P, std::size_t N, std::unsigned_integral T>
-requires((N + P) <= (sizeof(T) * 8))
-constexpr T bits(T const t) {
-  return {static_cast<T>(t >> P & ((1u << N) - 1u))};
-}
-
 struct Info {
   FrameType frameType : 1;     ///< Frame type
   MessageType messageType : 2; ///< Message type

@@ -52,6 +52,8 @@ struct AccessoryMemoryQuery {
                    .cPair = d.uint8(),
                    .cOutputs = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -71,6 +73,9 @@ struct AccessoryMemoryQuery {
       return std::unexpected(std::errc::invalid_argument);
     return AccessoryMemoryQuery{.head = *head, .cAdr = d.uint16()};
   }
+  constexpr bool operator==(AccessoryMemoryQuery const&) const = default;
+  constexpr AccessoryMemoryQuery&
+  operator=(AccessoryMemoryQuery const&) = default;
 };
 
 } // namespace ulf::mx1bin

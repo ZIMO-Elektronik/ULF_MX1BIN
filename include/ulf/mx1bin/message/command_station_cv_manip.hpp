@@ -43,6 +43,8 @@ struct CommandStationCvManip {
                    .error = static_cast<Error>(d.uint8()),
                    .value = d.uint8()};
     }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
   };
   using Head = detail::Head;
   Head head{.info = bitfields::Info{FrameType::Short,
@@ -66,6 +68,9 @@ struct CommandStationCvManip {
                                  // Add optional data
                                  .value = d.s_uint8()};
   }
+  constexpr bool operator==(CommandStationCvManip const&) const = default;
+  constexpr CommandStationCvManip&
+  operator=(CommandStationCvManip const&) = default;
 };
 
 } // namespace ulf::mx1bin

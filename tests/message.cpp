@@ -400,6 +400,19 @@ TEST(Message, DecoderCvManip) {
   ASSERT_EQ(*message.value, *result.message.value);
 }
 
+TEST(Message, DecoderCvManip_no_value) {
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip>);
+
+  ulf::mx1bin::DecoderCvManip message{.cAdr = 0x8003u, .variable = 0x55u};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_FALSE(message.value);
+  ASSERT_FALSE(result.message.value);
+}
+
 // TEST(Message, DecoderCvManip_Reply) {}
 
 // TEST(Message, DecoderCvManip_Busy) {}
