@@ -24,9 +24,9 @@ The protocol is based on type-sized messages, that can be roughly categorized in
 
 The stream representation is encoded before and after transfer. Hence, the actual message size may differ from the stream size. 
 
-Diagrams
-
 :construction:
+> [!TODO]
+> Place example diagrams here
 
 ## Getting Started
 ### Prerequisites
@@ -85,8 +85,19 @@ else {}
 ```
 
 A matching  `Reply` type is contained in each primary `Message`. Once filled, it can be converted to a response string. 
+> [!NOTE]
+> When initializing any `Message` type, the `message.head` should not be user-initialized as this will override default values. 
+> This also means that `uSID` and possibly `reply_uSID` need to be set *AFTER* initialization
+
 ```cpp
 // Create Response from Feedback
+decltype(message)::Reply reply{}; // Can be Aggregate-initalized
+reply.uSID = next_uSID; 
+reply.reply_uSID = message.uSID; 
+
+// Possibly other modifications
+// ... //
+
 auto response{ulf::mx1bin::response2mx1bin(reply)};
 ```
 
