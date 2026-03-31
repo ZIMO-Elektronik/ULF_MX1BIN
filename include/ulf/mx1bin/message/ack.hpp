@@ -30,7 +30,7 @@ struct TAck {
                                     MessageType::L1Ack,
                                     detail::defaultSender,
                                     StationType::MX1},
-            .code{C}};
+            .code = C};
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e);

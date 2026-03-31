@@ -131,11 +131,10 @@ struct StreamDecoder {
       if (*iter++ == detail::dle) {
         // Encoded
         if (iter++ == _end) break; // Decode error
-        size += 2uz;
       } else {
         // Non-encoded
-        size++;
       }
+      size++;
     }
     return size;
   }
@@ -152,11 +151,10 @@ struct StreamDecoder {
       if (*iter++ == detail::dle) {
         // Encoded
         if (iter++ == _end) break; // Decode error
-        size += 2uz;
       } else {
         // Non-encoded
-        size++;
       }
+      size++;
     }
     return size >= n;
   }

@@ -92,8 +92,8 @@ A matching  `Reply` type is contained in each primary `Message`. Once filled, it
 ```cpp
 // Create Response from Feedback
 decltype(message)::Reply reply{}; // Can be Aggregate-initalized
-reply.uSID = next_uSID; 
-reply.reply_uSID = message.uSID; 
+reply.head.uSID = next_uSID; 
+reply.head.reply_uSID = message.head.uSID; 
 
 // Possibly other modifications
 // ... //

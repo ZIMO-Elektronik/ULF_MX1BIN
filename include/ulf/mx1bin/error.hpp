@@ -27,7 +27,7 @@ enum class Error : uint8_t {
   ERR_NO_MODUL = 0x09,
   ERR_MESSAGE = 0x0A,
   ERR_SPEED = 0x0B,
-  ERR_ADRESSE_OCUPIED = 0x0C,
+  ERR_ADRESSE_OCCUPIED = 0x0C,
 };
 
 } // namespace ulf::mx1bin

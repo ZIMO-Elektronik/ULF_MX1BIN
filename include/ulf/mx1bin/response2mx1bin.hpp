@@ -18,7 +18,7 @@
 namespace ulf::mx1bin {
 
 template<Encodable E>
-constexpr Packet response2mx1bin(E& re) {
+constexpr Packet response2mx1bin(E const& re) {
   Packet result{};
   StreamEncoder e{result};
   e.addSOF();

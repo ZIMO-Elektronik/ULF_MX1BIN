@@ -17,6 +17,7 @@
 #include <span>
 #include <system_error>
 #include <variant>
+#include <vector>
 #include <ztl/inplace_vector.hpp>
 #include "bitfields.hpp"
 #include "commands.hpp"
@@ -40,7 +41,7 @@
 #include "message/nak.hpp"
 #include "message/reset.hpp"
 #include "message/serial_info.hpp"
-#include "message/shuttle_tain.hpp"
+#include "message/shuttle_train.hpp"
 #include "message/track_control.hpp"
 
 namespace ulf::mx1bin {
@@ -118,6 +119,7 @@ using Message = std::variant<Ack,
                              SerialInfo,
                              DecoderCvManip,
                              DecoderCvManip::Reply,
+                             DecoderCvManip::ReplyL2,
                              DecoderCvManip::Busy,
                              DecoderCvManip::Error>;
 

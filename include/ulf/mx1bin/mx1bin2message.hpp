@@ -2,9 +2,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-/// MX1Bin 2 DCC
+/// MX1Bin 2 Message
 ///
-/// \file   ulf/mx1bin/mx1bin2dcc.hpp
+/// \file   ulf/mx1bin/mx1bin2message.hpp
 /// \author Jonas Gahlert
 /// \date   16/07/2025
 

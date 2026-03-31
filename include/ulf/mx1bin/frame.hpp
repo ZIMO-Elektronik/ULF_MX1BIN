@@ -59,6 +59,10 @@ verify(std::span<uint8_t const> frame) {
   // Long or Short frame
   StreamDecoder d{frame};
   d.strip();
+
+  // Check if at least uSID and Info are present
+  if (!d.has_at_least(2uz)) return std::unexpected(std::errc::invalid_argument);
+
   d.uint8(); // Skip uSID
   bitfields::Info info{d.uint8()};
 

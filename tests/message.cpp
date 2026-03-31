@@ -223,7 +223,7 @@ TEST(Message, LocoMemoryQuery) {
 
   auto const result{encode_and_decode(message)};
   match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, message.cAdr);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
 }
 
 TEST(Message, LocoMemoryQuery_Reply) {

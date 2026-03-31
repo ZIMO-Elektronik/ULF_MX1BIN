@@ -201,3 +201,37 @@ TEST(decoder, decode_optional_uint16_empty) {
 
   ASSERT_FALSE(d.s_uint16());
 }
+
+TEST(decoder, remaining) {
+  std::vector<uint8_t> stream{ulf::mx1bin::detail::dle,
+                              0x02u,
+                              0x55u,
+                              0x55u,
+                              ulf::mx1bin::detail::dle,
+                              0x02u};
+  ulf::mx1bin::StreamDecoder d{stream};
+
+  ASSERT_EQ(d.remaining(), 4u);
+
+  d.uint8();
+
+  ASSERT_EQ(d.remaining(), 3u);
+}
+
+TEST(decoder, has_at_least) {
+  std::vector<uint8_t> stream{ulf::mx1bin::detail::dle,
+                              0x02u,
+                              0x55u,
+                              0x55u,
+                              ulf::mx1bin::detail::dle,
+                              0x02u};
+  ulf::mx1bin::StreamDecoder d{stream};
+
+  ASSERT_TRUE(d.has_at_least(4u));
+  ASSERT_FALSE(d.has_at_least(5u));
+
+  d.uint8();
+
+  ASSERT_TRUE(d.has_at_least(3u));
+  ASSERT_FALSE(d.has_at_least(4u));
+}
