@@ -56,9 +56,10 @@ struct LocoMemoryQuery {
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
       if (!head ||
-          !d.has_at_least(sizeof(cAdr) + sizeof(cSpeed) + sizeof(cData1) +
-                          sizeof(cData2) + sizeof(cData3) + sizeof(cAzBz) +
-                          sizeof(cStatus) + sizeof(cData4) + sizeof(cData5)))
+          !d.has_at_least(sizeof(error) + sizeof(cAdr) + sizeof(cSpeed) +
+                          sizeof(cData1) + sizeof(cData2) + sizeof(cData3) +
+                          sizeof(cAzBz) + sizeof(cStatus) + sizeof(cData4) +
+                          sizeof(cData5)))
         return std::unexpected(std::errc::invalid_argument);
       return Reply{.head = *head,
                    .error = static_cast<Error>(d.uint8()),

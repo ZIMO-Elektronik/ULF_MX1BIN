@@ -89,8 +89,8 @@ struct DecoderCvManip {
                   .cAdr = d.uint8(),
                   .variable = d.uint8(),
                   .activeUSID = d.s_uint8(),
-                  .activeAddr = d.s_uint8(),
-                  .activeCv = d.s_uint8()};
+                  .activeAddr = d.s_uint16(),
+                  .activeCv = d.s_uint16()};
     }
     constexpr bool operator==(Busy const&) const = default;
     constexpr Busy& operator=(Busy const&) = default;
@@ -112,7 +112,7 @@ struct DecoderCvManip {
     template<Decoder D>
     static std::expected<Error, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
-      if (!head || d.has_at_least(sizeof(cAdr) + sizeof(cError)))
+      if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cError)))
         return std::unexpected{std::errc::invalid_argument};
       return Error{.head = *head, .cAdr = d.uint16(), .cError = d.uint8()};
     }

@@ -38,7 +38,7 @@ struct TrackControl {
     template<Decoder D>
     static std::expected<Reply, std::errc> decode(D& d) {
       auto const base{Head::decode(d)};
-      if (!base || !d.has_at_least(sizeof(cAction)))
+      if (!base || !d.has_at_least(sizeof(statusBits)))
         return std::unexpected(std::errc::invalid_argument);
       return Reply{.head = *base, .statusBits = d.uint8()};
     }
