@@ -113,29 +113,30 @@ struct ControlSpeed {
 };
 
 struct ControlData {
-  uint8_t manual : 1u;     ///< Manual control
-  uint8_t direction : 1u;  ///< Direction
-  uint8_t headlights : 1u; ///< F0 (Headlights)
-  uint8_t speed_step : 2u; ///< Speed step system
-  uint8_t az_enable : 1u;  ///< Accel time enable
-  uint8_t bz_enable : 1u;  ///< Break time enable
+  uint8_t manual : 1u;       ///< Manual control
+  uint8_t direction : 1u;    ///< Direction
+  uint8_t headlights : 1u;   ///< F0 (Headlights)
+  SpeedStep speed_step : 2u; ///< Speed step system
+  uint8_t az_enable : 1u;    ///< Accel time enable
+  uint8_t bz_enable : 1u;    ///< Break time enable
   constexpr ControlData() = default;
   constexpr ControlData(ControlData const&) = default;
   constexpr ControlData(uint8_t const _manual,
                         uint8_t const _direction,
                         uint8_t const _headlights,
-                        uint8_t const _speed_step,
+                        SpeedStep const _speed_step,
                         uint8_t const _az_enable,
                         uint8_t const _bz_enable)
     : manual{_manual}, direction{_direction}, headlights{_headlights},
       speed_step{_speed_step}, az_enable{_az_enable}, bz_enable{_bz_enable} {}
   constexpr ControlData(uint8_t const val) {
-    new (this) ControlData(ztl::map_value_from<ztl::mask<7u>>(val),
-                           ztl::map_value_from<ztl::mask<5u>>(val),
-                           ztl::map_value_from<ztl::mask<4u>>(val),
-                           ztl::map_value_from<ztl::mask<3u, 2u>>(val),
-                           ztl::map_value_from<ztl::mask<1u>>(val),
-                           ztl::map_value_from<ztl::mask<0u>>(val));
+    new (this) ControlData(
+      ztl::map_value_from<ztl::mask<7u>>(val),
+      ztl::map_value_from<ztl::mask<5u>>(val),
+      ztl::map_value_from<ztl::mask<4u>>(val),
+      static_cast<SpeedStep>(ztl::map_value_from<ztl::mask<3u, 2u>>(val)),
+      ztl::map_value_from<ztl::mask<1u>>(val),
+      ztl::map_value_from<ztl::mask<0u>>(val));
   }
   constexpr ControlData& operator=(uint8_t const val) {
     return *new (this) ControlData(val);
@@ -145,7 +146,7 @@ struct ControlData {
       ztl::map_value_to<ztl::mask<7u>>(manual) |
       ztl::map_value_to<ztl::mask<5u>>(direction) |
       ztl::map_value_to<ztl::mask<4u>>(headlights) |
-      ztl::map_value_to<ztl::mask<3u, 2u>>(speed_step) |
+      ztl::map_value_to<ztl::mask<3u, 2u>>(std::to_underlying(speed_step)) |
       ztl::map_value_to<ztl::mask<1u>>(az_enable) |
       ztl::map_value_to<ztl::mask<0u>>(bz_enable));
   }
@@ -211,27 +212,27 @@ struct AddressControl_Control {
 };
 
 struct AddressControl_Payload {
-  uint8_t format : 2u;    ///< Address format specification
-  uint8_t type : 1u;      ///< Address type
-  uint8_t speedStep : 2u; ///< Speed step system
-  uint8_t lock : 1u;      ///< Lock address
-  uint8_t log : 1u;       ///< Log external changes
+  uint8_t format : 2u;      ///< Address format specification
+  uint8_t type : 1u;        ///< Address type
+  SpeedStep speedStep : 2u; ///< Speed step system
+  uint8_t lock : 1u;        ///< Lock address
+  uint8_t log : 1u;         ///< Log external changes
   constexpr AddressControl_Payload() = default;
   constexpr AddressControl_Payload(AddressControl_Payload const&) = default;
   constexpr AddressControl_Payload(uint8_t const _format,
                                    uint8_t const _type,
-                                   uint8_t const _speedStep,
+                                   SpeedStep const _speedStep,
                                    uint8_t const _lock,
                                    uint8_t const _log)
     : format{_format}, type{_type}, speedStep{_speedStep}, lock{_lock},
       log{_log} {}
   constexpr AddressControl_Payload(uint8_t const val) {
-    new (this)
-      AddressControl_Payload(ztl::map_value_from<ztl::mask<7u, 6u>>(val),
-                             ztl::map_value_from<ztl::mask<5u>>(val),
-                             ztl::map_value_from<ztl::mask<3u, 2u>>(val),
-                             ztl::map_value_from<ztl::mask<1u>>(val),
-                             ztl::map_value_from<ztl::mask<0u>>(val));
+    new (this) AddressControl_Payload(
+      ztl::map_value_from<ztl::mask<7u, 6u>>(val),
+      ztl::map_value_from<ztl::mask<5u>>(val),
+      static_cast<SpeedStep>(ztl::map_value_from<ztl::mask<3u, 2u>>(val)),
+      ztl::map_value_from<ztl::mask<1u>>(val),
+      ztl::map_value_from<ztl::mask<0u>>(val));
   }
   constexpr AddressControl_Payload& operator=(uint8_t const val) {
     return *new (this) AddressControl_Payload(val);
@@ -240,7 +241,7 @@ struct AddressControl_Payload {
     return static_cast<uint8_t>(
       ztl::map_value_to<ztl::mask<7u, 6u>>(format) |
       ztl::map_value_to<ztl::mask<5u>>(type) |
-      ztl::map_value_to<ztl::mask<3u, 2u>>(speedStep) |
+      ztl::map_value_to<ztl::mask<3u, 2u>>(std::to_underlying(speedStep)) |
       ztl::map_value_to<ztl::mask<1u>>(lock) |
       ztl::map_value_to<ztl::mask<0u>>(log));
   }

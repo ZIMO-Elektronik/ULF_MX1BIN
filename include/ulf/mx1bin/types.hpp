@@ -15,11 +15,13 @@
 namespace ulf::mx1bin {
 
 /// DCC speed step
+///
+/// \note For more info, see chapter 4.6 in the docs
 enum class SpeedStep : uint8_t {
-  NA = 0b00,
-  _14 = 0b01,
-  _28 = 0b10,
-  _126 = 0b11
+  NA = 0b00,  ///< Last used / Not used
+  _14 = 0b01, ///< 14 Speed Steps
+  _28 = 0b10, ///< 28 Speed Steps
+  _126 = 0b11 ///< 126 Speed Steps
 };
 
 } // namespace ulf::mx1bin
