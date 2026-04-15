@@ -413,8 +413,54 @@ TEST(Message, DecoderCvManip_no_value) {
   ASSERT_FALSE(result.message.value);
 }
 
-// TEST(Message, DecoderCvManip_Reply) {}
+TEST(Message, DecoderCvManip_Reply) {
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Reply>);
 
-// TEST(Message, DecoderCvManip_Busy) {}
+  ulf::mx1bin::DecoderCvManip::Reply message{};
 
-// TEST(Message, DecoderCvManip_Erro) {}
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+}
+
+TEST(Message, DecoderCvManip_ReplyL2) {
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip::ReplyL2>);
+
+  ulf::mx1bin::DecoderCvManip::ReplyL2 message{
+    .cAdr = 0x8003u, .variable = 8u, .cValue = 8u};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cError, result.message.cError);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.cValue, result.message.cValue);
+}
+
+TEST(Message, DecoderCvManip_Busy) {
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Busy>);
+
+  ulf::mx1bin::DecoderCvManip::Busy message{.cAdr = 0x8003u,
+                                            .variable = 8u,
+                                            .activeUSID = 2u,
+                                            .activeAddr = 0x8004u,
+                                            .activeCv = 8u};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.activeUSID, result.message.activeUSID);
+  ASSERT_EQ(message.activeAddr, result.message.activeAddr);
+  ASSERT_EQ(message.activeCv, result.message.activeCv);
+}
+
+TEST(Message, DecoderCvManip_Error) {
+  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Error>);
+
+  ulf::mx1bin::DecoderCvManip::Error message{.cAdr = 0x8003u, .cError = 1u};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.cError, result.message.cError);
+}

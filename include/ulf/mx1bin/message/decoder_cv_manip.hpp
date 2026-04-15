@@ -86,8 +86,8 @@ struct DecoderCvManip {
         return std::unexpected{std::errc::invalid_argument};
       return Busy{.head = *head,
                   .busy = d.uint8(),
-                  .cAdr = d.uint8(),
-                  .variable = d.uint8(),
+                  .cAdr = d.uint16(),
+                  .variable = d.uint16(),
                   .activeUSID = d.s_uint8(),
                   .activeAddr = d.s_uint16(),
                   .activeCv = d.s_uint16()};
