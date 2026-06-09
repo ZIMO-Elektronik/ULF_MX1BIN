@@ -3,42 +3,65 @@ include(FetchContent)
 
 FetchContent_Declare(
   CMakeModules
-  GIT_REPOSITORY https://github.com/ZIMO-Elektronik/CMakeModules
-  GIT_TAG v0.9.5
+  GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
+  GIT_TAG v0.12.3
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
 version_from_git()
 project(
-  MX1Bin
+  ULF_MX1BIN
   VERSION ${VERSION_FROM_GIT}
   LANGUAGES CXX)
 
-add_library(MX1Bin INTERFACE ${SRC})
-add_library(ULF::MX1Bin ALIAS MX1Bin)
+option(COMMUNICATION_MASTER "Communication master" OFF)
 
-target_compile_features(MX1Bin INTERFACE cxx_std_23)
+add_library(ULF_MX1BIN INTERFACE)
+add_library(ULF::MX1BIN ALIAS ULF_MX1BIN)
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-  target_include_directories(MX1Bin INTERFACE include)
+target_compile_features(ULF_MX1BIN INTERFACE cxx_std_23)
+
+target_compile_definitions(ULF_MX1BIN INTERFACE $<$<BOOL:${COMMUNICATION_MASTER}>:MASTER>)
+
+# https://github.com/espressif/esp-idf/issues/17773
+if(PROJECT_IS_TOP_LEVEL AND NOT ESP_PLATFORM)
+  target_include_directories(ULF_MX1BIN INTERFACE include)
+  target_common_warnings(ULF_MX1BIN INTERFACE)
+  target_common_errors(ULF_MX1BIN INTERFACE)
 else()
-  target_include_directories(MX1Bin SYSTEM INTERFACE include)
+  target_include_directories(ULF_MX1BIN SYSTEM INTERFACE include)
 endif()
 
-target_common_warnings(MX1Bin INTERFACE)
+if(NOT TARGET ctre::ctre)
+  cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.10.0")
+endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+if(NOT TARGET ZTL::ZTL)
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.24.2")
+endif()
+
+if(NOT TARGET DCC::DCC)
+  cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.46.1")
+endif()
+
+target_link_libraries(ULF_MX1BIN INTERFACE ctre::ctre DCC::DCC)
+
+if(PROJECT_IS_TOP_LEVEL)
   include(CTest)
+  add_subdirectory(examples)
   file(
     DOWNLOAD
     "https://github.com/ZIMO-Elektronik/.github/raw/master/data/.clang-format"
     ${CMAKE_CURRENT_LIST_DIR}/.clang-format)
-  add_clang_format_target(MX1BinFormat OPTIONS -i FILES ${SRC})
+  file(GLOB_RECURSE SRC examples/*.[ch]pp include/*.[ch]pp src/*.[ch]pp
+       tests/*.[ch]pp)
+  add_clang_format_target(ULF_MX1BINFormat OPTIONS -i FILES ${SRC})
+  add_include_what_you_must_target(ULF_MX1BINIncludeWhatYouMust TARGET
+                                   ULF_MX1BIN)
 endif()
 
 if(BUILD_TESTING
-   AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME
+   AND PROJECT_IS_TOP_LEVEL
    AND CMAKE_SYSTEM_NAME STREQUAL CMAKE_HOST_SYSTEM_NAME)
-  add_subdirectory(examples)
   add_subdirectory(tests)
 endif()

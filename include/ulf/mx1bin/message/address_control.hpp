@@ -1,0 +1,75 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// Address Control Message
+///
+/// \file   ulf/mx1bin/message/address_control.hpp
+/// \author Jonas Gahlert
+/// \date   26/03/2026
+
+#pragma once
+
+#include <cstdint>
+#include "../bitfields.hpp"
+#include "../commands.hpp"
+#include "../decoder.hpp"
+#include "../encoder.hpp"
+#include "../error.hpp"
+#include "message_base.hpp"
+
+namespace ulf::mx1bin {
+
+struct AddressControl {
+  struct Reply {
+    using Head = detail::ReplyHead;
+    Head head{.info = bitfields::Info{FrameType::Short,
+                                      MessageType::L1Ack,
+                                      detail::defaultSender,
+                                      StationType::MX1},
+              .code = Command::AddressControl};
+    bitfields::AddressControl_Payload payload{}; ///< Control params
+    uint8_t cOutputs{};                          ///< Acc decoder outputs
+    template<Encoder E>
+    E encode(E e) const {
+      return head.encode(e).uint8(payload).uint8(cOutputs);
+    }
+    template<Decoder D>
+    static std::expected<Reply, std::errc> decode(D& d) {
+      auto const head{Head::decode(d)};
+      if (!head || !d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
+        return std::unexpected{std::errc::invalid_argument};
+      return Reply{.head = *head, .payload = d.uint8(), .cOutputs = d.uint8()};
+    }
+    constexpr bool operator==(Reply const&) const = default;
+    constexpr Reply& operator=(Reply const&) = default;
+  };
+  using Head = detail::Head;
+  Head head{.info = bitfields::Info{FrameType::Short,
+                                    MessageType::Primary,
+                                    detail::defaultSender,
+                                    StationType::MX1},
+            .code = Command::AddressControl};
+  bitfields::DecoderAddress cAdr{};             ///< Address
+  bitfields::AddressControl_Control cControl{}; ///< Control parameters
+  std::optional<uint8_t> cOutputs{};            ///< Acc decoder outputs
+  template<Encoder E>
+  E encode(E e) const {
+    return head.encode(e).uint16(cAdr).uint8(cControl).uint8(cOutputs);
+  }
+  template<Decoder D>
+  static std::expected<AddressControl, std::errc> decode(D& d) {
+    auto const head{Head::decode(d)};
+    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cControl)))
+      return std::unexpected(std::errc::invalid_argument);
+    return AddressControl{.head = *head,
+                          .cAdr = d.uint16(),
+                          .cControl = d.uint8(),
+                          // Add optional data
+                          .cOutputs = d.s_uint8()};
+  }
+  constexpr bool operator==(AddressControl const&) const = default;
+  constexpr AddressControl& operator=(AddressControl const&) = default;
+};
+
+} // namespace ulf::mx1bin

@@ -1,0 +1,179 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+/// MX1Bin stream 2 frame decoder
+///
+/// \file   ulf/mx1bin/decoder.hpp
+/// \author Jonas Gahlert
+/// \date   02/09/2025
+
+#pragma once
+
+#include <cassert>
+#include <span>
+#include "utility.hpp"
+
+namespace ulf::mx1bin {
+
+/// Field decoder
+template<typename T>
+concept FieldDecoder = requires(T t) {
+  { t.uint8() } -> std::same_as<uint8_t>;
+  { t.uint16() } -> std::same_as<uint16_t>;
+};
+
+/// Optional field decoder
+template<typename T>
+concept OptionalFieldDecoder = requires(T t) {
+  { t.s_uint8() } -> std::same_as<std::optional<uint8_t>>;
+  { t.s_uint16() } -> std::same_as<std::optional<uint16_t>>;
+};
+
+/// Is Decoder
+template<typename T>
+concept Decoder = FieldDecoder<T> && OptionalFieldDecoder<T>;
+
+/// MX1Bin message stream decoder
+template<std::input_iterator I, std::sentinel_for<I> S>
+struct StreamDecoder {
+  // Construct
+  template<std::ranges::input_range R>
+  requires std::convertible_to<std::ranges::iterator_t<R>, I> &&
+             std::convertible_to<std::ranges::sentinel_t<R>, S>
+  StreamDecoder(R const& r)
+    : _iter{std::ranges::cbegin(r)}, _end{std::ranges::cend(r)} {}
+  StreamDecoder(I iter, S end) : _iter{iter}, _end{end} {}
+
+  /// Strips SOH and EOH
+  ///
+  /// \return StreamDecoder reference
+  StreamDecoder& strip() {
+    assert(_iter != _end);
+    while (*_iter == detail::soh) _iter++;
+    while (*(_end - 1) == detail::eot) _end--;
+    return *this;
+  }
+
+  /// Strips CRC
+  ///
+  /// @tparam type Type of CRC (uint8_t or uint16_t)
+  /// @return StreamDecoder reference
+  // template<std::unsigned_integral type>
+  //  requires std::same_as<type, uint8_t> || std::same_as<type, uint16_t>
+  template<typename type>
+  StreamDecoder& strip_crc() {
+    assert(_iter != _end);
+    for (uint8_t i{0u}; i++ < sizeof(type);) {
+      if (*(_end - 2) == detail::dle) _end--; // Catch encoded crc
+      _end--;
+    }
+    return *this;
+  }
+
+  /// Decode next uint8
+  ///
+  /// \warning  UB if out of data
+  /// \return   Decoded value
+  uint8_t uint8() {
+    if (*_iter == detail::dle) {
+      // Encoded
+      _iter++;
+      return static_cast<uint8_t>(*_iter++ ^ detail::cypher);
+    }
+    // Non-encoded
+    return static_cast<uint8_t>(*_iter++);
+  }
+
+  /// Decode next uint8 - checked
+  ///
+  /// \retval std::nullopt  Out of data
+  /// \retval uint8_t       Decoded value
+  std::optional<uint8_t> s_uint8() {
+    if (_iter == _end) return std::nullopt;
+    if (*_iter == detail::dle) {
+      // Encoded
+      _iter++;
+      return _iter != _end ? std::make_optional(
+                               static_cast<uint8_t>(*_iter++ ^ detail::cypher))
+                           : std::nullopt;
+    }
+    // Non-encoded
+    return std::make_optional(static_cast<uint8_t>(*_iter++));
+  }
+
+  /// Decode next uint16
+  ///
+  /// \warning  UB if out of data
+  /// \return   Decoded value
+  uint16_t uint16() {
+    return static_cast<uint16_t>(uint8() << 8u | uint8() << 0u);
+  }
+
+  /// Decode next uint16 - checked
+  ///
+  /// \retval std::nullopt  Out of data
+  /// \retval uint16        Decoded value
+  std::optional<uint16_t> s_uint16() {
+    if (auto const hi{s_uint8()})
+      if (auto const lo{s_uint8()})
+        return std::make_optional(static_cast<uint16_t>(*hi << 8u | *lo << 0u));
+    return std::nullopt;
+  }
+
+  /// Calculate remaining size
+  ///
+  /// \return Remaining message size
+  size_t remaining() const {
+    auto iter{_iter};
+    size_t size{0uz};
+    while (iter != _end) {
+      if (*iter++ == detail::dle) {
+        // Encoded
+        if (iter++ == _end) break; // Decode error
+      } else {
+        // Non-encoded
+      }
+      size++;
+    }
+    return size;
+  }
+
+  /// Check, if message has at least n byte left
+  ///
+  /// \param n Minimum size to check
+  /// \retval true  At least n bytes left
+  /// \retval false Not enough bytes left
+  bool has_at_least(size_t const n) const {
+    auto iter{_iter};
+    size_t size{0uz};
+    while (iter != _end && size < n) {
+      if (*iter++ == detail::dle) {
+        // Encoded
+        if (iter++ == _end) break; // Decode error
+      } else {
+        // Non-encoded
+      }
+      size++;
+    }
+    return size >= n;
+  }
+
+private:
+  /// Iterator
+  I _iter;
+
+  /// End
+  S _end;
+};
+
+// Deduction guides
+template<std::input_iterator I, std::sentinel_for<I> S>
+StreamDecoder(I, S) -> StreamDecoder<I, S>;
+
+template<std::ranges::input_range R>
+StreamDecoder(R const&)
+  -> StreamDecoder<decltype(std::declval<R const&>().cbegin()),
+                   decltype(std::declval<R const&>().cend())>;
+
+} // namespace ulf::mx1bin

@@ -1,6 +1,7 @@
 file(GLOB_RECURSE SRC *.cpp)
-add_executable(MX1BinExamples ${SRC})
+add_executable(ULF_MX1BINExamples ${SRC})
 
-target_common_warnings(MX1BinExamples PRIVATE)
+target_common_warnings(ULF_MX1BINExamples PRIVATE)
+target_common_errors(ULF_MX1BINExamples PRIVATE)
 
-target_link_libraries(MX1BinExamples PRIVATE ULF::MX1Bin)
+target_link_libraries(ULF_MX1BINExamples PRIVATE ULF_MX1BIN)
