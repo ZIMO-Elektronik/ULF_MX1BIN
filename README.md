@@ -1,4 +1,4 @@
-# MX1Bin
+# ULF_MX1BIN
 
 [![build](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/build.yml) [![tests](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml/badge.svg)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/actions/workflows/tests.yml) [![license](https://img.shields.io/github/license/ZIMO-Elektronik/ULF_MX1BIN)](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/raw/master/LICENSE)
 

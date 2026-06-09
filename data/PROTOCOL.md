@@ -1,4 +1,4 @@
-# MX1Bin
+# MX1BIN
 This document is a rewrite of the original [document](https://github.com/ZIMO-Elektronik/ULF_MX1BIN/blob/master/data/The%20serial%20communication%20of%20the%20MX1_MXULF_V5_9.pdf) in Markdown in an attempt to make corrections and additions easier. 
 
 > Note, this rewrite is incomplete and only reflects Elements that are part of this library
