@@ -280,6 +280,25 @@ Reply: [Reply level 1](#generic-ack) -> [Reply level 2](#read-set-decoder-cv_re)
 
 Reply: [Reply level 1](#read-set-decoder-cv-busy_re)
 
+<h4 id="read-decoder-cv-multi_pri">Read multiple decoder CVs : Code 20 - Primary - Command station</h4> 
+> Since this command uses XPom, only DCC addresses are supported
+
+This message opens a query with the message parameters. The resulting query is either a `read` query, if no `Value` fields are present, or a `write` query, which will write as many values as fields are present (one to four) 
+
+| Message byte(s) | Name        | Value             | Description                                         |
+| :-------------- | ----------- | ----------------- | --------------------------------------------------- |
+| [0..1]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [2..3]          | Variable    | -                 | first CV address                                    |
+| [4]             | SequenceID  | [0x0..0xF]        | XPom sequence identifier                            |
+| [5] optional    | Value 1     | -                 | First CV value to write                                |          
+| [6] optional    | Value 2     | -                 | Second CV value to write                               |
+| [7] optional    | Value 3     | -                 | Third CV value to write                                |
+| [8] optional    | Value 4     | -                 | Fourth CV value to write                               |
+
+Upon finishing the query, the Command Station responds with an async [Reply level 2](#read-set-decoder-cv-multi-async_re)
+
+Reply: [Reply level 1](#read-set-decoder-cv-multi_re) -> [Reply level 2](#read-set-decoder-cv-multi-async_re)
+
 <h4 id="current-loco-memory_pri">Current loco memory : Code 255 - Primary - Command station</h4>
 
 If logging is activated for a loco address ([Address Control](#address-control-pri)), this message is sent whenever the loco memory state changes due to external input (e.g. command station interface).
@@ -477,6 +496,36 @@ Since only one query can be active at a time, any following query should be resp
 | [9..10] optional  | Variable  | -                 | Variable of the active query                                |
 
 Reply: None
+
+<h4 id="read-set-decoder-cv-multi_re">Read / Set multiple decoder CVs : Code 20 - Reply level 1 - Command station</h4> 
+This message is always sent as response, wether the operation was successful or not. 
+
+| Message byte(s) | Name        | Value             | Description                                         |
+| --------------- | ----------- | ----------------- | --------------------------------------------------- | 
+| [0]             | re-uSID     | ID                | uSID of the message being replied to                |
+| [1]             | cSuccess    | -                 | Successfully started the query                      |
+| [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  | 
+| [3..4]          | Variable    | -                 | First CV address                                    |
+| [5]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                    | 
+
+Reply: None
+
+<h4 id="read-set-decoder-cv-multi-async_re"> Read / Set multiple decoder CVs : Code 20 - Reply level 2 - Command station</h4> 
+This message is always sent as response, wether the operation was successful or not. 
+
+| Message byte(s) | Name        | Value             | Description                                               |
+| --------------- | ----------- | ----------------- | --------------------------------------------------------- | 
+| [0]             | re-uSID     | ID                | uSID of the message being replied to                      |
+| [1]             | cSuccess    | -                 | Successfully finished the query                           |
+| [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address        | 
+| [3..4]          | Variable    | -                 | First CV address                                          |
+| [5]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                          | 
+| [6]             | Value 1     | -                 | First CV value                                            |
+| [7]             | Value 2     | -                 | Second CV value                                           |
+| [8]             | Value 3     | -                 | Third CV value                                            |
+| [9]             | Value 4     | -                 | Fourth CV value                                           |
+
+Reply: [Ack](#generic-ack)
 
 ### Long frame protocol primary messages
 
