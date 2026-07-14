@@ -99,7 +99,7 @@ struct StreamDecoder {
                            : std::nullopt;
     }
     // Non-encoded
-    return std::make_optional(static_cast<uint8_t>(*_iter++));
+    return static_cast<uint8_t>(*_iter++);
   }
 
   /// Decode next uint16
@@ -107,7 +107,8 @@ struct StreamDecoder {
   /// \warning  UB if out of data
   /// \return   Decoded value
   uint16_t uint16() {
-    return static_cast<uint16_t>(uint8() << 8u | uint8() << 0u);
+    return static_cast<uint16_t>(static_cast<uint32_t>(uint8()) << 8u |
+                                 static_cast<uint32_t>(uint8()) << 0u);
   }
 
   /// Decode next uint16 - checked
@@ -117,7 +118,8 @@ struct StreamDecoder {
   std::optional<uint16_t> s_uint16() {
     if (auto const hi{s_uint8()})
       if (auto const lo{s_uint8()})
-        return std::make_optional(static_cast<uint16_t>(*hi << 8u | *lo << 0u));
+        return static_cast<uint16_t>(static_cast<uint32_t>(*hi) << 8u |
+                                     static_cast<uint32_t>(*lo) << 0u);
     return std::nullopt;
   }
 

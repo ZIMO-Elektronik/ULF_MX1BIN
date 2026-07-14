@@ -108,8 +108,8 @@ struct StreamEncoder {
   requires ConvertibleTo<T, uint16_t>
   StreamEncoder& uint16(T const t) {
     auto const v{static_cast<uint16_t>(t)};
-    uint8(static_cast<uint8_t>((v & 0xFF00u) >> 8u));
-    uint8(static_cast<uint8_t>((v & 0x00FFu) >> 0u));
+    uint8(static_cast<uint8_t>(v >> 8u));
+    uint8(static_cast<uint8_t>(v >> 0u));
     return *this;
   }
 

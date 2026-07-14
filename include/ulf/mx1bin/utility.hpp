@@ -56,8 +56,8 @@ template<std::output_iterator<uint8_t> OutputIt>
 /// \return   Output iterator
 template<std::output_iterator<uint8_t> OutputIt>
 [[maybe_unused]] constexpr auto encode_16(uint16_t const v, OutputIt& out) {
-  out = encode_8(static_cast<uint8_t>((v & 0xFF00u) >> 8u), out);
-  return encode_8(static_cast<uint8_t>((v & 0x00FFu) >> 0u), out);
+  out = encode_8(static_cast<uint8_t>(v >> 8u), out);
+  return encode_8(static_cast<uint8_t>(v >> 0u), out);
 }
 
 /// Decode character if applicable
@@ -82,8 +82,9 @@ requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 /// \return  Decoded value
 template<std::input_iterator InputIt>
 requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
-[[maybe_unused]] constexpr auto decode_16(InputIt& in) {
-  return static_cast<uint16_t>(decode_8(in) << 8u | decode_8(in) << 0u);
+[[maybe_unused]] constexpr uint16_t decode_16(InputIt& in) {
+  return static_cast<uint16_t>(static_cast<uint32_t>(decode_8(in)) << 8u |
+                               static_cast<uint32_t>(decode_8(in)) << 0u);
 }
 
 } // namespace ulf::mx1bin::detail

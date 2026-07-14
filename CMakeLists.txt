@@ -4,7 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMakeModules
   GIT_REPOSITORY "https://github.com/ZIMO-Elektronik/CMakeModules"
-  GIT_TAG v0.12.3
+  GIT_TAG v0.12.4
   SOURCE_DIR ${CMAKE_BINARY_DIR}/CMakeModules)
 FetchContent_MakeAvailable(CMakeModules)
 
@@ -21,7 +21,8 @@ add_library(ULF::MX1BIN ALIAS ULF_MX1BIN)
 
 target_compile_features(ULF_MX1BIN INTERFACE cxx_std_23)
 
-target_compile_definitions(ULF_MX1BIN INTERFACE $<$<BOOL:${COMMUNICATION_MASTER}>:MASTER>)
+target_compile_definitions(ULF_MX1BIN
+                           INTERFACE $<$<BOOL:${COMMUNICATION_MASTER}>:MASTER>)
 
 # https://github.com/espressif/esp-idf/issues/17773
 if(PROJECT_IS_TOP_LEVEL AND NOT ESP_PLATFORM)
@@ -33,15 +34,15 @@ else()
 endif()
 
 if(NOT TARGET ctre::ctre)
-  cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.10.0")
+  cpmaddpackage("gh:hanickadot/compile-time-regular-expressions@3.11.0")
 endif()
 
 if(NOT TARGET ZTL::ZTL)
-  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.24.2")
+  cpmaddpackage("gh:ZIMO-Elektronik/ZTL@0.25.0")
 endif()
 
 if(NOT TARGET DCC::DCC)
-  cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.46.1")
+  cpmaddpackage("gh:ZIMO-Elektronik/DCC@0.48.0")
 endif()
 
 target_link_libraries(ULF_MX1BIN INTERFACE ctre::ctre DCC::DCC)
