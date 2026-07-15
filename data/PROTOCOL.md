@@ -123,12 +123,17 @@ Message data is context-sensitive. Depending on the header, message data may hav
 
 ### Short frame protocol primary messages
 
-<h4 id="reset_pri">Reset : Code 0 - Primary - Any</h4>
+#### Reset : Code 0 - Primary - Any
+<details open>
 Reset message. Upon receiving this message, the internal state to be reset. This is a header-only message.
 
-Reply: [Ack Level 1](#generic_ack)
+Reply: [Ack Level 1](#ack--code-c---reply-level-1---any)
+</details>
 
-<h4 id="track-control_pri">Tack Control : Code 2 - Primary - Command station</h4>
+---
+
+#### Tack Control : Code 2 - Primary - Command station
+<details open>
 Message to control the state of the track. Instructions should be handled immediatly. 
 
 | Message byte(s) | Name    | Value                  | Description |
@@ -137,9 +142,13 @@ Message to control the state of the track. Instructions should be handled immedi
 
 > An `cAction` of `2` also ends Service Mode if applicable. 
 
-Reply: [Ack Level 1](#generic_ack)
+Reply: [Ack Level 1](#ack--code-c---reply-level-1---any)
+</details>
 
-<h4 id="loco-control_pri">Loco Control : Code 3 - Primary - Command station</h4>
+---
+
+#### Loco Control : Code 3 - Primary - Command station
+<details open>
 Message to control a single loco on the track.
 
 | Message byte(s) | Name   | Value             | Description                                        |
@@ -154,9 +163,13 @@ Message to control a single loco on the track.
 
 > An addressed (`Address` != 0) message of this type implicitly ends Service Mode if applicable.  
 
-Reply: [Reply level 1](#loco-control_re)
+Reply: [Reply level 1](#loco-control--code-3--4--5--6---reply-level-1---command-station)
+</details>
 
-<h4 id="invert-bits_pri">Invert function bits : Code 4 - Primary - Command station</h4>
+---
+
+#### Invert function bits : Code 4 - Primary - Command station
+<details open>
 Message to invert function bits instead of setting
 
 | Message byte(s) | Name   | Value             | Description                            |
@@ -169,9 +182,13 @@ Message to invert function bits instead of setting
 | [6]             | cData4 | -                 | [7..0] F13..F20 (DCC only)             | 
 | [7]             | cData5 | -                 | [7..0] F21..F28 (DCC only)             |
 
-Reply: [Reply level 1](#loco-control_re)
+Reply: [Reply level 1](#loco-control--code-3--4--5--6---reply-level-1---command-station)
+</details>
 
-<h4 id="accel-deccel_pri">Acceleration / Deceleration : Code 5 - Primary - Command station</h4>
+---
+
+#### Acceleration / Deceleration : Code 5 - Primary - Command station
+<details open>
 Message to set acceleration and decelartion times. 
 
 | Message byte(s) | Name   | Value             | Description                              |
@@ -179,43 +196,63 @@ Message to set acceleration and decelartion times.
 | [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cAzBz  | -                 | [0..3] BZ (0..15) <br> [4..7] AZ (0..15) |
 
-Reply: [Reply level 1](#loco-control_re)
+Reply: [Reply level 1](#loco-control--code-3--4--5--6---reply-level-1---command-station)
+</details>
 
-<h4 id="shuttle-train_pri">Shuttle train : Code 6 - Primary - Command station</h4>
+---
+
+#### Shuttle train : Code 6 - Primary - Command station
+<details open>
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
 | [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cData  | -                 | [0..3] Contact rails 1..4 forward <br> [4..7] Contact rails 1..4 reverse |
 
-Reply: [Reply level 1](#loco-control_re)
+Reply: [Reply level 1](#loco-control--code-3--4--5--6---reply-level-1---command-station)
+</details>
 
-<h4 id="accessory-decoder_pri">Accessory decoder : Code 7 - Primary - Command station</h4>
+---
+
+#### Accessory decoder : Code 7 - Primary - Command station
+<details open>
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
 | [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cData  | -                 | [3] 1=on, 0=off <br> [2..0] output number |
 
-Reply: [Reply level 1](#accessory-control_re)
+Reply: [Reply level 1](#accessory-control--code-7---reply-level-1---command-station)
+</details>
 
-<h4 id="loco-memory-query_pri">Query command station's loco memory : Code 8 - Primary - Command station</h4>
+---
+
+#### Query command station's loco memory : Code 8 - Primary - Command station
+<details open>
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
 
-Reply: [Reply level 1](#loco-memory-query_re)
+Reply: [Reply level 1](#query-command-stations-loco-memory--Code-8---reply-level-1---command-station)
+</details>
 
-<h4 id="accessory-memory-query_pri">Query command station's accessory decoder memory : Code 9 - Primary - Command station</h4>
- 
+---
+
+#### Query command station's accessory decoder memory : Code 9 - Primary - Command station
+<details open>
+
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
 
-Reply: [Reply level 1](#accessory-memory-query_re)
+Reply: [Reply level 1](#query-command-stations-accessory-decoder-memory--Code-9---reply-level-1---command-station)
+</details>
 
-<h4 id="address-control_pri">Address control : Code 10 - Primary - Command station</h4>
+---
+
+#### Address control : Code 10 - Primary - Command station
+<details open>
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
@@ -223,21 +260,31 @@ Reply: [Reply level 1](#accessory-memory-query_re)
 | [2] | cControl | - | [7] 0=Query, 1=Set <br> [5] 0=Loco, 1=Accessory <br> [1] Lock address against external changes <br> [0] Log external changes |
 | [3] optional | cOutputs | - | For accessory decoder addresses: The outputs that shall be locked may be defined – keep in mind that there need to be 2 bits set for each paired output, if zero locking is deactivated |
 
-Reply: [Reply level 1](#address-control_re)
+Reply: [Reply level 1](#address-control--code-10---reply-level-1---command-station)
+</details>
 
-<h4 id="read-command-station-io_pri">Read command station I/O state : Code 11 - Primary - Command station</h4>
+---
+
+#### Read command station I/O state : Code 11 - Primary - Command station
+<details open>
+
 > Nobody knows, what the `zero` byte's purpose in this message is. However, the protocol does depend on it being there :sweat_smile:
 
 | Message byte(s) | Name | Value | Description     |
 | :-------------- | ---- | ----- | --------------- |
 | [1]             | zero | 0     | Command station |
 
-Reply: [Reply level 1](#read-command-station-io_re)
+Reply: [Reply level 1](#read-command-station-io-state--code-11---reply-level-1---command-station)
+</details>
 
-<h4 id="read-set-command-station-cv_pri">Read / set a command station CV : Code 12 - Primary - Command station</h4>
+---
+
+#### Read / set a command station CV : Code 12 - Primary - Command station
+<details open>
+
 Some older command stations have internal CV settings. These can be manipulated with this message. 
 
-> Any command station without CVs should just answer with an [Ack](#generic-ack)
+> Any command station without CVs should just answer with an [Ack](#ack--code-c---reply-level-1---any)
 
 | Message byte(s) | Name     | Value | Description                     |
 | :-------------- | -------- | ----- | ------------------------------- |
@@ -246,21 +293,31 @@ Some older command stations have internal CV settings. These can be manipulated 
 
 Depending on if the `Value` byte is present, the `Variable` is either read, or set. 
 
-Reply: [Reply level 1](#read-set-command-station-cv_re)
+Reply: [Reply level 1](#read--set-a-command-station-cv--code-12---reply-level-1---command-station)
+</details>
 
-<h4 id="command-station-equipment-query_pri">Command station equipment query : Code 13 - Primary - Command station</h4>
+---
+
+#### Command station equipment query : Code 13 - Primary - Command station
+<details open>
+
 > Nobody knows, what the `zero` byte's purpose in this message is. However, the protocol does depend on it being there :sweat_smile:
 
 | Message byte(s) | Name | Value | Description     |
 | :-------------- | ---- | ----- | --------------- |
 | [1]             | zero | 0     | Command station |
 
-Reply: [Reply level 1](#command-station-equipment-query_re)
+Reply: [Reply level 1](#command-station-equipment-query--code-13---reply-level-1---command-station)
+</details>
 
-<h4 id="read-set-decoder-cv_pri">Read / Set a decoder CV : Code 19 - Primary - Command station</h4>
-> At this time, the command station only supports CV read/set commands for DCC decoder addresses.
+---
 
-This message opens a query with the message parameters. Only one query can be active at a time and the result is transmitted asynchronously with a Reply level 2. 
+#### Read / Set a decoder CV : Code 19 - Primary - Command station
+<details open>
+
+> At this time, the command station only supports CV read/set commands for DCC decoder addresses. Only one query with code 19 can be active at a time.
+
+This message opens a query with the message parameters.
 
 ![Example process](./images/read_cv.svg)
 
@@ -274,14 +331,19 @@ Depending on if the `Value` byte is present, the `Variable` is either read, or s
 
 If the address (excluding the format specifier) is 0, the query is handled in DCC Service mode. Otherwise, On-The-Main programming is used.
 
-Reply: [Reply level 1](#generic-ack) -> [Reply level 2](#read-set-decoder-cv_re)
+Reply: [Reply level 1](#ack--code-c---reply-level-1---any) -> [Reply level 2](#read--set-a-decoder-cv--code-19---reply-level-2---command-station)
 
 ***OR - If another query is already active***
 
-Reply: [Reply level 1](#read-set-decoder-cv-busy_re)
+Reply: [Reply level 1](#read--set-a-decoder-cv---busy--code-19---reply-level-1---command-station)
+</details>
 
-<h4 id="read-decoder-cv-multi_pri">Read multiple decoder CVs : Code 20 - Primary - Command station</h4> 
-> Since this command uses XPom, only DCC addresses are supported
+---
+
+#### Read multiple decoder CVs : Code 20 - Primary - Command station 
+<details open>
+
+> Since this command uses XPom, only DCC addresses are supported. Only one query of code 20 can be active at a time.
 
 This message opens a query with the message parameters. The resulting query is either a `read` query, if no `Value` fields are present, or a `write` query, which will write as many values as fields are present (one to four) 
 
@@ -290,16 +352,24 @@ This message opens a query with the message parameters. The resulting query is e
 | [0..1]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
 | [2..3]          | Variable    | -                 | first CV address                                    |
 | [4]             | SequenceID  | [0x0..0xF]        | XPom sequence identifier                            |
-| [5] optional    | Value 1     | -                 | First CV value to write                                |          
-| [6] optional    | Value 2     | -                 | Second CV value to write                               |
-| [7] optional    | Value 3     | -                 | Third CV value to write                                |
-| [8] optional    | Value 4     | -                 | Fourth CV value to write                               |
+| [5] optional    | Value 1     | -                 | First CV value to write                             |          
+| [6] optional    | Value 2     | -                 | Second CV value to write                            |
+| [7] optional    | Value 3     | -                 | Third CV value to write                             |
+| [8] optional    | Value 4     | -                 | Fourth CV value to write                            |
 
-Upon finishing the query, the Command Station responds with an async [Reply level 2](#read-set-decoder-cv-multi-async_re)
+Upon finishing the query, the Command Station responds with an async [Reply level 2](#read--set-multiple-decoder-cvs--code-20---reply-level-2---command-station)
 
-Reply: [Reply level 1](#read-set-decoder-cv-multi_re) -> [Reply level 2](#read-set-decoder-cv-multi-async_re)
+Reply: [Reply level 1](#ack--code-c---reply-level-1---any) -> [Reply level 2](#read--set-multiple-decoder-cvs--code-20---reply-level-2---command-station)
 
-<h4 id="current-loco-memory_pri">Current loco memory : Code 255 - Primary - Command station</h4>
+***OR - If another query is active***
+
+Reply: [Reply level 1](#read--set-a-decoder-cv---busy--code-20---reply-level-1---command-station)
+</details>
+
+---
+
+#### Current loco memory : Code 255 - Primary - Command station
+<details open>
 
 If logging is activated for a loco address ([Address Control](#address-control-pri)), this message is sent whenever the loco memory state changes due to external input (e.g. command station interface).
 
@@ -315,9 +385,13 @@ If logging is activated for a loco address ([Address Control](#address-control-p
 | [8] optional    | cData4    | -                 | [7..0] F13..F20 (DCC only)              |
 | [9] optional    | cData5    | -                 | [7..0] F21..F28 (DCC only)              |
 
-Reply: [Ack](#generic-ack)
+Reply: [Ack](#ack--code-c---reply-level-1---any)
+</details>
 
-<h4 id="current-accessory-memory_pri">Current accessory decoder memory : Code 254 - Primary - Command station</h4>
+---
+
+#### Current accessory decoder memory : Code 254 - Primary - Command station
+<details open>
 
 If logging is activated for a loco address ([Address Control](#address-control-pri)), this message is sent whenever the accessory decoder memory state changes due to external input (e.g. command station interface).
 
@@ -327,11 +401,17 @@ If logging is activated for a loco address ([Address Control](#address-control-p
 | [2]             | cPair     | 0 <br> 1          | Paired output function <br> single output function  |
 | [3]             | cOutputs  | -                 | State of the Outputs                                |
 
-Reply: [Ack](#generic-ack)
+Reply: [Ack](#ack--code-c---reply-level-1---any)
+</details>
+
+---
+---
 
 ### Short frame protocol reply messages
 
-<h4 id="generic-ack">Ack : Code C - Reply level 1 - Any</h4>
+#### Ack : Code C - Reply level 1 - Any
+<details open>
+
 A generic Ack that confirms the message reception. This message inherits the message code of the matching primary message 
 
 | Message byte(s) | Value      | Description                         |
@@ -339,16 +419,26 @@ A generic Ack that confirms the message reception. This message inherits the mes
 | [0]             | Primary-ID | uSID of the replied primary message |
 
 Reply: None
+</details>
 
-<h4 id="generic-nak">Nak : Code 1 - Reply level 1 - Any</h4>
+---
+
+#### Nak : Code 1 - Reply level 1 - Any
+<details open>
+
 A generic Nak that implies problems during message reception. This is a header-only message.
 
 Reply: None
+</details>
 
-<h4 id="loco-control_re">Loco control : Code 3 / 4 / 5 / 6 - Reply level 1 - Command station</h4>
+---
+
+#### Loco control : Code 3 / 4 / 5 / 6 - Reply level 1 - Command station
+<details open>
+
 In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
 
-The actual track state needs to be queried seperatly using (Track Control)[#track-control_pri]
+The actual track state needs to be queried seperatly using (Track Control)[#tack-control--code-2---primary---command-station]
 
 | Message byte(s) | Name    | Value     | Description                                                                                 |
 | :-------------- | ------- | --------- | ------------------------------------------------------------------------------------------- |
@@ -357,11 +447,16 @@ The actual track state needs to be queried seperatly using (Track Control)[#trac
 | [2] if no Error | Status  | ff00ss0t  | ff - [Format](#address-format) <br> ss - [Speed step system](#speed-step-system) <br> t - track state (0 = normal, 1 = fault) |
 
 Reply: None
+</details>
 
-<h4 id="accessory-control_re">Accessory control : Code 7 - Reply level 1 - Command station</h4>
+---
+
+#### Accessory control : Code 7 - Reply level 1 - Command station
+<details open>
+
 In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
 
-The actual track state needs to be queried seperatly using (Track Control)[#track-control_pri]
+The actual track state needs to be queried seperatly using (Track Control)[#tack-control--code-2---primary---command-station]
 
 | Message byte(s) | Name    | Value     | Description                                                       |
 | :-------------- | ------- | --------- | ----------------------------------------------------------------- |
@@ -370,8 +465,13 @@ The actual track state needs to be queried seperatly using (Track Control)[#trac
 | [2] if no Error | Status  | ff00000t  | ff - [Format](#address-format) <br> t - track state (0 = normal, 1 = fault) |
 
 Reply: None
+</details>
 
-<h4 id="loco-memory-query_re">Query command station's loco memory : Code 8 - Reply level 1 - Command station</h4>
+---
+
+#### Query command station's loco memory : Code 8 - Reply level 1 - Command station
+<details open>
+
 In case there is no error within the request, the level 1 acknowledgement contains the requested da-
 ta.
 
@@ -390,8 +490,13 @@ ta.
 | [11] if no Error - optional   | cData5    | -                 | [7..0] F21..F28 (DCC only)              |
 
 Reply: None
+</details>
 
-<h4 id="accessory-memory-query_re">Query command station's accessory decoder memory : Code 9 - Reply level 1 - Command station</h4>
+---
+
+#### Query command station's accessory decoder memory : Code 9 - Reply level 1 - Command station
+<details open>
+
 In case there is no error within the request, the level 1 acknowledgement contains the requested da-
 ta.
 
@@ -404,8 +509,12 @@ ta.
 | [5] if no Error     | cOutputs  | -                 | State of the Outputs                                |
 
 Reply: None
+</details>
 
-<h4 id="address-control_re">Address control : Code 10 - Reply level 1 - Command station</h4>
+---
+
+#### Address control : Code 10 - Reply level 1 - Command station
+<details open>
 
 | Message byte(s)             | Name      | Value     | Description                              |
 | :-------------------------- | --------- | --------- | ---------------------------------------- |
@@ -415,8 +524,12 @@ Reply: None
 | [4] if no Error - optional  | cOutputs  | -         | Bit mask of locked accessory outputs    |
 
 Reply: None
+</details>
 
-<h4 id="read-command-station-io_re">Read command station I/O state : Code 11 - Reply level 1 - Command station</h4>
+---
+
+#### Read command station I/O state : Code 11 - Reply level 1 - Command station
+<details open>
 
 > Nobody knows, what the `zero` byte's purpose in this message is. However, the protocol does depend on it being there :sweat_smile:
 
@@ -446,8 +559,12 @@ Current values with bit [15] set are one of the special values listed below:
 | 0x8007        | "SL UES"                          |
 
 Reply: None
+</details>
 
-<h4 id="read-set-command-station-cv_re">Read / set a command station CV : Code 12 - Reply level 1 - Command station</h4>
+---
+
+#### Read / set a command station CV : Code 12 - Reply level 1 - Command station
+<details open>
 
 | Message byte(s) | Name      | Value     | Description                             |
 | :-------------- | --------- | --------- | --------------------------------------- |
@@ -456,8 +573,12 @@ Reply: None
 | [2] if no Error | cValue    | -         | Value of the CV                         |
 
 Reply: None
+</details>
 
-<h4 id="read-set-decoder-cv_re">Read / Set a decoder CV : Code 19 - Reply level 2 - Command station</h4>
+---
+
+#### Read / Set a decoder CV : Code 19 - Reply level 2 - Command station
+<details open>
 
 There are two different replies, depending on wether an error occurred during query exection. If no error occurred, the reply should have the following structure: 
 
@@ -479,62 +600,100 @@ When an Error occurs (e.g. timeout), the following message should be sent:
 | [1..2]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [3]             | cError    | Error             | Error code                              |
 
-Reply: [Ack](#generic_ack)
+Reply: [Ack](#ack--code-c---reply-level-1---any)
+</details>
 
-<h4 id="read-set-decoder-cv-busy_re">Read / Set a decoder CV - Busy : Code 19 - Reply level 1 - Command station</h4>
+---
+
+#### Read / Set a decoder CV - Busy : Code 19 - Reply level 1 - Command station
+<details open>
+
 Since only one query can be active at a time, any following query should be responded to with the following message: 
 
-| Message byte(s)   | Name      | Value             | Description                                                 |
-| :---------------- | --------- | ----------------- | ----------------------------------------------------------- |
-| [0]               | re-uSID   | ID                | uSID of the message being replied to                        |
-| [1]               | cBusy     | 0x04              | Busy - there is already an active request                   |
-| [1..2]            | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address                      |
-| [3..4]            | Variable  | -                 | CV address                                                  |
-| [5] optional      | cID       | ID                | uSID of the message requesting the active query             |
-| [6] optional      | cError    | -                 | Error (0=No Error, >0= Error)                               |
-| [7..8] optional   | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address of the active query  |
-| [9..10] optional  | Variable  | -                 | Variable of the active query                                |
+| Message byte(s)   | Name        | Value             | Description                                                             |
+| :---------------- | ----------- | ----------------- | ----------------------------------------------------------------------- |
+| [0]               | re-uSID     | ID                | uSID of the message being replied to                                    |
+| [1]               | cBusy       | 0x04              | Busy - there is already an active request                               |
+| [1..2]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
+| [3..4]            | Variable    | -                 | CV address                                                              |
+| [5] optional      | cID         | ID                | uSID of the message requesting the active query                         |
+| [6] optional      | cError      | -                 | Error (0=No Error, >0= Error)                                           |
+| [7..8] optional   | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
+| [9..10] optional  | Variable    | -                 | Variable of the active query                                            |
 
 Reply: None
+</details>
 
-<h4 id="read-set-decoder-cv-multi_re">Read / Set multiple decoder CVs : Code 20 - Reply level 1 - Command station</h4> 
-This message is always sent as response, wether the operation was successful or not. 
+---
+
+#### Read / Set multiple decoder CVs : Code 20 - Reply level 2 - Command station
+<details open>
+
+There are two different replies, depending on wether an error occurred during query exection. If no error occurred, the reply should have the following structure: 
+
+> No idea, what the `cError` byte should accomplish here. On error, a different message is sent anyway. For the record, I kept it to keep form with the [old](#read--set-a-decoder-cv--code-19---reply-level-2---command-station) message
 
 | Message byte(s) | Name        | Value             | Description                                         |
 | --------------- | ----------- | ----------------- | --------------------------------------------------- | 
 | [0]             | re-uSID     | ID                | uSID of the message being replied to                |
-| [1]             | cSuccess    | -                 | Successfully started the query                      |
-| [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  | 
+| [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
 | [3..4]          | Variable    | -                 | First CV address                                    |
 | [5]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                    | 
+| [6]             | cError      | Error             | Error code                                          | 
+| [7]             | Value 1     | -                 | First CV value                                      |
+| [8]             | Value 2     | -                 | Second CV value                                     |
+| [9]             | Value 3     | -                 | Third CV value                                      |
+| [10]            | Value 4     | -                 | Fourth CV value                                     |
+
+When an Error occurs (e.g. timeout), the following message should be sent: 
+
+| Message byte(s) | Name      | Value             | Description                                         |
+| :-------------- | --------- | ----------------- | --------------------------------------------------- |
+| [0]             | re-uSID   | ID                | uSID of the message being replied to                |
+| [1..2]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [3]             | cError    | Error             | Error code                                          |
+
+Reply: [Ack](#ack--code-c---reply-level-1---any)
+</details>
+
+---
+
+#### Read / Set multiple decoder CVs - Busy : Code 20 - Reply level 1 - Command station
+<details open>
+
+Since only one query can be active at a time, any following query should be responded to with the following message: 
+
+| Message byte(s)   | Name        | Value             | Description                                                             |
+| :---------------- | ----------- | ----------------- | ----------------------------------------------------------------------- |
+| [0]               | re-uSID     | ID                | uSID of the message being replied to                                    |
+| [1]               | cBusy       | 0x04              | Busy - there is already an active request                               |
+| [1..2]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
+| [3..4]            | Variable    | -                 | CV address                                                              |
+| [5]               | SequenceID  | [0..3]            | XPom Sequence ID                                                        |
+| [6] optional      | cID         | ID                | uSID of the message requesting the active query                         |
+| [7] optional      | cError      | -                 | Error (0=No Error, >0= Error)                                           |
+| [8..9] optional   | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
+| [10..11] optional | Variable    | -                 | Variable of the active query                                            |
+| [12] optional     | Sequence ID | [0..3]            | XPom Sequence ID of the active query                                    |
 
 Reply: None
+</details>
 
-<h4 id="read-set-decoder-cv-multi-async_re"> Read / Set multiple decoder CVs : Code 20 - Reply level 2 - Command station</h4> 
-This message is always sent as response, wether the operation was successful or not. 
-
-| Message byte(s) | Name        | Value             | Description                                               |
-| --------------- | ----------- | ----------------- | --------------------------------------------------------- | 
-| [0]             | re-uSID     | ID                | uSID of the message being replied to                      |
-| [1]             | cSuccess    | -                 | Successfully finished the query                           |
-| [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address        | 
-| [3..4]          | Variable    | -                 | First CV address                                          |
-| [5]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                          | 
-| [6]             | Value 1     | -                 | First CV value                                            |
-| [7]             | Value 2     | -                 | Second CV value                                           |
-| [8]             | Value 3     | -                 | Third CV value                                            |
-| [9]             | Value 4     | -                 | Fourth CV value                                           |
-
-Reply: [Ack](#generic-ack)
+---
+---
 
 ### Long frame protocol primary messages
 
 > [Warning]
 > This implementation does not handle any messages of this type yet.
 
+---
+---
+
 ### Long frame protocol reply messages
 
-<h4 id="command-station-equipment-query_re">Command station equipment query : Code 13 - Reply level 1 - Command station</h4>
+#### Command station equipment query : Code 13 - Reply level 1 - Command station
+<details open>
 
 | Message byte(s)   | Name          | Value   | Description                           |
 | :---------------- | ------------- | ------- | ------------------------------------- |
@@ -567,6 +726,10 @@ The Device IDs are predfined values. The possible values are listed below:
 | 5         |KLUG           |
 
 Reply: None
+</details>
+
+---
+---
 
 ## Protocol details
 Some details are used at multiple points withing the protocol. As such, they are defined here. 
@@ -672,13 +835,13 @@ scribes whether there will be any consecutive frames with data.
 | 1 1  | `Reserved`                     |
 
 ## Missing information
- - In the original protocol, no explicit "leave Service Mode" trigger was defined. Here, i defined, that on the first addressed [Loco Control](#loco-control_pri) or on a [Track Control](#track-control_pri) message, the Service Mode is ended, but this needs to be checked.
+ - In the original protocol, no explicit "leave Service Mode" trigger was defined. Here, i defined, that on the first addressed [Loco Control](#loco-control--code-3---primary---command-station) or on a [Track Control](#tack-control--code-2---primary---command-station) message, the Service Mode is ended, but this needs to be checked.
 
- - If [Track Control](#track-control_pri) results in the track being powered off, should that happen immediatly or is it alright to finish a running query? May result in up to 1s shutoff time (absolute worst case scenario)
+ - If [Track Control](#tack-control--code-2---primary---command-station) results in the track being powered off, should that happen immediatly or is it alright to finish a running query? May result in up to 1s shutoff time (absolute worst case scenario)
 
- - If Track is off, should [Read / Write CV](#read-set-decoder-cv_pri) be responded with an error since there is no way a query can be handled without track power or should the track just be switched on again? 
+ - If Track is off, should [Read / Write CV](#read--set-a-decoder-cv--code-19---primary---command-station) be responded with an error since there is no way a query can be handled without track power or should the track just be switched on again? 
 
- - Since there is no way to just respond with ***"HELP, I don't know this command!!!"***, should every unsupported / unknown command be [Nak'd](#generic_nak) or [Ack'd](#generic_ack)
+ - Since there is no way to just respond with ***"HELP, I don't know this command!!!"***, should every unsupported / unknown command be [Nak'd](#nak--code-1---reply-level-1---any) or [Ack'd](#ack--code-c---reply-level-1---any)
 
  - In the Long frame header, does the length of header really just mean the header length? Since the original document mixes frame, message and header pretty freely, this needs to be checked. It would probably make more sense to catch the message length itself. 
 

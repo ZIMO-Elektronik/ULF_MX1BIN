@@ -464,3 +464,121 @@ TEST(Message, DecoderCvManip_Error) {
   ASSERT_EQ(message.cAdr, result.message.cAdr);
   ASSERT_EQ(message.cError, result.message.cError);
 }
+
+TEST(Message, DecoderMultiCvManip) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
+
+  ulf::mx1bin::DecoderMultiCvManip message{
+    .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
+  ASSERT_EQ(message.values, result.message.values);
+}
+
+TEST(Message, DecoderMultiCvManip_with_one_value) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
+
+  ulf::mx1bin::DecoderMultiCvManip message{
+    .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u}};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
+  ASSERT_EQ(message.values, result.message.values);
+}
+
+TEST(Message, DecoderMultiCvManip_with_two_values) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
+
+  ulf::mx1bin::DecoderMultiCvManip message{
+    .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u, 2u}};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
+  ASSERT_EQ(message.values, result.message.values);
+}
+
+TEST(Message, DecoderMultiCvManip_with_three_values) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
+
+  ulf::mx1bin::DecoderMultiCvManip message{
+    .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u, 2u, 3u}};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
+  ASSERT_EQ(message.values, result.message.values);
+}
+
+TEST(Message, DecoderMultiCvManip_with_four_values) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
+
+  ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
+                                           .variable = 7u,
+                                           .sequenceID = 2u,
+                                           .values = {1u, 2u, 3u, 4u}};
+
+  auto const result{encode_and_decode(message)};
+  match_head(message, result.message);
+  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  ASSERT_EQ(message.variable, result.message.variable);
+  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
+  ASSERT_EQ(message.values, result.message.values);
+}
+
+TEST(Message, DecoderMultiCvManip_Reply) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Reply>);
+
+  ulf::mx1bin::DecoderMultiCvManip::Reply message{};
+
+  auto const result{encode_and_decode(message)};
+  ASSERT_EQ(message, result.message);
+}
+
+TEST(Message, DecoderMultiCvManip_Busy) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Busy>);
+
+  ulf::mx1bin::DecoderMultiCvManip::Busy message{.cAdr = 0x8003u,
+                                                 .variable = 8u,
+                                                 .sequenceID = 2u,
+                                                 .activeUSID = 2u,
+                                                 .activeAddr = 0x8004u,
+                                                 .activeCv = 8u,
+                                                 .activeSequenceID = 3u};
+
+  auto const result{encode_and_decode(message)};
+  ASSERT_EQ(message, result.message);
+}
+
+TEST(Message, DecoderMultiCvManip_ReplyL2) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::ReplyL2>);
+
+  ulf::mx1bin::DecoderMultiCvManip::ReplyL2 message{.cAdr = 0x8003u,
+                                                    .variable = 7u,
+                                                    .sequenceID = 2u,
+                                                    .values = {1u, 2u, 3u, 4u}};
+
+  auto const result{encode_and_decode(message)};
+  ASSERT_EQ(message, result.message);
+}
+
+TEST(Message, DecoderMultiCvManip_Error) {
+  static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Error>);
+
+  ulf::mx1bin::DecoderMultiCvManip::Error message{.cAdr = 0x8003u,
+                                                  .cError = 1u};
+
+  auto const result{encode_and_decode(message)};
+  ASSERT_EQ(message, result.message);
+}

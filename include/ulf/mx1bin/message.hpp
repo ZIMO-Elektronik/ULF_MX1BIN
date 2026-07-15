@@ -34,6 +34,7 @@
 #include "message/command_station_equipment_query.hpp"
 #include "message/command_station_io_query.hpp"
 #include "message/decoder_cv_manip.hpp"
+#include "message/decoder_multi_cv_manip.hpp"
 #include "message/invert_function_bits.hpp"
 #include "message/loco_control.hpp"
 #include "message/loco_memory_query.hpp"
@@ -121,7 +122,10 @@ using Message = std::variant<Ack,
                              DecoderCvManip::Reply,
                              DecoderCvManip::ReplyL2,
                              DecoderCvManip::Busy,
-                             DecoderCvManip::Error>;
+                             DecoderCvManip::Error,
+                             DecoderMultiCvManip,
+                             DecoderMultiCvManip::Reply,
+                             DecoderMultiCvManip::ReplyL2>;
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
 

@@ -42,8 +42,11 @@ concept IsPrimary =
 ///
 /// \note Since this is rare, a list of types should suffice
 template<typename T>
-concept IsReplyL2 = std::same_as<T, ulf::mx1bin::DecoderCvManip::ReplyL2> ||
-                    std::same_as<T, ulf::mx1bin::DecoderCvManip::Error>;
+concept IsReplyL2 =
+  std::same_as<T, ulf::mx1bin::DecoderCvManip::ReplyL2> ||
+  std::same_as<T, ulf::mx1bin::DecoderMultiCvManip::ReplyL2> ||
+  std::same_as<T, ulf::mx1bin::DecoderCvManip::Error> ||
+  std::same_as<T, ulf::mx1bin::DecoderMultiCvManip::Error>;
 
 /// Concept to check if a type is a L1Ack
 template<typename T>

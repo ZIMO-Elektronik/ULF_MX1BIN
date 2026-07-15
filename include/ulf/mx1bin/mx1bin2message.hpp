@@ -71,6 +71,8 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
         return decode<CommandStationEquipmentQuery>(frame);
       case Command::SerialInfo: return decode<SerialInfo>(frame);
       case Command::DecoderCvManip: return decode<DecoderCvManip>(frame);
+      case Command::DecoderMultiCvManip:
+        return decode<DecoderMultiCvManip>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
 
