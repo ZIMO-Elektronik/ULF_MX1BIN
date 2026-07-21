@@ -36,9 +36,9 @@ struct DecoderMultiCvManip {
   /// ReplyL2 (Asynchronous)
   ///
   /// \details
-  /// This reply is sent by the command station upon query end, regardless if
-  /// successful. If the query was unsuccessful (e.g. timeout), `cSuccess` is
-  /// set to false. The content of `values` can be ignored in this case.
+  /// This reply is sent by the command station upon successful query
+  /// completion. If the query was unsuccessful, an `Error` reply is sent
+  /// instead.
   struct ReplyL2 {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
@@ -66,9 +66,8 @@ struct DecoderMultiCvManip {
     template<Decoder D>
     static std::expected<ReplyL2, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
-      if (!head ||
-          !d.has_at_least(sizeof(cAdr) + sizeof(variable) + sizeof(sequenceID) +
-                          std::tuple_size<decltype(values)>::value))
+      if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
+                                   sizeof(sequenceID) + 4uz /*values*/))
         return std::unexpected{std::errc::invalid_argument};
       return ReplyL2{.head = *head,
                      .cAdr = d.uint16(),
@@ -81,6 +80,9 @@ struct DecoderMultiCvManip {
     constexpr ReplyL2& operator=(ReplyL2 const&) = default;
   };
 
+  /// This reply is sent by the command station in case the query can't be
+  /// handled. This usually means, that there currently is another query being
+  /// handled.
   struct Busy {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
@@ -129,6 +131,8 @@ struct DecoderMultiCvManip {
     constexpr Busy& operator=(Busy const&) = default;
   };
 
+  /// This reply is sent by the command station in case an error (e.g. timeout)
+  /// occurred during query execution.
   struct Error {
     using Head = detail::ReplyHead;
     Head head{.info = bitfields::Info{FrameType::Short,
@@ -183,10 +187,10 @@ struct DecoderMultiCvManip {
       .variable = d.uint16(),
       .sequenceID = d.uint8(),
     };
-    while (auto const value{d.s_uint8()}) {
-      if (result.values.full()) break;
-      result.values.push_back(*value);
-    };
+    while (!result.values.full()) {
+      if (auto const value{d.s_uint8()}; !value) break;
+      else result.values.push_back(*value);
+    }
     return result;
   }
   constexpr bool operator==(DecoderMultiCvManip const&) const = default;

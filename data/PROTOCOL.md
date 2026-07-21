@@ -132,7 +132,7 @@ Reply: [Ack Level 1](#ack--code-c---reply-level-1---any)
 
 ---
 
-#### Tack Control : Code 2 - Primary - Command station
+#### Track Control : Code 2 - Primary - Command station
 <details open>
 Message to control the state of the track. Instructions should be handled immediatly. 
 
@@ -345,6 +345,8 @@ Reply: [Reply level 1](#read--set-a-decoder-cv---busy--code-19---reply-level-1--
 
 > Since this command uses XPom, only DCC addresses are supported. Only one query of code 20 can be active at a time.
 
+> Note, that the Host (PC) is responsible for checking if the Decoder supports XPom
+
 This message opens a query with the message parameters. The resulting query is either a `read` query, if no `Value` fields are present, or a `write` query, which will write as many values as fields are present (one to four) 
 
 | Message byte(s) | Name        | Value             | Description                                         |
@@ -438,7 +440,7 @@ Reply: None
 
 In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
 
-The actual track state needs to be queried seperatly using (Track Control)[#tack-control--code-2---primary---command-station]
+The actual track state needs to be queried seperatly using [Track Control](#track-control--code-2---primary---command-station)
 
 | Message byte(s) | Name    | Value     | Description                                                                                 |
 | :-------------- | ------- | --------- | ------------------------------------------------------------------------------------------- |
@@ -456,7 +458,7 @@ Reply: None
 
 In case there is no error within a request, the level 1 acknowledgement contains additional information. If the track state is not in normal operational mode bit 0 is set. 
 
-The actual track state needs to be queried seperatly using (Track Control)[#tack-control--code-2---primary---command-station]
+The actual track state needs to be queried seperatly using [Track Control](#track-control--code-2---primary---command-station)
 
 | Message byte(s) | Name    | Value     | Description                                                       |
 | :-------------- | ------- | --------- | ----------------------------------------------------------------- |
@@ -835,9 +837,9 @@ scribes whether there will be any consecutive frames with data.
 | 1 1  | `Reserved`                     |
 
 ## Missing information
- - In the original protocol, no explicit "leave Service Mode" trigger was defined. Here, i defined, that on the first addressed [Loco Control](#loco-control--code-3---primary---command-station) or on a [Track Control](#tack-control--code-2---primary---command-station) message, the Service Mode is ended, but this needs to be checked.
+ - In the original protocol, no explicit "leave Service Mode" trigger was defined. Here, i defined, that on the first addressed [Loco Control](#loco-control--code-3---primary---command-station) or on a [Track Control](#track-control--code-2---primary---command-station) message, the Service Mode is ended, but this needs to be checked.
 
- - If [Track Control](#tack-control--code-2---primary---command-station) results in the track being powered off, should that happen immediatly or is it alright to finish a running query? May result in up to 1s shutoff time (absolute worst case scenario)
+ - If [Track Control](#track-control--code-2---primary---command-station) results in the track being powered off, should that happen immediatly or is it alright to finish a running query? May result in up to 1s shutoff time (absolute worst case scenario)
 
  - If Track is off, should [Read / Write CV](#read--set-a-decoder-cv--code-19---primary---command-station) be responded with an error since there is no way a query can be handled without track power or should the track just be switched on again? 
 

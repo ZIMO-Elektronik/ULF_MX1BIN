@@ -125,7 +125,9 @@ using Message = std::variant<Ack,
                              DecoderCvManip::Error,
                              DecoderMultiCvManip,
                              DecoderMultiCvManip::Reply,
-                             DecoderMultiCvManip::ReplyL2>;
+                             DecoderMultiCvManip::ReplyL2,
+                             DecoderMultiCvManip::Busy,
+                             DecoderMultiCvManip::Error>;
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
 
