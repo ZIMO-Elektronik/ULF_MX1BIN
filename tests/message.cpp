@@ -2,32 +2,6 @@
 #include <ulf/mx1bin.hpp>
 #include "helper.hpp"
 
-#define CODABLE(type)                                                          \
-  static_assert(ulf::mx1bin::Encodable<type>);                                 \
-  static_assert(ulf::mx1bin::Decodable<type>);
-
-#define CODE(var)                                                              \
-  auto encoded{mencode(var)};                                                  \
-  auto const decoded{ulf::mx1bin::decode<decltype(var)>(encoded)};             \
-  ASSERT_TRUE(decoded) << "Error during decoding";                             \
-  auto const d_##var{*decoded};
-
-#define MATCH_HEAD(var)                                                        \
-  ASSERT_EQ(var.head.uSID, d_##var.head.uSID);                                 \
-  ASSERT_EQ(var.head.info.frameType, d_##var.head.info.frameType);             \
-  ASSERT_EQ(var.head.info.messageType, d_##var.head.info.messageType);         \
-  ASSERT_EQ(var.head.info.sender, d_##var.head.info.sender);                   \
-  ASSERT_EQ(var.head.info.stationType, d_##var.head.info.stationType);         \
-  ASSERT_EQ(var.head.code, d_##var.head.code);
-
-template<ulf::mx1bin::Encodable E>
-constexpr ulf::mx1bin::Packet mencode(E& e) {
-  ulf::mx1bin::Packet result;
-  ulf::mx1bin::StreamEncoder en{result};
-  en = e.encode(en);
-  return result;
-}
-
 TEST(Message, Ack) {
   static_assert(Codable<ulf::mx1bin::Ack>);
 
@@ -35,8 +9,7 @@ TEST(Message, Ack) {
 
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, Nak) {
@@ -44,8 +17,7 @@ TEST(Message, Nak) {
 
   ulf::mx1bin::Nak message{};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, Reset) {
@@ -53,8 +25,7 @@ TEST(Message, Reset) {
 
   ulf::mx1bin::Reset message{};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, TrackControl) {
@@ -63,9 +34,7 @@ TEST(Message, TrackControl) {
   ulf::mx1bin::TrackControl message{.cAction =
                                       decltype(message)::Action::TrackOn};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAction, result.message.cAction);
+  encode_decode_encode(message);
 }
 
 TEST(Message, TrackControl_Reply) {
@@ -74,9 +43,7 @@ TEST(Message, TrackControl_Reply) {
   ulf::mx1bin::TrackControl::Reply message{.statusBits = 0x55u};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.statusBits, result.message.statusBits);
+  encode_decode_encode(message);
 }
 
 TEST(Message, LocoControl) {
@@ -88,14 +55,7 @@ TEST(Message, LocoControl) {
                                    .cData2 = 0xAAu,
                                    .cData3 = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cSpeed, result.message.cSpeed);
-  ASSERT_EQ(message.cData1, result.message.cData1);
-  ASSERT_EQ(message.cData2, result.message.cData2);
-  ASSERT_EQ(message.cData3, result.message.cData3);
-  ASSERT_FALSE(result.message.cData4);
-  ASSERT_FALSE(result.message.cData5);
+  encode_decode_encode(message);
 }
 
 TEST(Message, LocoControl_Reply) {
@@ -105,10 +65,7 @@ TEST(Message, LocoControl_Reply) {
                                           .payload = 0x8Cu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.payload, result.message.payload);
+  encode_decode_encode(message);
 }
 
 TEST(Message, InvertFunctionBits) {
@@ -121,14 +78,7 @@ TEST(Message, InvertFunctionBits) {
                                           .cData4 = 0xAAu,
                                           .cData5 = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cData1, result.message.cData1);
-  ASSERT_EQ(message.cData2, result.message.cData2);
-  ASSERT_EQ(message.cData3, result.message.cData3);
-  ASSERT_EQ(message.cData4, result.message.cData4);
-  ASSERT_EQ(message.cData5, result.message.cData5);
+  encode_decode_encode(message);
 }
 
 TEST(Message, InvertFunctionBits_Reply) {
@@ -138,10 +88,7 @@ TEST(Message, InvertFunctionBits_Reply) {
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.payload, result.message.payload);
+  encode_decode_encode(message);
 }
 
 TEST(Message, Acceleration) {
@@ -149,10 +96,7 @@ TEST(Message, Acceleration) {
 
   ulf::mx1bin::Acceleration message{.cAdr = 0x8003u, .cAzBz = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cAzBz, result.message.cAzBz);
+  encode_decode_encode(message);
 }
 
 TEST(Message, Acceleration_Reply) {
@@ -162,10 +106,7 @@ TEST(Message, Acceleration_Reply) {
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.payload, result.message.payload);
+  encode_decode_encode(message);
 }
 
 TEST(Message, ShuttleTrain) {
@@ -173,10 +114,7 @@ TEST(Message, ShuttleTrain) {
 
   ulf::mx1bin::ShuttleTrain message{.cAdr = 0x8003u, .cData = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cData, result.message.cData);
+  encode_decode_encode(message);
 }
 
 TEST(Message, ShuttleTrain_Reply) {
@@ -186,10 +124,7 @@ TEST(Message, ShuttleTrain_Reply) {
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.payload, result.message.payload);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AccessoryControl) {
@@ -197,10 +132,7 @@ TEST(Message, AccessoryControl) {
 
   ulf::mx1bin::AccessoryControl message{.cAdr = 0x8003u, .cData = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cData, result.message.cData);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AccessoryControl_Reply) {
@@ -210,10 +142,7 @@ TEST(Message, AccessoryControl_Reply) {
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.payload, result.message.payload);
+  encode_decode_encode(message);
 }
 
 TEST(Message, LocoMemoryQuery) {
@@ -221,9 +150,7 @@ TEST(Message, LocoMemoryQuery) {
 
   ulf::mx1bin::LocoMemoryQuery message{.cAdr = 0x8003u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  encode_decode_encode(message);
 }
 
 TEST(Message, LocoMemoryQuery_Reply) {
@@ -240,19 +167,7 @@ TEST(Message, LocoMemoryQuery_Reply) {
                                               .cData5 = 0x09u};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cSpeed, result.message.cSpeed);
-  ASSERT_EQ(message.cData1, result.message.cData1);
-  ASSERT_EQ(message.cData2, result.message.cData2);
-  ASSERT_EQ(message.cData3, result.message.cData3);
-  ASSERT_EQ(message.cAzBz, result.message.cAzBz);
-  ASSERT_EQ(message.cStatus, result.message.cStatus);
-  ASSERT_EQ(message.cData4, result.message.cData4);
-  ASSERT_EQ(message.cData5, result.message.cData5);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AccessoryMemoryQuery) {
@@ -260,9 +175,7 @@ TEST(Message, AccessoryMemoryQuery) {
 
   ulf::mx1bin::AccessoryMemoryQuery message{.cAdr = 0x8003u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AccessoryMemoryQuery_Reply) {
@@ -275,13 +188,7 @@ TEST(Message, AccessoryMemoryQuery_Reply) {
     .cOutputs = 0xAAu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.head.reply_uSID, result.message.head.reply_uSID);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cPair, result.message.cPair);
-  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AddressControl) {
@@ -290,11 +197,7 @@ TEST(Message, AddressControl) {
   ulf::mx1bin::AddressControl message{
     .cAdr = 0x8003u, .cControl = 0x55u, .cOutputs = 0xAAu};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cControl, result.message.cControl);
-  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
+  encode_decode_encode(message);
 }
 
 TEST(Message, AddressControl_Reply) {
@@ -304,10 +207,7 @@ TEST(Message, AddressControl_Reply) {
                                              .cOutputs = 0xAAu};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.payload, result.message.payload);
-  ASSERT_EQ(message.cOutputs, result.message.cOutputs);
+  encode_decode_encode(message);
 }
 
 TEST(Message, CommandStationIOQuery) {
@@ -315,9 +215,7 @@ TEST(Message, CommandStationIOQuery) {
 
   ulf::mx1bin::CommandStationIOQuery message{};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.zero, result.message.zero);
+  encode_decode_encode(message);
 }
 
 TEST(Message, CommandStationIOQuery_Reply) {
@@ -330,13 +228,7 @@ TEST(Message, CommandStationIOQuery_Reply) {
                                                     .cAux = 0x55u};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cCurrent1, result.message.cCurrent1);
-  ASSERT_EQ(message.cVoltage1, result.message.cVoltage1);
-  ASSERT_EQ(message.cCurrent2, result.message.cCurrent2);
-  ASSERT_EQ(message.cVoltage2, result.message.cVoltage2);
-  ASSERT_EQ(message.cAux, result.message.cAux);
+  encode_decode_encode(message);
 }
 
 TEST(Message, CommandStationCvManip) {
@@ -344,10 +236,7 @@ TEST(Message, CommandStationCvManip) {
 
   ulf::mx1bin::CommandStationCvManip message{.variable = 0x55u, .value = 0xAAu};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(*message.value, *result.message.value);
+  encode_decode_encode(message);
 }
 
 TEST(Message, CommandStationCvManip_Reply) {
@@ -358,10 +247,7 @@ TEST(Message, CommandStationCvManip_Reply) {
     .error = ulf::mx1bin::Error::NO_ERROR, .value = 0x55u};
   message.head.reply_uSID = 0x03u;
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.error, result.message.error);
-  ASSERT_EQ(message.value, result.message.value);
+  encode_decode_encode(message);
 }
 
 TEST(Message, CommandStationEquipmentQuery) {
@@ -369,9 +255,7 @@ TEST(Message, CommandStationEquipmentQuery) {
 
   ulf::mx1bin::CommandStationEquipmentQuery message{};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.zero, result.message.zero);
+  encode_decode_encode(message);
 }
 
 // TEST(Message, CommandStationEquipmentQuery_Reply) {}
@@ -381,10 +265,7 @@ TEST(Message, SerialInfo) {
 
   ulf::mx1bin::SerialInfo message{.toolID = 0xAAu, .action = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.action, result.message.action);
-  ASSERT_EQ(message.toolID, result.message.toolID);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip) {
@@ -393,11 +274,7 @@ TEST(Message, DecoderCvManip) {
   ulf::mx1bin::DecoderCvManip message{
     .cAdr = 0x8003u, .variable = 0x55u, .value = 0xAAu};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(*message.value, *result.message.value);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip_no_value) {
@@ -405,12 +282,7 @@ TEST(Message, DecoderCvManip_no_value) {
 
   ulf::mx1bin::DecoderCvManip message{.cAdr = 0x8003u, .variable = 0x55u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_FALSE(message.value);
-  ASSERT_FALSE(result.message.value);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip_Reply) {
@@ -418,8 +290,7 @@ TEST(Message, DecoderCvManip_Reply) {
 
   ulf::mx1bin::DecoderCvManip::Reply message{};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip_ReplyL2) {
@@ -428,12 +299,7 @@ TEST(Message, DecoderCvManip_ReplyL2) {
   ulf::mx1bin::DecoderCvManip::ReplyL2 message{
     .cAdr = 0x8003u, .variable = 8u, .cValue = 8u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cError, result.message.cError);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.cValue, result.message.cValue);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip_Busy) {
@@ -445,13 +311,7 @@ TEST(Message, DecoderCvManip_Busy) {
                                             .activeAddr = 0x8004u,
                                             .activeCv = 8u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.activeUSID, result.message.activeUSID);
-  ASSERT_EQ(message.activeAddr, result.message.activeAddr);
-  ASSERT_EQ(message.activeCv, result.message.activeCv);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderCvManip_Error) {
@@ -459,10 +319,7 @@ TEST(Message, DecoderCvManip_Error) {
 
   ulf::mx1bin::DecoderCvManip::Error message{.cAdr = 0x8003u, .cError = 1u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.cError, result.message.cError);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip) {
@@ -471,12 +328,7 @@ TEST(Message, DecoderMultiCvManip) {
   ulf::mx1bin::DecoderMultiCvManip message{
     .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
-  ASSERT_EQ(message.values, result.message.values);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_with_one_value) {
@@ -485,12 +337,7 @@ TEST(Message, DecoderMultiCvManip_with_one_value) {
   ulf::mx1bin::DecoderMultiCvManip message{
     .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u}};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
-  ASSERT_EQ(message.values, result.message.values);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_with_two_values) {
@@ -499,12 +346,7 @@ TEST(Message, DecoderMultiCvManip_with_two_values) {
   ulf::mx1bin::DecoderMultiCvManip message{
     .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u, 2u}};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
-  ASSERT_EQ(message.values, result.message.values);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_with_three_values) {
@@ -513,12 +355,7 @@ TEST(Message, DecoderMultiCvManip_with_three_values) {
   ulf::mx1bin::DecoderMultiCvManip message{
     .cAdr = 0x8003u, .variable = 7u, .sequenceID = 2u, .values = {1u, 2u, 3u}};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
-  ASSERT_EQ(message.values, result.message.values);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_with_four_values) {
@@ -529,12 +366,7 @@ TEST(Message, DecoderMultiCvManip_with_four_values) {
                                            .sequenceID = 2u,
                                            .values = {1u, 2u, 3u, 4u}};
 
-  auto const result{encode_and_decode(message)};
-  match_head(message, result.message);
-  ASSERT_EQ(message.cAdr, result.message.cAdr);
-  ASSERT_EQ(message.variable, result.message.variable);
-  ASSERT_EQ(message.sequenceID, result.message.sequenceID);
-  ASSERT_EQ(message.values, result.message.values);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_Reply) {
@@ -542,8 +374,7 @@ TEST(Message, DecoderMultiCvManip_Reply) {
 
   ulf::mx1bin::DecoderMultiCvManip::Reply message{};
 
-  auto const result{encode_and_decode(message)};
-  ASSERT_EQ(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_Busy) {
@@ -557,8 +388,7 @@ TEST(Message, DecoderMultiCvManip_Busy) {
                                                  .activeCv = 8u,
                                                  .activeSequenceID = 3u};
 
-  auto const result{encode_and_decode(message)};
-  ASSERT_EQ(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_ReplyL2) {
@@ -569,8 +399,7 @@ TEST(Message, DecoderMultiCvManip_ReplyL2) {
                                                     .sequenceID = 2u,
                                                     .values = {1u, 2u, 3u, 4u}};
 
-  auto const result{encode_and_decode(message)};
-  ASSERT_EQ(message, result.message);
+  encode_decode_encode(message);
 }
 
 TEST(Message, DecoderMultiCvManip_Error) {
@@ -579,6 +408,5 @@ TEST(Message, DecoderMultiCvManip_Error) {
   ulf::mx1bin::DecoderMultiCvManip::Error message{.cAdr = 0x8003u,
                                                   .cError = 1u};
 
-  auto const result{encode_and_decode(message)};
-  ASSERT_EQ(message, result.message);
+  encode_decode_encode(message);
 }
