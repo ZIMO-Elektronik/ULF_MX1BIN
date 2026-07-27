@@ -396,6 +396,7 @@ TEST(Message, DecoderMultiCvManip_Busy) {
                                                  .sequenceID = 2u,
                                                  .activeUSID = 2u,
                                                  .activeAddr = 0x8004u,
+                                                 .activeIndex = 3u,
                                                  .activeCv = 8u,
                                                  .activeSequenceID = 3u};
 
