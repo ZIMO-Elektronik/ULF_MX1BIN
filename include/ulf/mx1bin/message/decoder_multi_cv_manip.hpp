@@ -74,7 +74,8 @@ struct DecoderMultiCvManip {
         return std::unexpected{std::errc::invalid_argument};
       return ReplyL2{.head = *head,
                      .cAdr = d.uint16(),
-                     .variable = d.uint16(),
+                     .index = d.uint16(),
+                     .variable = d.uint8(),
                      .sequenceID = d.uint8(),
                      .values =
                        std::array{d.uint8(), d.uint8(), d.uint8(), d.uint8()}};
@@ -96,12 +97,13 @@ struct DecoderMultiCvManip {
     uint8_t const busy{0x04u};           ///< Busy
     bitfields::DecoderAddress cAdr{};    ///< Decoder address
     uint16_t index{};                    ///< CV page index
-    uint8_t variable{};                  ///< CV address
+    uint8_t variable{};                  ///< CV index
     uint8_t sequenceID{};                ///< XPom sequence ID
     std::optional<uint8_t> activeUSID{}; ///< Active uSID
     std::optional<bitfields::DecoderAddress>
       activeAddr{};                            ///< Active Decoder address
-    std::optional<uint16_t> activeCv{};        ///< Active CV address
+    std::optional<uint16_t> activeIndex{};     ///< Active CV Page index
+    std::optional<uint8_t> activeCv{};         ///< Active CV index
     std::optional<uint8_t> activeSequenceID{}; ///< Active XPom sequenceID
     template<Encoder E>
     E encode(E e) const {
@@ -113,7 +115,8 @@ struct DecoderMultiCvManip {
         .uint8(sequenceID)
         .uint8(activeUSID)
         .uint16(activeAddr)
-        .uint16(activeCv)
+        .uint16(activeIndex)
+        .uint8(activeCv)
         .uint8(activeSequenceID);
     }
     template<Decoder D>
@@ -130,7 +133,8 @@ struct DecoderMultiCvManip {
                   .sequenceID = d.uint8(),
                   .activeUSID = d.s_uint8(),
                   .activeAddr = d.s_uint16(),
-                  .activeCv = d.s_uint16(),
+                  .activeIndex = d.s_uint16(),
+                  .activeCv = d.s_uint8(),
                   .activeSequenceID = d.s_uint8()};
     }
     constexpr bool operator==(Busy const&) const = default;

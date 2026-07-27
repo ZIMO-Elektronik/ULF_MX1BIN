@@ -325,11 +325,8 @@ TEST(Message, DecoderCvManip_Error) {
 TEST(Message, DecoderMultiCvManip) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
 
-  ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
-                                           .index_1 = 1u,
-                                           .index_2 = 2u,
-                                           .variable = 7u,
-                                           .sequenceID = 2u};
+  ulf::mx1bin::DecoderMultiCvManip message{
+    .cAdr = 0x8003u, .index = 3u, .variable = 7u, .sequenceID = 2u};
 
   encode_decode_encode(message);
 }
@@ -338,8 +335,7 @@ TEST(Message, DecoderMultiCvManip_with_one_value) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
 
   ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
-                                           .index_1 = 1u,
-                                           .index_2 = 2u,
+                                           .index = 3u,
                                            .variable = 7u,
                                            .sequenceID = 2u,
                                            .values = {1u}};
@@ -351,8 +347,7 @@ TEST(Message, DecoderMultiCvManip_with_two_values) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
 
   ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
-                                           .index_1 = 1u,
-                                           .index_2 = 2u,
+                                           .index = 3u,
                                            .variable = 7u,
                                            .sequenceID = 2u,
                                            .values = {1u, 2u}};
@@ -364,8 +359,7 @@ TEST(Message, DecoderMultiCvManip_with_three_values) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
 
   ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
-                                           .index_1 = 1u,
-                                           .index_2 = 2u,
+                                           .index = 3u,
                                            .variable = 7u,
                                            .sequenceID = 2u,
                                            .values = {1u, 2u, 3u}};
@@ -377,8 +371,7 @@ TEST(Message, DecoderMultiCvManip_with_four_values) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip>);
 
   ulf::mx1bin::DecoderMultiCvManip message{.cAdr = 0x8003u,
-                                           .index_1 = 1u,
-                                           .index_2 = 2u,
+                                           .index = 3u,
                                            .variable = 7u,
                                            .sequenceID = 2u,
                                            .values = {1u, 2u, 3u, 4u}};
@@ -398,8 +391,7 @@ TEST(Message, DecoderMultiCvManip_Busy) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Busy>);
 
   ulf::mx1bin::DecoderMultiCvManip::Busy message{.cAdr = 0x8003u,
-                                                 .index_1 = 1u,
-                                                 .index_2 = 2u,
+                                                 .index = 3u,
                                                  .variable = 8u,
                                                  .sequenceID = 2u,
                                                  .activeUSID = 2u,
@@ -414,8 +406,7 @@ TEST(Message, DecoderMultiCvManip_ReplyL2) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::ReplyL2>);
 
   ulf::mx1bin::DecoderMultiCvManip::ReplyL2 message{.cAdr = 0x8003u,
-                                                    .index_1 = 1u,
-                                                    .index_2 = 2u,
+                                                    .index = 3u,
                                                     .variable = 7u,
                                                     .sequenceID = 2u,
                                                     .values = {1u, 2u, 3u, 4u}};
