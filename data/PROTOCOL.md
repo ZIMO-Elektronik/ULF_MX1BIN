@@ -354,7 +354,7 @@ This message opens a query with the message parameters. The resulting query is e
 | [0..1]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
 | [2..3]          | Page Index  | -                 | CV page index (CV31 CV32)                           |
 | [4]             | CV Index    | -                 | First CV index (in page)                            |
-| [5]             | SequenceID  | [0x0..0xF]        | XPom sequence identifier                            |
+| [5]             | SequenceID  | [0x0..0x3]        | XPom sequence identifier                            |
 | [6] optional    | Value 1     | -                 | First CV value to write                             |          
 | [7] optional    | Value 2     | -                 | Second CV value to write                            |
 | [8] optional    | Value 3     | -                 | Third CV value to write                             |
