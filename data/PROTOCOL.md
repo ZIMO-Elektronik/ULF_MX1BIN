@@ -352,12 +352,13 @@ This message opens a query with the message parameters. The resulting query is e
 | Message byte(s) | Name        | Value             | Description                                         |
 | :-------------- | ----------- | ----------------- | --------------------------------------------------- |
 | [0..1]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
-| [2..3]          | Variable    | -                 | first CV address                                    |
-| [4]             | SequenceID  | [0x0..0xF]        | XPom sequence identifier                            |
-| [5] optional    | Value 1     | -                 | First CV value to write                             |          
-| [6] optional    | Value 2     | -                 | Second CV value to write                            |
-| [7] optional    | Value 3     | -                 | Third CV value to write                             |
-| [8] optional    | Value 4     | -                 | Fourth CV value to write                            |
+| [2..3]          | Page Index  | -                 | CV page index (CV31 CV32)                           |
+| [4]             | CV Index    | -                 | First CV index (in page)                            |
+| [5]             | SequenceID  | [0x0..0xF]        | XPom sequence identifier                            |
+| [6] optional    | Value 1     | -                 | First CV value to write                             |          
+| [7] optional    | Value 2     | -                 | Second CV value to write                            |
+| [8] optional    | Value 3     | -                 | Third CV value to write                             |
+| [9] optional    | Value 4     | -                 | Fourth CV value to write                            |
 
 Upon finishing the query, the Command Station responds with an async [Reply level 2](#read--set-multiple-decoder-cvs--code-20---reply-level-2---command-station)
 
@@ -639,13 +640,14 @@ There are two different replies, depending on wether an error occurred during qu
 | --------------- | ----------- | ----------------- | --------------------------------------------------- | 
 | [0]             | re-uSID     | ID                | uSID of the message being replied to                |
 | [1..2]          | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
-| [3..4]          | Variable    | -                 | First CV address                                    |
-| [5]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                    | 
-| [6]             | cError      | Error             | Error code                                          | 
-| [7]             | Value 1     | -                 | First CV value                                      |
-| [8]             | Value 2     | -                 | Second CV value                                     |
-| [9]             | Value 3     | -                 | Third CV value                                      |
-| [10]            | Value 4     | -                 | Fourth CV value                                     |
+| [3..4]          | Page Index  | -                 | CV page index (CV31 CV32)                           |
+| [5]             | CV Index    | -                 | First CV index (in page)                            |
+| [6]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                    | 
+| [7]             | cError      | Error             | Error code                                          | 
+| [8]             | Value 1     | -                 | First CV value                                      |
+| [9]             | Value 2     | -                 | Second CV value                                     |
+| [10]            | Value 3     | -                 | Third CV value                                      |
+| [11]            | Value 4     | -                 | Fourth CV value                                     |
 
 When an Error occurs (e.g. timeout), the following message should be sent: 
 
@@ -669,14 +671,16 @@ Since only one query can be active at a time, any following query should be resp
 | :---------------- | ----------- | ----------------- | ----------------------------------------------------------------------- |
 | [0]               | re-uSID     | ID                | uSID of the message being replied to                                    |
 | [1]               | cBusy       | 0x04              | Busy - there is already an active request                               |
-| [1..2]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
-| [3..4]            | Variable    | -                 | CV address                                                              |
-| [5]               | SequenceID  | [0..3]            | XPom Sequence ID                                                        |
-| [6] optional      | cID         | ID                | uSID of the message requesting the active query                         |
-| [7] optional      | cError      | -                 | Error (0=No Error, >0= Error)                                           |
-| [8..9] optional   | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
-| [10..11] optional | Variable    | -                 | Variable of the active query                                            |
-| [12] optional     | Sequence ID | [0..3]            | XPom Sequence ID of the active query                                    |
+| [2..3]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
+| [4..5]            | Page Index  | -                 | CV page index (CV31 CV32)                                               | 
+| [6]               | CV Index    | -                 | First CV index (in page)                                                |
+| [7]               | SequenceID  | [0..3]            | XPom Sequence ID                                                        |
+| [8] optional      | cID         | ID                | uSID of the message requesting the active query                         |
+| [9] optional      | cError      | -                 | Error (0=No Error, >0= Error)                                           |
+| [10..11] optional | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
+| [12..13] optional | Page Index  | -                 | CV page index of the active query                                       |
+| [14] optional     | CV Index    | -                 | First CV index of the active query                                      |
+| [15] optional     | Sequence ID | [0..3]            | XPom Sequence ID of the active query                                    |
 
 Reply: None
 </details>

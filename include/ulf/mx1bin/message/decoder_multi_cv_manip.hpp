@@ -47,7 +47,8 @@ struct DecoderMultiCvManip {
                                       StationType::MX1},
               .code = Command::DecoderMultiCvManip};
     bitfields::DecoderAddress cAdr{};  ///< Address of Decoder
-    uint16_t variable{};               ///< CV address
+    uint16_t index{};                  ///< CV page index
+    uint8_t variable{};                ///< CV address
     uint8_t sequenceID{};              ///< XPom sequence ID
     std::array<uint8_t, 4uz> values{}; ///< Values
     template<Encoder E>
@@ -55,7 +56,8 @@ struct DecoderMultiCvManip {
     E encode(E e) const {
       return head.encode(e)
         .uint16(cAdr)
-        .uint16(variable)
+        .uint16(index)
+        .uint8(variable)
         .uint8(sequenceID)
         .uint8(values[0])
         .uint8(values[1])
@@ -66,8 +68,9 @@ struct DecoderMultiCvManip {
     template<Decoder D>
     static std::expected<ReplyL2, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
-                                   sizeof(sequenceID) + 4uz /*values*/))
+      if (!head ||
+          !d.has_at_least(sizeof(cAdr) + sizeof(index) + sizeof(variable) +
+                          sizeof(sequenceID) + 4uz /*values*/))
         return std::unexpected{std::errc::invalid_argument};
       return ReplyL2{.head = *head,
                      .cAdr = d.uint16(),
@@ -92,7 +95,8 @@ struct DecoderMultiCvManip {
               .code = Command::DecoderMultiCvManip};
     uint8_t const busy{0x04u};           ///< Busy
     bitfields::DecoderAddress cAdr{};    ///< Decoder address
-    uint16_t variable{};                 ///< CV address
+    uint16_t index{};                    ///< CV page index
+    uint8_t variable{};                  ///< CV address
     uint8_t sequenceID{};                ///< XPom sequence ID
     std::optional<uint8_t> activeUSID{}; ///< Active uSID
     std::optional<bitfields::DecoderAddress>
@@ -104,7 +108,8 @@ struct DecoderMultiCvManip {
       return head.encode(e)
         .uint8(busy)
         .uint16(cAdr)
-        .uint16(variable)
+        .uint16(index)
+        .uint8(variable)
         .uint8(sequenceID)
         .uint8(activeUSID)
         .uint16(activeAddr)
@@ -114,13 +119,14 @@ struct DecoderMultiCvManip {
     template<Decoder D>
     static std::expected<Busy, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(busy) + sizeof(cAdr) +
+      if (!head || !d.has_at_least(sizeof(busy) + sizeof(cAdr) + sizeof(index) +
                                    sizeof(variable) + sizeof(sequenceID)))
         return std::unexpected{std::errc::invalid_argument};
       return Busy{.head = *head,
                   .busy = d.uint8(),
                   .cAdr = d.uint16(),
-                  .variable = d.uint16(),
+                  .index = d.uint16(),
+                  .variable = d.uint8(),
                   .sequenceID = d.uint8(),
                   .activeUSID = d.s_uint8(),
                   .activeAddr = d.s_uint16(),
@@ -164,13 +170,15 @@ struct DecoderMultiCvManip {
                                     StationType::MX1},
             .code = Command::DecoderMultiCvManip};
   bitfields::DecoderAddress cAdr{};           ///< Address of Decoder
-  uint16_t variable{};                        ///< CV address
+  uint16_t index{};                           ///< CV page index
+  uint8_t variable{};                         ///< CV address
   uint8_t sequenceID{};                       ///< XPom sequence ID
   ztl::inplace_vector<uint8_t, 4uz> values{}; ///< Values
   /// Encode
   template<Encoder E>
   E encode(E e) const {
-    e = head.encode(e).uint16(cAdr).uint16(variable).uint8(sequenceID);
+    e = head.encode(e).uint16(cAdr).uint16(index).uint8(variable).uint8(
+      sequenceID);
     std::ranges::for_each(values, [&e](uint8_t v) { e = e.uint8(v); });
     return e;
   }
@@ -178,13 +186,14 @@ struct DecoderMultiCvManip {
   template<Decoder D>
   static std::expected<DecoderMultiCvManip, std::errc> decode(D& d) {
     auto const head{Head::decode(d)};
-    if (!head ||
-        !d.has_at_least(sizeof(cAdr) + sizeof(variable) + sizeof(sequenceID)))
+    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(index) +
+                                 sizeof(variable) + sizeof(sequenceID)))
       return std::unexpected{std::errc::invalid_argument};
     DecoderMultiCvManip result{
       .head = *head,
       .cAdr = d.uint16(),
-      .variable = d.uint16(),
+      .index = d.uint16(),
+      .variable = d.uint8(),
       .sequenceID = d.uint8(),
     };
     while (!result.values.full()) {
