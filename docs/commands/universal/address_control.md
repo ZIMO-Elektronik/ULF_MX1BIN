@@ -9,7 +9,7 @@
 | 0       | Head          | 1 Byte  | uSID                        | -                 | -                                           |
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                           |
 | 2       | Head          | 1 Byte  | Message Code                | 10                | -                                           |
-| 3       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                             |
+| 3       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                             |
 | 5       | Data          | 1 Byte  | cControl                    | -                 | Control information                         |
 | 6       | Optional Data | 1 Byte  | cOutputs                    | -                 | Outputs to lock                             |
 
@@ -43,3 +43,5 @@
 | \[0]    | `l`     | Log changes (`0` off, `1` on)           |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa

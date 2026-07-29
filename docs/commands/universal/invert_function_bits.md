@@ -9,7 +9,7 @@
 | 0       | Head    | 1 Byte  | uSID                        | -                 | -                                   |
 | 1       | Head    | 1 Byte  | Header Info                 | -                 | -                                   |
 | 2       | Head    | 1 Byte  | Message Code                | 4                 | -                                   |
-| 3       | Data    | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Loco Address                        |
+| 3       | Data    | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Loco Address                        |
 | 5       | Data    | 1 Byte  | [cSpeed](#cspeed-esssssss)  | esssssss          | Loco Speed                          |
 | 6       | Data    | 1 Byte  | [cData1](#cdata1)           | -                 | -                                   |
 | 7       | Data    | 1 Byte  | [cData2](#cdata2)           | -                 | Function group F1..F8 (DCC only)    |
@@ -109,3 +109,5 @@
 | \[0]    | `t`     | Track state (`0` normal, `1` fault) |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa

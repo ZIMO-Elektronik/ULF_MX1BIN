@@ -9,7 +9,7 @@
 | 0       | Head          | 1 Byte  | uSID                        | -                 | -                                   |
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                   |
 | 2       | Head          | 1 Byte  | Message Code                | 8                 | -                                   |
-| 3       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 3       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                     |
 
 ---
 
@@ -22,7 +22,7 @@
 | 2       | Head          | 1 Byte  | Message Code                | 8                 | -                                   |
 | 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                   | 
 | 4       | Data          | 1 Byte  | Error                       | -                 | If any - Error                      |   
-| 5       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 5       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                     |
 | 7       | Data          | 1 Byte  | [cSpeed](#cspeed-esssssss)  | -                 | Speed in Speed Step System          |
 | 8       | Data          | 1 Byte  | [cData1](#cdata1)           | -                 | -                                   |
 | 9       | Data          | 1 Byte  | [cData2](#cdata2)           | -                 | -                                   |
@@ -115,3 +115,5 @@
 | \[0]    | F28         |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa

@@ -9,7 +9,7 @@
 | 0       | Head          | 1 Byte  | uSID                        | -                 | -                                   |
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                   |
 | 2       | Head          | 1 Byte  | Message Code                | 9                 | -                                   |
-| 3       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 3       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                     |
 
 ---
 
@@ -22,7 +22,7 @@
 | 2       | Head          | 1 Byte  | Message Code                | 9                 | -                                   |
 | 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                   | 
 | 4       | Data          | 1 Byte  | Error                       | -                 | If any - Error                      |   
-| 5       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 5       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                     |
 | 7       | Data          | 1 Byte  | [cPair](#cpair)             | -                 |                                     | 
 | 8       | Data          | 1 Byte  | cOutputs                    | -                 | State of outputs                    |
 
@@ -38,3 +38,5 @@
 | `1`   | Single output function  |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa

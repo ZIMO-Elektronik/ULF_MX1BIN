@@ -9,7 +9,7 @@
 | 0       | Head    | 1 Byte  | uSID                        | -                 | -                                   |
 | 1       | Head    | 1 Byte  | Header Info                 | -                 | -                                   |
 | 2       | Head    | 1 Byte  | Message Code                | 7                 | -                                   |
-| 3       | Data    | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Accessory Address                   |
+| 3       | Data    | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Accessory Address                   |
 | 5       | Data    | 1 Byte  | [cData](#cdata-0000snnn)    | 0000snnn          | Output and Output state             |
 
 ---
@@ -48,3 +48,5 @@
 | \[0]    | `t`     | Track state (`0` normal, `1` fault) |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa

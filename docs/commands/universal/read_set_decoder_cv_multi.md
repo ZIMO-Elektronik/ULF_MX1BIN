@@ -9,7 +9,7 @@
 | 0       | Head          | 1 Byte  | uSID                        | -                 | -                                   |
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                   |
 | 2       | Head          | 1 Byte  | Message Code                | 20                | -                                   |
-| 3       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 3       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                     |
 | 5       | Data          | 2 Byte  | Index                       | -                 | CV page index (CV31 CV32)           |
 | 7       | Data          | 1 Byte  | Variable                    | -                 | CV index                            |
 | 8       | Data          | 1 Byte  | SequenceID                  | \[0..3]           | Xpom SequenceID                     | 
@@ -40,13 +40,13 @@
 | 2       | Head          | 1 Byte  | Message Code                | 20                | -                                     |
 | 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                     |
 | 4       | Data          | 1 Byte  | cBusy                       | 4                 | Unable to handle query ATM            |
-| 5       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                       |
+| 5       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                       |
 | 7       | Data          | 2 Byte  | Index                       | -                 | CV page index                         | 
 | 9       | Data          | 1 Byte  | Variable                    | -                 | CV index                              |
 | 10      | Data          | 1 Byte  | SequenceID                  | -                 | Xpom SequenceID                       |  
 | 11      | Optional Data | 1 Byte  | cID                         | -                 | ID of the blocking query              |
 | 12      | Optional Data | 1 Byte  | cError                      | -                 | Error                                 |
-| 13      | Optional Data | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address of the blocking query |
+| 13      | Optional Data | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address of the blocking query |
 | 15      | Optional Data | 2 Byte  | Index                       | -                 | CV page index of the blocking query   | 
 | 17      | Optional Data | 2 Byte  | Variable                    | -                 | CV index of the blocking query        | 
 | 18      | Optional Data | 1 Byte  | SequenceID                  | \[0..3]           | Xpom SequenceID of the blocking query |
@@ -61,7 +61,7 @@
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                     |
 | 2       | Head          | 1 Byte  | Message Code                | 20                | -                                     |
 | 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                     |
-| 4       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                       | 
+| 4       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                       | 
 | 6       | Data          | 2 Byte  | Index                       | -                 | CV page index                         | 
 | 8       | Data          | 1 Byte  | Variable                    | -                 | CV index                              | 
 | 9       | Data          | 1 Byte  | SequenceID                  | \[0..3]           | Xpom SequenceID                       |
@@ -81,7 +81,7 @@
 | 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                     |
 | 2       | Head          | 1 Byte  | Message Code                | 20                | -                                     |
 | 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                     |
-| 4       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                       | 
+| 4       | Data          | 2 Byte  | [cAdr]                      | ffaaaaaa aaaaaaaa | Decoder Address                       | 
 | 6       | Data          | 1 Byte  | cError                      | -                 | Error                                 |
 
 ---
@@ -96,3 +96,5 @@
 | 3       | Head          | 1 Byte  | pre-uSID                    | -         | -                                 |
 
 ---
+
+[cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa
