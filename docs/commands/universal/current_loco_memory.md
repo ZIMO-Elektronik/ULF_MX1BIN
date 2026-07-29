@@ -1,0 +1,116 @@
+# Current Loco Memory - **Code 255**
+
+## Available Messages
+
+### [Primary](../../definition/message_type/primary.md)
+
+| Offset  | Section       | Size    | Field                       | Value             | Description                         |
+| ------: | ------------: | ------: | --------------------------- | ----------------- | ----------------------------------- |
+| 0       | Head          | 1 Byte  | uSID                        | -                 | -                                   |
+| 1       | Head          | 1 Byte  | Header Info                 | -                 | -                                   |
+| 2       | Head          | 1 Byte  | Message Code                | 255               | -                                   |
+| 3       | Head          | 1 Byte  | pre-uSID                    | -                 | -                                   | 
+| 4       | Data          | 2 Byte  | cAdr                        | ffaaaaaa aaaaaaaa | Decoder Address                     |
+| 6       | Data          | 1 Byte  | [cSpeed](#cspeed-esssssss)  | -                 | Speed in Speed Step System          |
+| 7       | Data          | 1 Byte  | [cData1](#cdata1)           | -                 | -                                   |
+| 8       | Data          | 1 Byte  | [cData2](#cdata2)           | -                 | -                                   |
+| 9       | Data          | 1 Byte  | [cData3](#cdata3)           | -                 | -                                   |
+| 10      | Data          | 1 Byte  | [cAzBz](#cazbz-aaaabbbb)    | -                 | -                                   |
+| 11      | Data          | 1 Byte  | [cStatus](#cstatus)         | -                 | -                                   |
+| 12      | Optional Data | 1 Byte  | [cData4](#cdata4)           | -                 | -                                   |
+| 13      | Optional Data | 1 Byte  | [cData5](#cdata5)           | -                 | -                                   | 
+
+---
+
+### [Level 1 Ack](../../definition/message_type/level_1_ack.md)
+
+| Offset  | Section       | Size    | Field                       | Value     | Description     |
+| ------: | ------------: | ------- | --------------------------- | --------- | --------------- |
+| 0       | Head          | 1 Byte  | uSID                        | -         | -               |
+| 1       | Head          | 1 Byte  | Header Info                 | -         | -               |
+| 2       | Head          | 1 Byte  | Message Code                | 255       | -               |
+| 3       | Head          | 1 Byte  | pre-uSID                    | -         | -               |
+
+---
+
+## Bitfields and Values
+
+### **cSpeed** `esssssss`
+
+| Bit(-s) | Acronym | Description     |
+| ------: | ------: |---------------- |
+| \[7]    | `e`     | Emergency stop  |
+| \[6..0] | `s`     | Speed           |
+
+---
+
+### **cData1**
+
+| Bit(-s) | Description                     |
+| ------: | ------------------------------- |
+| \[7]    | Manual (ignore limits)          | 
+| \[6]    | Reserved (set to `0`)           |
+| \[5]    | Direction (`0` fw, `1` bw)      |
+| \[4]    | Headlights (`0` off, `1` on)    |
+| \[3..2] | Speed step system               |
+| \[1]    | Deceleration (`0` off, `1` on)  | 
+| \[0]    | Acceleration (`0` off, `1` on)  |
+
+---
+
+### **cData2**
+
+| Bit(-s) | Description |
+| ------: | ----------- |
+| \[7]    | F1          |
+| ...     | ...         |
+| \[0]    | F8          |
+
+---
+
+### **cData3**
+
+| Bit(-s) | Description           |
+| ------: | --------------------- |
+| \[7..4] | Reserved (set to `0`) |
+| \[3]    | F9                    |
+| ...     | ...                   |
+| \[0]    | F12                   |
+
+---
+
+### **cAzBz** `aaaabbbb`
+
+| Bit(-s) | Acronym | Description       |
+| ------: | ------: | ----------------- |
+| \[7..4] | `a`     | Acceleration time |
+| \[3..0] | `b`     | Deceleration time |
+
+---
+
+### **cStatus** 
+
+| Value | Description   | 
+| ----: | ------------- |
+| `0`   | Loco inactive |
+| `1`   | Loco active   | 
+
+### **cData4**
+
+| Bit(-s) | Description |
+| ------: | ----------- |
+| \[7]    | F13         |
+| ...     | ...         |
+| \[0]    | F20         |
+
+---
+
+### **cData5**
+
+| Bit(-s) | Description |
+| ------: | ----------- |
+| \[7]    | F21         |
+| ...     | ...         |
+| \[0]    | F28         |
+
+---

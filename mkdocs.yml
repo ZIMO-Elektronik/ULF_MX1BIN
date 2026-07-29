@@ -1,0 +1,63 @@
+site_name: MX1Bin Protocol
+
+theme:
+  name: material
+  highlightjs: true
+  hljs_languages:
+    - cpp
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format 
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
+
+nav:
+  - Home: index.md
+  - Definition: 
+      - Overview: definition/index.md
+      - Message Type:
+          - Overview: definition/message_type/index.md
+          - Primary: definition/message_type/primary.md
+          - Level 1 Ack: definition/message_type/level_1_ack.md
+          - Reply Level 2: definition/message_type/reply_level_2.md
+          - Level 2 Ack: definition/message_type/level_2_ack.md
+  - Commands:
+      - Overview: commands/index.md
+      - Universal Commands: 
+          - Overview: commands/universal/index.md
+          - Reset: commands/universal/reset.md
+          - Track Control: commands/universal/track_control.md
+          - Loco Control: commands/universal/loco_control.md
+          - Invert Function Bits: commands/universal/invert_function_bits.md
+          - Acceleration / Deceleration: commands/universal/acceleration_deceleration.md
+          - Shuttle Train: commands/universal/shuttle_train.md
+          - Accessory Control: commands/universal/accessory_control.md
+          - Loco Memory Query: commands/universal/loco_memory_query.md
+          - Accessory Memory Query: commands/universal/accessory_memory_query.md
+          - Address Control: commands/universal/address_control.md
+          - Read Command Station I/O State: commands/universal/read_command_station_io_state.md
+          - Read / Set Command Station CV: commands/universal/read_set_command_station_cv.md
+          - Command Station Equipment Query: commands/universal/command_station_equipment_query.md
+          - Read / Set Decoder CV: commands/universal/read_set_decoder_cv.md
+          - Read / Set Multiple Decoder CVs: commands/universal/read_set_decoder_cv_multi.md
+          - Current Loco Memory: commands/universal/current_loco_memory.md
+          - Current Accessory Memory: commands/universal/current_accessory_memory.md
+  - Messages:
+      - Overview: messages/index.md
+      - Short Messages: 
+          - Overview: messages/short/index.md
+      - Long Messages: 
+          - Overview: messages/long/index.md
