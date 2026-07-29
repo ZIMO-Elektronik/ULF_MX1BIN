@@ -28,12 +28,17 @@ nav:
   - Home: index.md
   - Definition: 
       - Overview: definition/index.md
+      - Structure: 
+          - Overview: definition/structure/index.md
+          - Stream: definition/structure/stream/index.md
+          - Message: definition/structure/message/index.md
       - Message Type:
           - Overview: definition/message_type/index.md
           - Primary: definition/message_type/primary.md
           - Level 1 Ack: definition/message_type/level_1_ack.md
           - Reply Level 2: definition/message_type/reply_level_2.md
           - Level 2 Ack: definition/message_type/level_2_ack.md
+      - Globals: definition/globals/index.md
   - Commands:
       - Overview: commands/index.md
       - Universal Commands: 
