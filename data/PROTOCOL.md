@@ -643,11 +643,11 @@ There are two different replies, depending on wether an error occurred during qu
 | [3..4]          | Page Index  | -                 | CV page index (CV31 CV32)                           |
 | [5]             | CV Index    | -                 | First CV index (in page)                            |
 | [6]             | SequenceID  | [0x0..0x3]        | XPom Sequence ID                                    | 
-| [7]             | cError      | Error             | Error code                                          | 
-| [8]             | Value 1     | -                 | First CV value                                      |
-| [9]             | Value 2     | -                 | Second CV value                                     |
-| [10]            | Value 3     | -                 | Third CV value                                      |
-| [11]            | Value 4     | -                 | Fourth CV value                                     |
+| [7]             | Value 1     | -                 | First CV value                                      |
+| [8]             | Value 2     | -                 | Second CV value                                     |
+| [9]             | Value 3     | -                 | Third CV value                                      |
+| [10]            | Value 4     | -                 | Fourth CV value                                     |
+| [11]            | cError      | Error             | Error code                                          | 
 
 When an Error occurs (e.g. timeout), the following message should be sent: 
 

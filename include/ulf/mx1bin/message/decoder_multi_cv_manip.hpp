@@ -51,6 +51,7 @@ struct DecoderMultiCvManip {
     uint8_t variable{};                ///< CV address
     uint8_t sequenceID{};              ///< XPom sequence ID
     std::array<uint8_t, 4uz> values{}; ///< Values
+    uint8_t cError{};                  ///< Error code (if any)
     template<Encoder E>
     /// Encode
     E encode(E e) const {
@@ -62,7 +63,8 @@ struct DecoderMultiCvManip {
         .uint8(values[0])
         .uint8(values[1])
         .uint8(values[2])
-        .uint8(values[3]);
+        .uint8(values[3])
+        .uint8(cError);
     }
     /// Decode
     template<Decoder D>
@@ -70,15 +72,17 @@ struct DecoderMultiCvManip {
       auto const head{Head::decode(d)};
       if (!head ||
           !d.has_at_least(sizeof(cAdr) + sizeof(index) + sizeof(variable) +
-                          sizeof(sequenceID) + 4uz /*values*/))
+                          sizeof(sequenceID) + 4uz /*values*/ + sizeof(cError)))
         return std::unexpected{std::errc::invalid_argument};
-      return ReplyL2{.head = *head,
-                     .cAdr = d.uint16(),
-                     .index = d.uint16(),
-                     .variable = d.uint8(),
-                     .sequenceID = d.uint8(),
-                     .values =
-                       std::array{d.uint8(), d.uint8(), d.uint8(), d.uint8()}};
+      return ReplyL2{
+        .head = *head,
+        .cAdr = d.uint16(),
+        .index = d.uint16(),
+        .variable = d.uint8(),
+        .sequenceID = d.uint8(),
+        .values = std::array{d.uint8(), d.uint8(), d.uint8(), d.uint8()},
+        .cError = d.uint8(),
+      };
     }
     constexpr bool operator==(ReplyL2 const&) const = default;
     constexpr ReplyL2& operator=(ReplyL2 const&) = default;
@@ -100,6 +104,7 @@ struct DecoderMultiCvManip {
     uint8_t variable{};                  ///< CV index
     uint8_t sequenceID{};                ///< XPom sequence ID
     std::optional<uint8_t> activeUSID{}; ///< Active uSID
+    std::optional<uint8_t> cError{};     ///< Error?
     std::optional<bitfields::DecoderAddress>
       activeAddr{};                            ///< Active Decoder address
     std::optional<uint16_t> activeIndex{};     ///< Active CV Page index
@@ -114,6 +119,7 @@ struct DecoderMultiCvManip {
         .uint8(variable)
         .uint8(sequenceID)
         .uint8(activeUSID)
+        .uint8(cError)
         .uint16(activeAddr)
         .uint16(activeIndex)
         .uint8(activeCv)
@@ -132,6 +138,7 @@ struct DecoderMultiCvManip {
                   .variable = d.uint8(),
                   .sequenceID = d.uint8(),
                   .activeUSID = d.s_uint8(),
+                  .cError = d.s_uint8(),
                   .activeAddr = d.s_uint16(),
                   .activeIndex = d.s_uint16(),
                   .activeCv = d.s_uint8(),

@@ -395,6 +395,7 @@ TEST(Message, DecoderMultiCvManip_Busy) {
                                                  .variable = 8u,
                                                  .sequenceID = 2u,
                                                  .activeUSID = 2u,
+                                                 .cError = 42u,
                                                  .activeAddr = 0x8004u,
                                                  .activeIndex = 3u,
                                                  .activeCv = 8u,
@@ -410,7 +411,8 @@ TEST(Message, DecoderMultiCvManip_ReplyL2) {
                                                     .index = 3u,
                                                     .variable = 7u,
                                                     .sequenceID = 2u,
-                                                    .values = {1u, 2u, 3u, 4u}};
+                                                    .values = {1u, 2u, 3u, 4u},
+                                                    .cError = 42u};
 
   encode_decode_encode(message);
 }
