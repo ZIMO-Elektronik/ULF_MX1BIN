@@ -64,13 +64,16 @@ concept Decodable = requires(T t, StreamDecoder<char const*, char const*>& d) {
 /// Long frame message concept
 template<typename T>
 concept Long = requires(T t) {
-  requires std::same_as<std::remove_cv_t<std::remove_reference_t<T>>,
-                        CommandStationEquipmentQuery::Reply>;
+  requires std::same_as<typename T::Head, detail::LongHead> ||
+             std::same_as<typename T::Head, detail::ReplyLongHead>;
 };
 
 /// Short frame message concept
 template<typename T>
-concept Short = requires(T t) { requires !Long<T>; };
+concept Short = requires(T t) {
+  requires std::same_as<typename T::Head, detail::Head> ||
+             std::same_as<typename T::Head, detail::ReplyHead>;
+};
 
 /// Decode helper
 ///
