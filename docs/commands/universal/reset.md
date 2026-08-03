@@ -1,4 +1,4 @@
-# Reset - **Code 1**
+# Reset - **Code 0**
 
 The `Reset` message is used to reset the protocol state. This includes resetting the Sequence ID counter, as well as deleting any pending messages etc.
 
@@ -12,7 +12,7 @@ The `Reset` message is used to reset the protocol state. This includes resetting
 | -----: | ---: | -----: | -------------------- | ----- |
 |      0 | Head | 1 Byte | [Unique Sequence-ID] | -     |
 |      1 | Head | 1 Byte | [Header Info]        | -     |
-|      2 | Head | 1 Byte | [Command Code]       | 1     |
+|      2 | Head | 1 Byte | [Command Code]       | 0     |
 
 ---
 
@@ -24,7 +24,7 @@ The `Reset` message is used to reset the protocol state. This includes resetting
 | -----: | ---: | -----: | --------------------------------------- | ----- |
 |      0 | Head | 1 Byte | [Unique Sequence-ID]                    | -     |
 |      1 | Head | 1 Byte | [Header Info]                           | -     |
-|      2 | Head | 1 Byte | [Command Code]                          | 1     |
+|      2 | Head | 1 Byte | [Command Code]                          | 0     |
 |      3 | Head | 1 Byte | [Unique Sequence-ID] of primary message | -     |
 
 ---

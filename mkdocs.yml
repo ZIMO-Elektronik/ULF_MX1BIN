@@ -45,6 +45,7 @@ nav:
       - Overview: commands/index.md
       - Universal Commands: 
           - Reset: commands/universal/reset.md
+          - Nak: commands/universal/nak.md
           - Track Control: commands/universal/track_control.md
           - Loco Control: commands/universal/loco_control.md
           - Invert Function Bits: commands/universal/invert_function_bits.md

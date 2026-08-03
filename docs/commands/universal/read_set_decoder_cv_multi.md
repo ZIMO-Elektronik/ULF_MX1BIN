@@ -1,5 +1,13 @@
 # Read / Set Multiple Decoder CVs - **Code 20**
 
+This command allows read / write operations on up to four consecutive CVs. Since this currently uses the DCC Xpom mechanism, this is only available for DCC Addresses.
+
+!!! info "Only one query of this type can be active at a time"
+
+!!! warning 
+
+    This requires both a relatively new Command Station AND Decoder firmware. To check if the package is supported, one test package may be sent. If this works, the software can assume that it will continue to work with this address (and Command Station(-Version))
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)
@@ -22,6 +30,8 @@
 
 ### [Level 1 Ack](../../definition/message_type/level_1_ack.md)
 
+This response is sent if the query is open and being processed.
+
 | Offset | Section | Size   | Field                                   | Value | Description |
 | -----: | ------: | ------ | --------------------------------------- | ----- | ----------- |
 |      0 |    Head | 1 Byte | [Unique Sequence-ID]                    | -     | -           |
@@ -32,6 +42,10 @@
 ---
 
 ### [Busy - Level 1 Ack](../../definition/message_type/level_1_ack.md)
+
+If the command station is either busy with another query of this type (or can't handle another query for some reason), the busy package is sent.
+
+!!! info "If another query is active, usually this package contains the metadata from this query"
 
 | Offset |       Section | Size   | Field                                   | Value             | Description                           |
 | -----: | ------------: | ------ | --------------------------------------- | ----------------- | ------------------------------------- |
@@ -55,6 +69,8 @@
 
 ### [Reply Level 2](../../definition/message_type/reply_level_2.md)
 
+If the query was processed successfully, the package contains the input values, as well as the result values.
+
 | Offset | Section | Size   | Field                                   | Value             | Description     |
 | -----: | ------: | ------ | --------------------------------------- | ----------------- | --------------- |
 |      0 |    Head | 1 Byte | [Unique Sequence-ID]                    | -                 | -               |
@@ -74,6 +90,8 @@
 ---
 
 ### [Error - Reply Level 2](../../definition/message_type/reply_level_2.md)
+
+If any error occurred during processing (e.g. a timeout), this message is sent. The value of `cError` is currently not specified
 
 | Offset | Section | Size   | Field                                   | Value             | Description     |
 | -----: | ------: | ------ | --------------------------------------- | ----------------- | --------------- |
