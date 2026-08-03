@@ -40,8 +40,8 @@ struct DecoderMultiCvManip {
   /// completion. If the query was unsuccessful, an `Error` reply is sent
   /// instead.
   struct ReplyL2 {
-    using Head = detail::ReplyLongHead;
-    Head head{.info = bitfields::Info{FrameType::Long,
+    using Head = detail::ReplyHead;
+    Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::ReplyL2,
                                       detail::defaultSender,
                                       StationType::MX1},
@@ -92,8 +92,8 @@ struct DecoderMultiCvManip {
   /// handled. This usually means, that there currently is another query being
   /// handled.
   struct Busy {
-    using Head = detail::ReplyHead;
-    Head head{.info = bitfields::Info{FrameType::Short,
+    using Head = detail::ReplyLongHead;
+    Head head{.info = bitfields::Info{FrameType::Long,
                                       MessageType::L1Ack,
                                       detail::defaultSender,
                                       StationType::MX1},

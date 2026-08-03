@@ -434,7 +434,7 @@ TEST(Message, DecoderMultiCvManip_Reply) {
 
 TEST(Message, DecoderMultiCvManip_Busy) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Busy>);
-  static_assert(ulf::mx1bin::Short<ulf::mx1bin::DecoderMultiCvManip::Busy>);
+  static_assert(ulf::mx1bin::Long<ulf::mx1bin::DecoderMultiCvManip::Busy>);
 
   ulf::mx1bin::DecoderMultiCvManip::Busy message{.cAdr = 0x8003u,
                                                  .index = 3u,
@@ -452,7 +452,7 @@ TEST(Message, DecoderMultiCvManip_Busy) {
 
 TEST(Message, DecoderMultiCvManip_ReplyL2) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::ReplyL2>);
-  static_assert(ulf::mx1bin::Long<ulf::mx1bin::DecoderMultiCvManip::ReplyL2>);
+  static_assert(ulf::mx1bin::Short<ulf::mx1bin::DecoderMultiCvManip::ReplyL2>);
 
   ulf::mx1bin::DecoderMultiCvManip::ReplyL2 message{.cAdr = 0x8003u,
                                                     .index = 3u,
