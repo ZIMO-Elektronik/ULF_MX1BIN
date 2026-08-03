@@ -1,6 +1,6 @@
 # Level 2 Ack
 
-```mermaid
+``` mermaid
 sequenceDiagram
     participant PC
     participant CommandStation

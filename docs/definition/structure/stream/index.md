@@ -33,9 +33,9 @@ acter prefix `DLE` and the character itself is XOR'ed with `0x20`.
 
 | Control character | Value  | Replacement within data | Description           |
 | :---------------: | ------ | ----------------------- | --------------------- |
-|       `SOH`       | `0x01` | `DLE`(`SOH` \^ `0x20`)  | Start of a data frame |
-|       `EOT`       | `0x17` | `DLE`(`EOT` \^ `0x20`)  | End of a data frame   |
-|       `DLE`       | `0x10` | `DLE`(`DLE` \^ `0x20`)  | Escape character      |
+|       `SOH`       | `0x01` | `DLE`(`SOH` ^ `0x20`)   | Start of a data frame |
+|       `EOT`       | `0x17` | `DLE`(`EOT` ^ `0x20`)   | End of a data frame   |
+|       `DLE`       | `0x10` | `DLE`(`DLE` ^ `0x20`)   | Escape character      |
 
 Each frame has one of the following layouts:
 

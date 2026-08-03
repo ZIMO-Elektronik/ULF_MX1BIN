@@ -10,7 +10,7 @@ Below is an incomplete list available of MX1Bin commands.
 
 Commands that are available on any type of command station
 
-!!! warning "Some devices (e.g. [`KLUG`](https://www.zimo.at/web2010/products/KLUG-Kompaktes_Lade_und_Update-Geraet.htm), [`MXULF`](https://www.zimo.at/web2010/products/MXULF-Decoder-Updater.htm)) only implement a subset of these"
+!!! warning "Some devices (e.g. [`KLUG`](https://www.zimo.at/web2010/products/KLUG-Kompaktes_Lade_und_Update-Geraet.htm), [`MXULF`](https://www.zimo.at/web2010/products/MXULF-Decoder-Updater.htm)) only implement a subset of these commands"
 
 - **[Reset](universal/reset.md)**
 - **[Nak](universal/nak.md)**

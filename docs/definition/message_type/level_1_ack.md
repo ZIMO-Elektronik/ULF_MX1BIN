@@ -2,7 +2,7 @@
 
 The `Level 1 Ack` marks the end of the synchronous part of command processign (and the end of most commands). The sender simply assumes that this type of message is always received.
 
-```mermaid
+``` mermaid
 sequenceDiagram
     participant PC
     participant CommandStation

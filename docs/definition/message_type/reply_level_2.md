@@ -1,8 +1,8 @@
 # Reply Level 2
 
-A message of this type follows the end of an asynchronous operation and contains its result, wether successful or not. This message *MUST* be replied with a [Level 2 Ack](level_2_ack.md).
+A message of this type follows the end of an asynchronous operation and contains its result, wether successful or not. This message _MUST_ be replied with a [Level 2 Ack](level_2_ack.md).
 
-```mermaid
+``` mermaid
 sequenceDiagram
     participant PC
     participant CommandStation
