@@ -40,8 +40,8 @@ struct DecoderMultiCvManip {
   /// completion. If the query was unsuccessful, an `Error` reply is sent
   /// instead.
   struct ReplyL2 {
-    using Head = detail::ReplyHead;
-    Head head{.info = bitfields::Info{FrameType::Short,
+    using Head = detail::ReplyLongHead;
+    Head head{.info = bitfields::Info{FrameType::Long,
                                       MessageType::ReplyL2,
                                       detail::defaultSender,
                                       StationType::MX1},
