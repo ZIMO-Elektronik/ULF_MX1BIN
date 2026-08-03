@@ -1,6 +1,6 @@
 # Reset - **Code 1**
 
-The `Reset` message is used to reset the protocol state. This includes resetting the Sequence ID counter, as well as deleting any pending messages etc. 
+The `Reset` message is used to reset the protocol state. This includes resetting the Sequence ID counter, as well as deleting any pending messages etc.
 
 ## Available Messages
 
@@ -8,11 +8,11 @@ The `Reset` message is used to reset the protocol state. This includes resetting
 
 !!! info "Header only"
 
-| Offset  | Area | Size    | Field         | Value |
-| ------: | ---: | ------: | ------------- | -     |
-| 0       | Head | 1 Byte  | uSID          | -     |
-| 1       | Head | 1 Byte  | Header Info   | -     |
-| 2       | Head | 1 Byte  | Message Code  | 1     |
+| Offset | Area |   Size | Field                | Value |
+| -----: | ---: | -----: | -------------------- | ----- |
+|      0 | Head | 1 Byte | [Unique Sequence-ID] | -     |
+|      1 | Head | 1 Byte | [Header Info]        | -     |
+|      2 | Head | 1 Byte | [Command Code]       | 1     |
 
 ---
 
@@ -20,11 +20,15 @@ The `Reset` message is used to reset the protocol state. This includes resetting
 
 !!! info "Header only"
 
-| Offset  | Area | Size    | Field         | Value |
-| ------: | ---: | ------: | ------------- | -     |
-| 0       | Head | 1 Byte  | uSID          | -     |
-| 1       | Head | 1 Byte  | Header Info   | -     |
-| 2       | Head | 1 Byte  | Message Code  | 1     |
-| 3       | Head | 1 Byte  | pre-uSID      | -     | 
+| Offset | Area |   Size | Field                                   | Value |
+| -----: | ---: | -----: | --------------------------------------- | ----- |
+|      0 | Head | 1 Byte | [Unique Sequence-ID]                    | -     |
+|      1 | Head | 1 Byte | [Header Info]                           | -     |
+|      2 | Head | 1 Byte | [Command Code]                          | 1     |
+|      3 | Head | 1 Byte | [Unique Sequence-ID] of primary message | -     |
 
 ---
+
+[Command Code]: ../../definition/structure/header/index.md#command-code
+[Header Info]: ../../definition/structure/header/index.md#header-info
+[Unique Sequence-ID]: ../../definition/structure/header/index.md#unique-sequence-id

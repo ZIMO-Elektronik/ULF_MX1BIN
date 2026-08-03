@@ -31,7 +31,9 @@ nav:
       - Structure: 
           - Overview: definition/structure/index.md
           - Stream: definition/structure/stream/index.md
+          - Header: definition/structure/header/index.md
           - Message: definition/structure/message/index.md
+          - CRC: definition/structure/crc/index.md
       - Message Type:
           - Overview: definition/message_type/index.md
           - Primary: definition/message_type/primary.md
@@ -42,7 +44,6 @@ nav:
   - Commands:
       - Overview: commands/index.md
       - Universal Commands: 
-          - Overview: commands/universal/index.md
           - Reset: commands/universal/reset.md
           - Track Control: commands/universal/track_control.md
           - Loco Control: commands/universal/loco_control.md
@@ -60,9 +61,3 @@ nav:
           - Read / Set Multiple Decoder CVs: commands/universal/read_set_decoder_cv_multi.md
           - Current Loco Memory: commands/universal/current_loco_memory.md
           - Current Accessory Memory: commands/universal/current_accessory_memory.md
-  - Messages:
-      - Overview: messages/index.md
-      - Short Messages: 
-          - Overview: messages/short/index.md
-      - Long Messages: 
-          - Overview: messages/long/index.md
