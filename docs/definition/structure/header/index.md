@@ -25,12 +25,12 @@ If the header is within a reply frame, the header contains an additional byte, m
 
 Long frames contain an additional bitfield with flow metadata and the size of the header
 
-| Offset | Value    | Description                               |
-| -----: | -------- | ----------------------------------------- |
-|      0 | -        | [Unique sequence-ID](#unique-sequence-id) |
-|      1 | I        | [Header info](#header-info)               |
-|      2 | C        | [Command Code](#command-code)             |
-|      3 | dd00nnnn | [Flow Information](#flow-information)     |
+| Offset | Value    | Description                                  |
+| -----: | -------- | -------------------------------------------- |
+|      0 | -        | [Unique sequence-ID](#unique-sequence-id)    |
+|      1 | I        | [Header info](#header-info)                  |
+|      2 | C        | [Command Code](#command-code)                |
+|      3 | dd00nnnn | [Flow Information](#flow-information-dd00nnnn) |
 
 If the header is within a reply frame, the header contains an additional byte, matching the unique sequence-ID of the previous primary message.
 
@@ -39,7 +39,7 @@ If the header is within a reply frame, the header contains an additional byte, m
 |      0 | -        | [Unique sequence-ID](#unique-sequence-id)                    |
 |      1 | I        | [Header info](#header-info)                                  |
 |      2 | C        | [Command Code](#command-code)                                |
-|      3 | dd00nnnn | [Flow Information](#flow-information)                        |
+|      3 | dd00nnnn | [Flow Information](#flow-information-dd00nnnn)                 |
 |      4 | -        | [Unique sequence-ID](#unique-sequence-id) of primary message |
 
 ## Bitfields and values
@@ -67,7 +67,7 @@ The code specifying the underlying command. This, in combination with the [Heade
 
 A list of commands can be found [here](../../../commands/index.md)
 
-### **Flow Information**
+### **Flow Information** 'dd00nnnn'
 
 The flow information byte contains the following two values
 
