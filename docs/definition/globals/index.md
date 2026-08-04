@@ -38,37 +38,37 @@ A two bit value represending the protocol format, the following address represen
 
 | Value | Description                              |
 | ----: | ---------------------------------------- |
-|   0 0 | Use protocol last used with this address |
-|   1 0 | Force DCC protocol                       |
-|   0 1 | Force Motorola protocol                  |
-|   1 1 | `Reserved`                               |
+| `0 0` | Use protocol last used with this address |
+| `1 0` | Force DCC protocol                       |
+| `0 1` | Force Motorola protocol                  |
+| `1 1` | `Reserved`                               |
 
 ***For [Level 1 Ack](../message_type/level_1_ack.md), [Reply Level 2](../message_type/reply_level_2.md) and [Level 2 Ack](../message_type/level_2_ack.md)***
 
 | Value | Description                              |
 | ----: | ---------------------------------------- |
-|   0 0 | Use protocol last used with this address |
-|   1 0 | Address uses DCC protocol                |
-|   0 1 | Address uses Motorola protocol           |
-|   1 1 | `Reserved`                               |
+| `0 0` | Use protocol last used with this address |
+| `1 0` | Address uses DCC protocol                |
+| `0 1` | Address uses Motorola protocol           |
+| `1 1` | `Reserved`                               |
 
 ***For [Decoder CV access via serv-prog](../../commands/universal/read_set_decoder_cv.md)***
 
 | Value | Description                              |
 | ----: | ---------------------------------------- |
-|   0 0 | Use protocol last used with this address |
-|   1 0 | Force DCC protocol                       |
-|   0 1 | Force Motorola protocol                  |
-|   1 1 | `Reserved`                               |
+| `0 0` | Use protocol last used with this address |
+| `1 0` | Force DCC protocol                       |
+| `0 1` | Force Motorola protocol                  |
+| `1 1` | `Reserved`                               |
 
 ***For [Decoder CV access via on-the-main programming](../../commands/universal/read_set_decoder_cv.md)***
 
 | Value | Description               |
 | ----: | ------------------------- |
-|   0 0 | `Reserved`                |
-|   1 0 | `Resetved`                |
-|   0 1 | Decoder address           |
-|   1 1 | Accessory decoder address |
+| `0 0` | `Reserved`                |
+| `1 0` | `Reserved`                |
+| `0 1` | Decoder address           |
+| `1 1` | Accessory decoder address |
 
 ### **Speed Step System specifier** `ss`
 
@@ -80,19 +80,19 @@ A two bit value represending the speed step system, the following speed is to be
 
 | Value | Description                                       |
 | ----: | ------------------------------------------------- |
-|   0 0 | Use speed step system last used with this address |
-|   1 0 | Force 14 speed steps (0..14)                      |
-|   0 1 | Force 28 speed steps (0..28)                      |
-|   1 1 | Force 126 speed steps (0..126)                    |
+| `0 0` | Use speed step system last used with this address |
+| `1 0` | Force 14 speed steps (0..14)                      |
+| `0 1` | Force 28 speed steps (0..28)                      |
+| `1 1` | Force 126 speed steps (0..126)                    |
 
 ***For [Level 1 Ack](../message_type/level_1_ack.md), [Reply Level 2](../message_type/reply_level_2.md) and [Level 2 Ack](../message_type/level_2_ack.md)***
 
 | Value | Description                    |
 | ----: | ------------------------------ |
-|   0 0 | not used                       |
-|   1 0 | Force 14 speed steps (0..14)   |
-|   0 1 | Force 28 speed steps (0..28)   |
-|   1 1 | Force 126 speed steps (0..126) |
+| `0 0` | not used                       |
+| `1 0` | Force 14 speed steps (0..14)   |
+| `0 1` | Force 28 speed steps (0..28)   |
+| `1 1` | Force 126 speed steps (0..126) |
 
 ### **Data flow specifier** `dd`
 
@@ -102,7 +102,7 @@ scribes whether there will be any consecutive frames with data.
 
 | Value | Description                    |
 | ----: | ------------------------------ |
-|   0 0 | No more data                   |
-|   0 1 | More data will follow          |
-|   1 0 | More data will possibly follow |
-|   1 1 | `Reserved`                     |
+| `0 0` | No more data                   |
+| `0 1` | More data will follow          |
+| `1 0` | More data will possibly follow |
+| `1 1` | `Reserved`                     |
