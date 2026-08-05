@@ -192,6 +192,5 @@ sequenceDiagram
 
 [cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa
 [Command Code]: ../../definition/structure/header/index.md#command-code
-[Flow Information]: ../../definition/structure/header/index.md#flow-information-dd00nnnn
 [Header Info]: ../../definition/structure/header/index.md#header-info
 [Unique Sequence-ID]: ../../definition/structure/header/index.md#unique-sequence-id
