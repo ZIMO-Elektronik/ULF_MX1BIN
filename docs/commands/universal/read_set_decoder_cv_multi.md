@@ -61,14 +61,13 @@ If the command station is either busy with another query of this type (or can't 
 |      0 |    Head | 1 Byte | [Unique Sequence-ID]                    | -                   | -                            |
 |      1 |    Head | 1 Byte | [Header Info]                           | -                   | -                            |
 |      2 |    Head | 1 Byte | [Command Code]                          | 20                  | -                            |
-|      3 |    Head | 1 Byte | [Flow Information]                      | dd00nnnn            | -                            |
-|      4 |    Head | 1 Byte | [Unique Sequence-ID] of primary message | -                   | -                            |
-|      5 |    Data | 1 Byte | cBusy                                   | 4                   | Unable to handle query ATM   |
-|      6 |    Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address              |
-|      8 |    Data | 2 Byte | Index                                   | -                   | CV page index                |
-|     10 |    Data | 1 Byte | Variable                                | -                   | CV index                     |
-|     11 |    Data | 1 Byte | SequenceID                              | -                   | Xpom SequenceID              |
-|     12 |    Data | 1 Byte | [Error](#example)                       | -                   | Error that lead to rejection |
+|      3 |    Head | 1 Byte | [Unique Sequence-ID] of primary message | -                   | -                            |
+|      4 |    Data | 1 Byte | cBusy                                   | 4                   | Unable to handle query ATM   |
+|      5 |    Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address              |
+|      7 |    Data | 2 Byte | Index                                   | -                   | CV page index                |
+|      9 |    Data | 1 Byte | Variable                                | -                   | CV index                     |
+|     10 |    Data | 1 Byte | SequenceID                              | -                   | Xpom SequenceID              |
+|     11 |    Data | 1 Byte | [Error](#example)                       | -                   | Error that lead to rejection |
 
 ---
 
