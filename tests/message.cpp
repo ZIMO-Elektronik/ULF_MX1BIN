@@ -434,18 +434,15 @@ TEST(Message, DecoderMultiCvManip_Reply) {
 
 TEST(Message, DecoderMultiCvManip_Busy) {
   static_assert(Codable<ulf::mx1bin::DecoderMultiCvManip::Busy>);
-  static_assert(ulf::mx1bin::Long<ulf::mx1bin::DecoderMultiCvManip::Busy>);
+  static_assert(ulf::mx1bin::Short<ulf::mx1bin::DecoderMultiCvManip::Busy>);
 
-  ulf::mx1bin::DecoderMultiCvManip::Busy message{.cAdr = 0x8003u,
-                                                 .index = 3u,
-                                                 .variable = 8u,
-                                                 .sequenceID = 2u,
-                                                 .activeUSID = 2u,
-                                                 .cError = 42u,
-                                                 .activeAddr = 0x8004u,
-                                                 .activeIndex = 3u,
-                                                 .activeCv = 8u,
-                                                 .activeSequenceID = 3u};
+  ulf::mx1bin::DecoderMultiCvManip::Busy message{
+    .cAdr = 0x8003u,
+    .index = 3u,
+    .variable = 8u,
+    .sequenceID = 2u,
+    .error =
+      ulf::mx1bin::DecoderMultiCvManip::Busy::Error::SequenceIDNotUnique};
 
   encode_decode_encode(message);
 }

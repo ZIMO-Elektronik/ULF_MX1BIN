@@ -343,7 +343,7 @@ Reply: [Reply level 1](#read--set-a-decoder-cv---busy--code-19---reply-level-1--
 #### Read multiple decoder CVs : Code 20 - Primary - Command station 
 <details open>
 
-> Since this command uses XPom, only DCC addresses are supported. Only one query of code 20 can be active at a time.
+> To allow overlapping of packets, up to four queries of this type can be active. The requirement for this is, that all addresses match (while processing) AND that every active query has a unique Xpom sequence ID.
 
 > Note, that the Host (PC) is responsible for checking if the Decoder supports XPom
 
@@ -661,6 +661,26 @@ Reply: [Ack](#ack--code-c---reply-level-1---any)
 </details>
 
 ---
+
+#### Read / Set multiple decoder CVs - Busy : Code 20 - Reply level 1 - Command station
+<details open>
+
+Since only one query can be active at a time, any following query should be responded to with the following message: 
+
+| Message byte(s)   | Name        | Value             | Description                                                             |
+| :---------------- | ----------- | ----------------- | ----------------------------------------------------------------------- |
+| [0]               | re-uSID     | ID                | uSID of the message being replied to                                    |
+| [1]               | cBusy       | 0x04              | Busy - there is already an active request                               |
+| [2..3]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
+| [4..5]            | Page Index  | -                 | CV page index (CV31 CV32)                                               | 
+| [6]               | CV Index    | -                 | First CV index (in page)                                                |
+| [7]               | SequenceID  | [0..3]            | XPom Sequence ID                                                        |
+| [8]               | Error       | -                 | 0 - Queue full <br> 1 - Address mismatch <br> 2 - Xpom sequence ID not unique <br> other - undefined error |  
+
+Reply: None
+</details>
+
+---
 ---
 
 ### Long frame protocol primary messages
@@ -705,31 +725,6 @@ The Device IDs are predfined values. The possible values are listed below:
 | 3         |MX31 ZL        |
 | 4         |MXULF          |
 | 5         |KLUG           |
-
-Reply: None
-</details>
-
----
-
-#### Read / Set multiple decoder CVs - Busy : Code 20 - Reply level 1 - Command station
-<details open>
-
-Since only one query can be active at a time, any following query should be responded to with the following message: 
-
-| Message byte(s)   | Name        | Value             | Description                                                             |
-| :---------------- | ----------- | ----------------- | ----------------------------------------------------------------------- |
-| [0]               | re-uSID     | ID                | uSID of the message being replied to                                    |
-| [1]               | cBusy       | 0x04              | Busy - there is already an active request                               |
-| [2..3]            | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
-| [4..5]            | Page Index  | -                 | CV page index (CV31 CV32)                                               | 
-| [6]               | CV Index    | -                 | First CV index (in page)                                                |
-| [7]               | SequenceID  | [0..3]            | XPom Sequence ID                                                        |
-| [8] optional      | cID         | ID                | uSID of the message requesting the active query                         |
-| [9] optional      | cError      | -                 | Error (0=No Error, >0= Error)                                           |
-| [10..11] optional | cAdr        | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
-| [12..13] optional | Page Index  | -                 | CV page index of the active query                                       |
-| [14] optional     | CV Index    | -                 | First CV index of the active query                                      |
-| [15] optional     | Sequence ID | [0..3]            | XPom Sequence ID of the active query                                    |
 
 Reply: None
 </details>

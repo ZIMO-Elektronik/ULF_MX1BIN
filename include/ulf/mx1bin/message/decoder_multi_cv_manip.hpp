@@ -92,24 +92,23 @@ struct DecoderMultiCvManip {
   /// handled. This usually means, that there currently is another query being
   /// handled.
   struct Busy {
-    using Head = detail::ReplyLongHead;
-    Head head{.info = bitfields::Info{FrameType::Long,
+    using Head = detail::ReplyHead;
+    Head head{.info = bitfields::Info{FrameType::Short,
                                       MessageType::L1Ack,
                                       detail::defaultSender,
                                       StationType::MX1},
               .code = Command::DecoderMultiCvManip};
-    uint8_t const busy{0x04u};           ///< Busy
-    bitfields::DecoderAddress cAdr{};    ///< Decoder address
-    uint16_t index{};                    ///< CV page index
-    uint8_t variable{};                  ///< CV index
-    uint8_t sequenceID{};                ///< XPom sequence ID
-    std::optional<uint8_t> activeUSID{}; ///< Active uSID
-    std::optional<uint8_t> cError{};     ///< Error?
-    std::optional<bitfields::DecoderAddress>
-      activeAddr{};                            ///< Active Decoder address
-    std::optional<uint16_t> activeIndex{};     ///< Active CV Page index
-    std::optional<uint8_t> activeCv{};         ///< Active CV index
-    std::optional<uint8_t> activeSequenceID{}; ///< Active XPom sequenceID
+    uint8_t const busy{0x04u};        ///< Busy
+    bitfields::DecoderAddress cAdr{}; ///< Decoder address
+    uint16_t index{};                 ///< CV page index
+    uint8_t variable{};               ///< CV index
+    uint8_t sequenceID{};             ///< XPom sequence ID
+    enum Error : uint8_t {
+      QueueFull = 0u,           ///< Queue is full
+      AddressMismatch = 1u,     ///< Address does not match queue
+      SequenceIDNotUnique = 2u, ///< SequenceID already occupied in queue
+      Undefined = 255u,         ///< Undefined
+    } error;                    ///< Error (Rejection reason)
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e)
@@ -118,31 +117,24 @@ struct DecoderMultiCvManip {
         .uint16(index)
         .uint8(variable)
         .uint8(sequenceID)
-        .uint8(activeUSID)
-        .uint8(cError)
-        .uint16(activeAddr)
-        .uint16(activeIndex)
-        .uint8(activeCv)
-        .uint8(activeSequenceID);
+        .uint8(error);
     }
     template<Decoder D>
     static std::expected<Busy, std::errc> decode(D& d) {
       auto const head{Head::decode(d)};
       if (!head || !d.has_at_least(sizeof(busy) + sizeof(cAdr) + sizeof(index) +
-                                   sizeof(variable) + sizeof(sequenceID)))
+                                   sizeof(variable) + sizeof(sequenceID) +
+                                   sizeof(error)))
         return std::unexpected{std::errc::invalid_argument};
-      return Busy{.head = *head,
-                  .busy = d.uint8(),
-                  .cAdr = d.uint16(),
-                  .index = d.uint16(),
-                  .variable = d.uint8(),
-                  .sequenceID = d.uint8(),
-                  .activeUSID = d.s_uint8(),
-                  .cError = d.s_uint8(),
-                  .activeAddr = d.s_uint16(),
-                  .activeIndex = d.s_uint16(),
-                  .activeCv = d.s_uint8(),
-                  .activeSequenceID = d.s_uint8()};
+      return Busy{
+        .head = *head,
+        .busy = d.uint8(),
+        .cAdr = d.uint16(),
+        .index = d.uint16(),
+        .variable = d.uint8(),
+        .sequenceID = d.uint8(),
+        .error = static_cast<Error>(d.uint8()),
+      };
     }
     constexpr bool operator==(Busy const&) const = default;
     constexpr Busy& operator=(Busy const&) = default;
