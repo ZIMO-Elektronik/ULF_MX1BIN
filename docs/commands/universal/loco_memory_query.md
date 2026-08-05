@@ -1,5 +1,7 @@
 # Loco Memory Query - **Code 8**
 
+This command attempts to retrieve the current drive data for a given loco address.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

@@ -1,5 +1,7 @@
 # Current Accessory Memory - **Code 254**
 
+This message may be sent by the command station to signal an external change to a given accessory address.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

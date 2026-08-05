@@ -1,5 +1,7 @@
 # Loco Control - **Code 3**
 
+This command is used to control the drive data of a loco via the protocol.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

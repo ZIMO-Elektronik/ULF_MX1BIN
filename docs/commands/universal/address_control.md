@@ -1,5 +1,8 @@
 # Address Control - **Code 10**
 
+The address control locks or unlocks (partial) decoder funtions to external changes, meaning that
+addresses affected by a lock can't be controlled directly from the command station anymore.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

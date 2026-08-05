@@ -1,5 +1,7 @@
 # Accessory Memory Query - **Code 9**
 
+This command attempts to retrieve the current drive data for a given accessory address.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

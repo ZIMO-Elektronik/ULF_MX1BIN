@@ -1,5 +1,7 @@
 # Accessory Control - **Code 7**
 
+This command is used to control the drive data of an accessory via the protocol.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)

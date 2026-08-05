@@ -1,5 +1,7 @@
 # Current Loco Memory - **Code 255**
 
+This message may be sent by the command station to signal an external change to a given loco address.
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)
