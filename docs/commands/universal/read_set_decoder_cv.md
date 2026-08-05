@@ -97,6 +97,26 @@ If any error occurred during processing (e.g. a timeout), this message is sent. 
 
 ---
 
+## Example
+
+To provide an example, we can just read the CV `8` on the `DCC` decoder with the address `3`
+
+``` mermaid
+sequenceDiagram
+    participant PC
+    participant CommandStation
+
+    PC->>CommandStation: [ID 1] Read Address 3 CV 8
+    CommandStation-->>PC: Ack [ID 128] [ReID = 1]
+    Note right of PC: Try another query
+    PC->>CommandStation: [ID = 2] Read Address 3 CV 1
+    CommandStation-->>PC: Busy [ID 129] [ReID = 2] [Data of rejected query] [Data of blocking query]
+    Note right of PC: Wait till response
+    CommandStation->>PC: ReplyL2 [ID 130] [ReID = 1] [Data of query plus result]
+    PC-->>CommandStation: AckL2 [ID 3] [ReID = 130]
+    Note right of PC: Ready for next query
+```
+
 [cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa
 [Command Code]: ../../definition/structure/header/index.md#command-code
 [Header Info]: ../../definition/structure/header/index.md#header-info
