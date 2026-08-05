@@ -67,7 +67,7 @@ If the command station is either busy with another query of this type (or can't 
 |      7 |    Data | 2 Byte | Index                                   | -                   | CV page index                |
 |      9 |    Data | 1 Byte | Variable                                | -                   | CV index                     |
 |     10 |    Data | 1 Byte | SequenceID                              | -                   | Xpom SequenceID              |
-|     11 |    Data | 1 Byte | [Error](#example)                       | -                   | Error that lead to rejection |
+|     11 |    Data | 1 Byte | [Error](#error)                         | -                   | Error that lead to rejection |
 
 ---
 
