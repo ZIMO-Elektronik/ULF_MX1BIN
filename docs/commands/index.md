@@ -14,7 +14,7 @@ Commands that are available on any type of command station
 
 - **[Reset](universal/reset.md)**
 - **[Nak](universal/nak.md)**
-- **[Track Control](universal/acceleration_deceleration.md)**
+- **[Track Control](universal/track_control.md)**
 - **[Loco Control](universal/loco_control.md)**
 - **[Invert Function Bits](universal/invert_function_bits.md)**
 - **[Acceleration Deceleration](universal/acceleration_deceleration.md)**

@@ -56,7 +56,7 @@ with different context using the same ID.
 
 ### Header info
 
-A metadata bitfield that specifies the context and origin of the following messgage.
+A metadata bitfield that specifies the context and origin of the following message.
 
 |  Bit(s) |                              Value | Description                                                                                                     |
 | ------: | ---------------------------------: | --------------------------------------------------------------------------------------------------------------- |

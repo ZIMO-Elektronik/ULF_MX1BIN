@@ -106,3 +106,26 @@ scribes whether there will be any consecutive frames with data.
 | `0 1` | More data will follow          |
 | `1 0` | More data will possibly follow |
 | `1 1` | `Reserved`                     |
+
+### **Error codes**
+
+The reply to message `0x0A` inherits an additional return code. This return code reflects the logical er-
+ror-status of the sent message. If the message is transmitted correctly but there is a logical error
+within the message that prevents the command station from executing it, then the codes below indi-
+cate the reason for it.
+
+| Return code         | Value | Description                              |
+| ------------------- | ----- | ---------------------------------------- |
+| NO_ERROR            | 0x00  | No Error                                 |
+| ERR_ADRESSE         | 0x01  | Not a valid address                      |
+| ERR_INDEX           | 0x02  | Error with the index of extended address |
+| ERR_FORWARD         | 0x03  | Request could't be forwarded             |
+| ERR_BUSY            | 0x04  | Busy with another command                |
+| ERR_NO_MOT          | 0x05  | Motorola jumper off                      |
+| ERR_NO_DCC          | 0x06  | DCC jumper off                           |
+| ERR_CV_ADRESSE      | 0x07  | Not a valid CV address                   |
+| ERR_SECTION         | 0x08  | Not a valid section                      |
+| ERR_NO_MODUL        | 0x09  | Module with given address doesn't exist  |
+| ERR_MESSAGE         | 0x0A  | Error within message                     |
+| ERR_SPEED           | 0x0B  | Given speed not valid                    |
+| ERR_ADRESSE_OCUPIED | 0x0C  | MXULF controls address                   |

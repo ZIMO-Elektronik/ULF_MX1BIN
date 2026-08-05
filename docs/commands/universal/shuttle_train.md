@@ -4,13 +4,13 @@
 
 ### [Primary](../../definition/message_type/primary.md)
 
-| Offset | Section |   Size | Field                    | Value             | Description              |
-| -----: | ------: | -----: | ------------------------ | ----------------- | ------------------------ |
-|      0 |    Head | 1 Byte | [Unique Sequence-ID]     | -                 | -                        |
-|      1 |    Head | 1 Byte | [Header Info]            | -                 | -                        |
-|      2 |    Head | 1 Byte | [Command Code]           | 6                 | -                        |
-|      3 |    Data | 2 Byte | [cAdr]                   | ffaaaaaa aaaaaaaa | Loco Address             |
-|      5 |    Data | 1 Byte | [cData](#cdata-rrrrffff) | rrrrffff          | Contact rail information |
+| Offset | Section |   Size | Field                    | Value               | Description              |
+| -----: | ------: | -----: | ------------------------ | ------------------- | ------------------------ |
+|      0 |    Head | 1 Byte | [Unique Sequence-ID]     | -                   | -                        |
+|      1 |    Head | 1 Byte | [Header Info]            | -                   | -                        |
+|      2 |    Head | 1 Byte | [Command Code]           | 6                   | -                        |
+|      3 |    Data | 2 Byte | [cAdr]                   | `ffaaaaaa aaaaaaaa` | Loco Address             |
+|      5 |    Data | 1 Byte | [cData](#cdata-rrrrffff) | `rrrrffff`          | Contact rail information |
 
 ---
 
@@ -20,7 +20,7 @@
 | -----: | ------------: | ------ | --------------------------------------- | ----- | -------------- |
 |      0 |          Head | 1 Byte | [Unique Sequence-ID]                    | -     | -              |
 |      1 |          Head | 1 Byte | [Header Info]                           | -     | -              |
-|      2 |          Head | 1 Byte | [Command Code]                          | 3     | -              |
+|      2 |          Head | 1 Byte | [Command Code]                          | 6     | -              |
 |      3 |          Head | 1 Byte | [Unique Sequence-ID] of primary message | -     | -              |
 |      4 |          Data | 1 Byte | Error                                   | -     | If any - Error |
 |      5 | Optional Data | 1 Byte | [Status](#status-ff00ss0t)              | -     | -              |
@@ -34,7 +34,7 @@
 | Bit(-s) | Acronym | Description                   |
 | ------: | ------: | ----------------------------- |
 | \[7..4] |     `r` | Contact rails \[4..1] forward |
-| \[3..0] |     `f` | Contact raild \[4..1] reverse |
+| \[3..0] |     `f` | Contact rails \[4..1] reverse |
 
 ---
 

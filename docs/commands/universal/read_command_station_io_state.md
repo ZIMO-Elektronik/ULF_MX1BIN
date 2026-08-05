@@ -36,7 +36,7 @@
 
 Both values of cCurrent can double as one of the special values below. This only applies if bit \[15] is set
 
-!!! into "Note:"
+!!! info "Note:"
 
     If no special value applies, the actual value can be calculated by $\text{I}_x = value \cdot 0.01A$.
 

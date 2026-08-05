@@ -4,13 +4,13 @@
 
 ### [Primary](../../definition/message_type/primary.md)
 
-| Offset | Section |   Size | Field                    | Value             | Description             |
-| -----: | ------: | -----: | ------------------------ | ----------------- | ----------------------- |
-|      0 |    Head | 1 Byte | [Unique Sequence-ID]     | -                 | -                       |
-|      1 |    Head | 1 Byte | [Header Info]            | -                 | -                       |
-|      2 |    Head | 1 Byte | [Command Code]           | 7                 | -                       |
-|      3 |    Data | 2 Byte | [cAdr]                   | ffaaaaaa aaaaaaaa | Accessory Address       |
-|      5 |    Data | 1 Byte | [cData](#cdata-0000snnn) | 0000snnn          | Output and Output state |
+| Offset | Section |   Size | Field                    | Value               | Description             |
+| -----: | ------: | -----: | ------------------------ | ------------------- | ----------------------- |
+|      0 |    Head | 1 Byte | [Unique Sequence-ID]     | -                   | -                       |
+|      1 |    Head | 1 Byte | [Header Info]            | -                   | -                       |
+|      2 |    Head | 1 Byte | [Command Code]           | 7                   | -                       |
+|      3 |    Data | 2 Byte | [cAdr]                   | `ffaaaaaa aaaaaaaa` | Accessory Address       |
+|      5 |    Data | 1 Byte | [cData](#cdata-0000snnn) | `0000snnn`          | Output and Output state |
 
 ---
 

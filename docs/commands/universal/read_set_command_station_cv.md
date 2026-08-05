@@ -1,5 +1,7 @@
 # Read / Set Command Station CV - **Code 12**
 
+Some older Command Station have internal CV values, that can be read and written
+
 ## Available Messages
 
 ### [Primary](../../definition/message_type/primary.md)
@@ -11,6 +13,8 @@
 |      2 |         Head | 1 Byte | [Command Code]       | 12    | -                               |
 |      3 |         Data | 2 Byte | Variable             | -     | CV address                      |
 |      5 | OptionalData | 1 Byte | Value                | -     | If present, set as new CV-value |
+
+!!! info "The given `Variable` is read if the `Value` byte is ommitted. Otherwise the `Variable` is set to `Value`"
 
 ### [Level 1 Ack](../../definition/message_type/level_1_ack.md)
 

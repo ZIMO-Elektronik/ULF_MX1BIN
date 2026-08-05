@@ -4,33 +4,35 @@
 
 ### [Primary](../../definition/message_type/primary.md)
 
-| Offset | Section |   Size | Field                | Value             | Description     |
-| -----: | ------: | -----: | -------------------- | ----------------- | --------------- |
-|      0 |    Head | 1 Byte | [Unique Sequence-ID] | -                 | -               |
-|      1 |    Head | 1 Byte | [Header Info]        | -                 | -               |
-|      2 |    Head | 1 Byte | [Command Code]       | 8                 | -               |
-|      3 |    Data | 2 Byte | [cAdr]               | ffaaaaaa aaaaaaaa | Decoder Address |
+| Offset | Section |   Size | Field                | Value               | Description     |
+| -----: | ------: | -----: | -------------------- | ------------------- | --------------- |
+|      0 |    Head | 1 Byte | [Unique Sequence-ID] | -                   | -               |
+|      1 |    Head | 1 Byte | [Header Info]        | -                   | -               |
+|      2 |    Head | 1 Byte | [Command Code]       | 8                   | -               |
+|      3 |    Data | 2 Byte | [cAdr]               | `ffaaaaaa aaaaaaaa` | Decoder Address |
 
 ---
 
 ### [Level 1 Ack](../../definition/message_type/level_1_ack.md)
 
-| Offset |       Section |   Size | Field                                   | Value             | Description                |
-| -----: | ------------: | -----: | --------------------------------------- | ----------------- | -------------------------- |
-|      0 |          Head | 1 Byte | [Unique Sequence-ID]                    | -                 | -                          |
-|      1 |          Head | 1 Byte | [Header Info]                           | -                 | -                          |
-|      2 |          Head | 1 Byte | [Command Code]                          | 8                 | -                          |
-|      3 |          Head | 1 Byte | [Unique Sequence-ID] of primary message | -                 | -                          |
-|      4 |          Data | 1 Byte | Error                                   | -                 | If any - Error             |
-|      5 |          Data | 2 Byte | [cAdr]                                  | ffaaaaaa aaaaaaaa | Decoder Address            |
-|      7 |          Data | 1 Byte | [cSpeed](#cspeed-esssssss)              | -                 | Speed in Speed Step System |
-|      8 |          Data | 1 Byte | [cData1](#cdata1)                       | -                 | -                          |
-|      9 |          Data | 1 Byte | [cData2](#cdata2)                       | -                 | -                          |
-|     10 |          Data | 1 Byte | [cData3](#cdata3)                       | -                 | -                          |
-|     11 |          Data | 1 Byte | [cAzBz](#cazbz-aaaabbbb)                | -                 | -                          |
-|     12 |          Data | 1 Byte | [cStatus](#cstatus)                     | -                 | -                          |
-|     13 | Optional Data | 1 Byte | [cData4](#cdata4)                       | -                 | -                          |
-|     14 | Optional Data | 1 Byte | [cData5](#cdata5)                       | -                 | -                          |
+| Offset |       Section |   Size | Field                                   | Value               | Description                |
+| -----: | ------------: | -----: | --------------------------------------- | ------------------- | -------------------------- |
+|      0 |          Head | 1 Byte | [Unique Sequence-ID]                    | -                   | -                          |
+|      1 |          Head | 1 Byte | [Header Info]                           | -                   | -                          |
+|      2 |          Head | 1 Byte | [Command Code]                          | 8                   | -                          |
+|      3 |          Head | 1 Byte | [Unique Sequence-ID] of primary message | -                   | -                          |
+|      4 |          Data | 1 Byte | Error                                   | -                   | If any - Error             |
+|      5 |          Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address            |
+|      7 |          Data | 1 Byte | [cSpeed](#cspeed-esssssss)              | -                   | Speed in Speed Step System |
+|      8 |          Data | 1 Byte | [cData1](#cdata1)                       | -                   | -                          |
+|      9 |          Data | 1 Byte | [cData2](#cdata2)                       | -                   | -                          |
+|     10 |          Data | 1 Byte | [cData3](#cdata3)                       | -                   | -                          |
+|     11 |          Data | 1 Byte | [cAzBz](#cazbz-aaaabbbb)                | -                   | -                          |
+|     12 |          Data | 1 Byte | [cStatus](#cstatus)                     | -                   | -                          |
+|     13 | Optional Data | 1 Byte | [cData4](#cdata4)                       | -                   | -                          |
+|     14 | Optional Data | 1 Byte | [cData5](#cdata5)                       | -                   | -                          |
+
+!!! info "In case the address is not known, the command station can send defualt values (everything `0`)"
 
 ---
 

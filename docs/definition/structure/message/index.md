@@ -16,14 +16,14 @@ missing, it will result in parsing errors.
 
 ### Optional Data
 
-Some messages have fields, that may or may not be present.In most cases this depends on wether an error
-has occurred, but may also be dependant on the device that is connected (e.g. MXULF).
+Some messages have fields that may or may not be present. In most cases this depends on whether an error
+has occurred, but may also be dependent on the device that is connected (e.g. MXULF).
 
 !!! warning "Consistency"
 
     Not all optional needs to be present **_BUT_** any optional data until the last optional byte needed
     must be present. As an example using [LocoControl](../../../commands/universal/loco_control.md#primary)
     If the last byte needed is `cData2`, `cData1` must also be present, otherwise parsing will most
-    definetly fail.
+    definitely fail.
 
     This however means, that cData1 needs to have an actual valid value, as it will be processed accordingly

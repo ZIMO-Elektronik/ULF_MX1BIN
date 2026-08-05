@@ -4,7 +4,7 @@ A Nak is sent by the command station in case a message could not be decoded.
 
 ## Available Messages
 
-### [Primary](../../definition/message_type/primary.md)
+### [Level 1 Ack](../../definition/message_type/level_1_ack.md)
 
 | Offset | Section |   Size | Field                | Value | Description |
 | -----: | ------: | -----: | -------------------- | ----- | ----------- |
