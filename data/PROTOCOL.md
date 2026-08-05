@@ -144,7 +144,7 @@ Message to control a single loco on the track.
 
 | Message byte(s) | Name   | Value             | Description                                        |
 | :-------------- | ------ | ----------------- | -------------------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address |
 | [2]             | cSpeed | esssssss          | e - Emergency stop <br> s..s - Speed               |
 | [3] optional    | cData1 | -                 | [7] Manual (ignore limits) <br> [6] N/A <br> [5] Direction (0 = fw, 1 = bw) <br> [4] Headlights (=DCC F0) <br> [3..2] Speed step system <br> [1] Decel. time enabled <br> [0] accel. time enabled | 
 | [4] optional    | cData2 | -                 | [7..0] F1..F8 (DCC only)                           |
@@ -161,7 +161,7 @@ Message to invert function bits instead of setting
 
 | Message byte(s) | Name   | Value             | Description                            |
 | :-------------- | ------ | ----------------- | -------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address |
 | [2]             | cSpeed | esssssss          | e - Emergency stop <br> Speed          |
 | [3]             | cData1 | -                 | [7] Manual (ignore limits) <br> [6] N/A <br> [5] Direction (0 = fw, 1 = bw) <br> [4] Headlights (=DCC F0) <br> [3..2] Speed step system <br> [1] Decel. time enabled <br> [0] accel. time enabled | 
 | [4]             | cData2 | -                 | [7..0] F1..F8 (DCC only)               |
@@ -176,7 +176,7 @@ Message to set acceleration and decelartion times.
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cAzBz  | -                 | [0..3] BZ (0..15) <br> [4..7] AZ (0..15) |
 
 Reply: [Reply level 1](#loco-control_re)
@@ -185,7 +185,7 @@ Reply: [Reply level 1](#loco-control_re)
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cData  | -                 | [0..3] Contact rails 1..4 forward <br> [4..7] Contact rails 1..4 reverse |
 
 Reply: [Reply level 1](#loco-control_re)
@@ -194,7 +194,7 @@ Reply: [Reply level 1](#loco-control_re)
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2]             | cData  | -                 | [3] 1=on, 0=off <br> [2..0] output number |
 
 Reply: [Reply level 1](#accessory-control_re)
@@ -203,7 +203,7 @@ Reply: [Reply level 1](#accessory-control_re)
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 
 Reply: [Reply level 1](#loco-memory-query_re)
 
@@ -211,7 +211,7 @@ Reply: [Reply level 1](#loco-memory-query_re)
  
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 
 Reply: [Reply level 1](#accessory-memory-query_re)
 
@@ -219,7 +219,7 @@ Reply: [Reply level 1](#accessory-memory-query_re)
 
 | Message byte(s) | Name   | Value             | Description                              |
 | :-------------- | ------ | ----------------- | ---------------------------------------- |
-| [0..1]          | cAdr   | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address   |
+| [0..1]          | cAdr   | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address   |
 | [2] | cControl | - | [7] 0=Query, 1=Set <br> [5] 0=Loco, 1=Accessory <br> [1] Lock address against external changes <br> [0] Log external changes |
 | [3] optional | cOutputs | - | For accessory decoder addresses: The outputs that shall be locked may be defined – keep in mind that there need to be 2 bits set for each paired output, if zero locking is deactivated |
 
@@ -266,7 +266,7 @@ This message opens a query with the message parameters. Only one query can be ac
 
 | Message byte(s) | Name      | Value             | Description                             |
 | :-------------- | --------- | ----------------- | --------------------------------------- |
-| [0..1]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [0..1]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [2..3]          | Variable  | -                 | CV address                              |
 | [4] optional    | Value     | -                 | If present, set as new CV-value         |
 
@@ -286,7 +286,7 @@ If logging is activated for a loco address ([Address Control](#address-control-p
 
 | Message byte(s) | Name      | Value             | Description                             |
 | :-------------- | --------- | ----------------- | --------------------------------------- |
-| [0..1]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [0..1]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [2]             | cSpeed    | -                 | Speed in step system |
 | [3]             | cData1    | -                 | [7] Manual (ignore limits) <br> [6] N/A <br> [5] Direction (0 = fw, 1 = bw) <br> [4] Headlights (=DCC F0) <br> [3..2] Speed step system <br> [1] Decel. time enabled <br> [0] accel. time enabled |
 | [4]             | cData2    | -                 | [7..0] F1..F8 (DCC only)                |
@@ -304,7 +304,7 @@ If logging is activated for a loco address ([Address Control](#address-control-p
 
 | Message byte(s) | Name      | Value             | Description                                         |
 | :-------------- | --------- | ----------------- | --------------------------------------------------- |
-| [0..1]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address              |
+| [0..1]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address              |
 | [2]             | cPair     | 0 <br> 1          | Paired output function <br> single output function  |
 | [3]             | cOutputs  | -                 | State of the Outputs                                |
 
@@ -360,7 +360,7 @@ ta.
 | :---------------------------- | --------- | ----------------- | --------------------------------------- |
 | [0]                           | re-uSID   | ID                | uSID of the message being replied to    |
 | [1]                           | Error     | -                 | If any - Error                          |
-| [2..3] if no Error            | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [2..3] if no Error            | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [4] if no Error               | cSpeed    | -                 | Speed in step system |
 | [5] if no Error               | cData1    | -                 | [7] Manual (ignore limits) <br> [6] N/A <br> [5] Direction (0 = fw, 1 = bw) <br> [4] Headlights (=DCC F0) <br> [3..2] Speed step system <br> [1] Decel. time enabled <br> [0] accel. time enabled |
 | [6] if no Error               | cData2    | -                 | [7..0] F1..F8 (DCC only)                |
@@ -380,7 +380,7 @@ ta.
 | :------------------ | --------- | ----------------- | --------------------------------------------------- |
 | [0]                 | re-uSID   | ID                | uSID of the message being replied to                |
 | [1]                 | Error     | -                 | If any - Error                                      |
-| [2..3] if no Error  | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address              |
+| [2..3] if no Error  | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address              |
 | [4] if no Error     | cPair     | 0 <br> 1          | Paired output function <br> single output function  |
 | [5] if no Error     | cOutputs  | -                 | State of the Outputs                                |
 
@@ -447,7 +447,7 @@ There are two different replies, depending on wether an error occurred during qu
 | Message byte(s) | Name      | Value             | Description                             |
 | :-------------- | --------- | ----------------- | --------------------------------------- |
 | [0]             | re-uSID   | ID                | uSID of the message being replied to    |
-| [1..2]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [1..2]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [3..4]          | Variable  | -                 | CV address                              |
 | [5]             | cValue    | -                 | CV value                                |
 | [6]             | cError    | -                 | Error (0=No Error, >0= Error)           |
@@ -457,7 +457,7 @@ When an Error occurs (e.g. timeout), the following message should be sent:
 | Message byte(s) | Name      | Value             | Description                             |
 | :-------------- | --------- | ----------------- | --------------------------------------- |
 | [0]             | re-uSID   | ID                | uSID of the message being replied to    |
-| [1..2]          | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address  |
+| [1..2]          | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address  |
 | [3]             | cError    | Error             | Error code                              |
 
 Reply: [Ack](#generic_ack)
@@ -469,11 +469,11 @@ Since only one query can be active at a time, any following query should be resp
 | :---------------- | --------- | ----------------- | ----------------------------------------------------------- |
 | [0]               | re-uSID   | ID                | uSID of the message being replied to                        |
 | [1]               | cBusy     | 0x04              | Busy - there is already an active request                   |
-| [1..2]            | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address                      |
+| [1..2]            | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address                      |
 | [3..4]            | Variable  | -                 | CV address                                                  |
 | [5] optional      | cID       | ID                | uSID of the message requesting the active query             |
 | [6] optional      | cError    | -                 | Error (0=No Error, >0= Error)                               |
-| [7..8] optional   | cAdr      | ffaaaaaa aaaaaaaa | ff - [Format](#address-format) <br> a..a - Address of the active query  |
+| [7..8] optional   | cAdr      | `ffaaaaaa aaaaaaaa` | ff - [Format](#address-format) <br> a..a - Address of the active query  |
 | [9..10] optional  | Variable  | -                 | Variable of the active query                                |
 
 Reply: None
