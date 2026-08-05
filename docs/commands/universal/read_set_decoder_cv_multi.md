@@ -7,6 +7,8 @@ To allow overlapping queries (for more info, consult the RCN214 and RCN217 respe
 up to **four** queries can be open at a time. The requirement for this is, that all queries
 must have a matching decoder Address **_AND_** have unique Xpom sequence identifiers.
 
+!!! info "Since reading more than one address at the same time would actually slow down the process, only queries with matching address are accepted"
+
 !!! warning 
 
     This requires both a relatively new Command Station AND Decoder firmware. To check
@@ -54,24 +56,19 @@ If the command station is either busy with another query of this type (or can't 
 
 !!! info "If another query is active, usually this package contains the metadata from this query"
 
-| Offset |       Section | Size   | Field                                   | Value               | Description                           |
-| -----: | ------------: | ------ | --------------------------------------- | ------------------- | ------------------------------------- |
-|      0 |          Head | 1 Byte | [Unique Sequence-ID]                    | -                   | -                                     |
-|      1 |          Head | 1 Byte | [Header Info]                           | -                   | -                                     |
-|      2 |          Head | 1 Byte | [Command Code]                          | 20                  | -                                     |
-|      3 |          Head | 1 Byte | [Flow Information]                      | dd00nnnn            | -                                     |
-|      4 |          Head | 1 Byte | [Unique Sequence-ID] of primary message | -                   | -                                     |
-|      5 |          Data | 1 Byte | cBusy                                   | 4                   | Unable to handle query ATM            |
-|      6 |          Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address                       |
-|      8 |          Data | 2 Byte | Index                                   | -                   | CV page index                         |
-|     10 |          Data | 1 Byte | Variable                                | -                   | CV index                              |
-|     11 |          Data | 1 Byte | SequenceID                              | -                   | Xpom SequenceID                       |
-|     12 | Optional Data | 1 Byte | cID                                     | -                   | ID of the blocking query              |
-|     13 | Optional Data | 1 Byte | cError                                  | -                   | Error                                 |
-|     14 | Optional Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address of the blocking query |
-|     16 | Optional Data | 2 Byte | Index                                   | -                   | CV page index of the blocking query   |
-|     18 | Optional Data | 1 Byte | Variable                                | -                   | CV index of the blocking query        |
-|     19 | Optional Data | 1 Byte | SequenceID                              | \[0..3]             | Xpom SequenceID of the blocking query |
+| Offset | Section | Size   | Field                                   | Value               | Description                  |
+| -----: | ------: | ------ | --------------------------------------- | ------------------- | ---------------------------- |
+|      0 |    Head | 1 Byte | [Unique Sequence-ID]                    | -                   | -                            |
+|      1 |    Head | 1 Byte | [Header Info]                           | -                   | -                            |
+|      2 |    Head | 1 Byte | [Command Code]                          | 20                  | -                            |
+|      3 |    Head | 1 Byte | [Flow Information]                      | dd00nnnn            | -                            |
+|      4 |    Head | 1 Byte | [Unique Sequence-ID] of primary message | -                   | -                            |
+|      5 |    Data | 1 Byte | cBusy                                   | 4                   | Unable to handle query ATM   |
+|      6 |    Data | 2 Byte | [cAdr]                                  | `ffaaaaaa aaaaaaaa` | Decoder Address              |
+|      8 |    Data | 2 Byte | Index                                   | -                   | CV page index                |
+|     10 |    Data | 1 Byte | Variable                                | -                   | CV index                     |
+|     11 |    Data | 1 Byte | SequenceID                              | -                   | Xpom SequenceID              |
+|     12 |    Data | 1 Byte | [Error](#example)                       | -                   | Error that lead to rejection |
 
 ---
 
@@ -123,6 +120,21 @@ If any error occurred during processing (e.g. a timeout), this message is sent. 
 
 ---
 
+## Bitfields and Values
+
+### Error
+
+To respond an actual reason why a query can't be processed, below are some possible errors
+
+|  Code | Description               |
+| ----: | ------------------------- |
+|     0 | Queue full                |
+|     1 | Address mismatch          |
+|     2 | Sequence ID is not unique |
+| other | An undefined error        |
+
+---
+
 ## Example
 
 To provide an example, we can just read the CV `1` till `4` on the `DCC` decoder with the address `3`
@@ -140,6 +152,8 @@ sequenceDiagram
     Note right of PC: Ready for next query
 ```
 
+---
+
 To make use of the overlapping queries, we must make sure, that the Xpom sequence ID is unique
 
 ``` mermaid
@@ -155,7 +169,7 @@ sequenceDiagram
     CommandStation-->>PC: Ack [ID 130] [ReID = 3]
     Note right of PC: Accidentally attempt to read Address 4
     PC->>CommandStation: [ID 4] Read Address 4 CV 13 - 16
-    CommandStation-->>PC: Busy [ID 131] [ReID = 4] [Data of rejected query] [Data of first blocking query]
+    CommandStation-->>PC: Busy [ID 131] [ReID = 4] [Data of rejected query] [Error - Address mismatch]
     Note right of PC: Send correct address now
     PC->>CommandStation: [ID 5] Read Address 3 CV 13 - 16
     CommandStation-->>PC: Ack [ID 132] [ReID = 5]
@@ -174,6 +188,8 @@ sequenceDiagram
     CommandStation->>PC: ReplyL2 [ID 138] [ReID = 10] [Data of query plus result]
     PC-->>CommandStation: AckL2 [ID 11] [ReID = 138]
 ```
+
+---
 
 [cAdr]: ../../definition/globals/index.md#cadr-ffaaaaaa-aaaaaaaa
 [Command Code]: ../../definition/structure/header/index.md#command-code
