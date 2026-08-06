@@ -74,6 +74,7 @@ If the command station is either busy with another query of this type (or can't 
 ### [Reply Level 2](../../definition/message_type/reply_level_2.md)
 
 If the query was processed successfully, the package contains the input values, as well as the result values.
+The value of `cError` is currently not specified.
 
 | Offset | Section | Size   | Field                                   | Value               | Description     |
 | -----: | ------: | ------ | --------------------------------------- | ------------------- | --------------- |
@@ -85,11 +86,11 @@ If the query was processed successfully, the package contains the input values, 
 |      6 |    Data | 2 Byte | Index                                   | -                   | CV page index   |
 |      8 |    Data | 1 Byte | Variable                                | -                   | CV index        |
 |      9 |    Data | 1 Byte | SequenceID                              | \[0..3]             | Xpom SequenceID |
-|     10 |    Data | 1 Byte | cError                                  | -                   | Error           |
-|     11 |    Data | 1 Byte | cValue1                                 | -                   | First CV Value  |
-|     12 |    Data | 1 Byte | cValue2                                 | -                   | Second CV Value |
-|     13 |    Data | 1 Byte | cValue3                                 | -                   | Third CV Value  |
-|     14 |    Data | 1 Byte | cValue4                                 | -                   | Fourth CV Value |
+|     10 |    Data | 1 Byte | Value 1                                 | -                   | First CV Value  |
+|     11 |    Data | 1 Byte | Value 2                                 | -                   | Second CV Value |
+|     12 |    Data | 1 Byte | Value 3                                 | -                   | Third CV Value  |
+|     13 |    Data | 1 Byte | Value 4                                 | -                   | Fourth CV Value |
+|     14 |    Data | 1 Byte | cError                                  | -                   | Error           |
 
 ---
 
