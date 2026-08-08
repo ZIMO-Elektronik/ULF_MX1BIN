@@ -34,6 +34,7 @@
 #include "message/command_station_equipment_query.hpp"
 #include "message/command_station_io_query.hpp"
 #include "message/decoder_cv_manip.hpp"
+#include "message/decoder_multi_cv_manip.hpp"
 #include "message/invert_function_bits.hpp"
 #include "message/loco_control.hpp"
 #include "message/loco_memory_query.hpp"
@@ -63,13 +64,16 @@ concept Decodable = requires(T t, StreamDecoder<char const*, char const*>& d) {
 /// Long frame message concept
 template<typename T>
 concept Long = requires(T t) {
-  requires std::same_as<std::remove_cv_t<std::remove_reference_t<T>>,
-                        CommandStationEquipmentQuery::Reply>;
+  requires std::same_as<typename T::Head, detail::LongHead> ||
+             std::same_as<typename T::Head, detail::ReplyLongHead>;
 };
 
 /// Short frame message concept
 template<typename T>
-concept Short = requires(T t) { requires !Long<T>; };
+concept Short = requires(T t) {
+  requires std::same_as<typename T::Head, detail::Head> ||
+             std::same_as<typename T::Head, detail::ReplyHead>;
+};
 
 /// Decode helper
 ///
@@ -121,7 +125,12 @@ using Message = std::variant<Ack,
                              DecoderCvManip::Reply,
                              DecoderCvManip::ReplyL2,
                              DecoderCvManip::Busy,
-                             DecoderCvManip::Error>;
+                             DecoderCvManip::Error,
+                             DecoderMultiCvManip,
+                             DecoderMultiCvManip::Reply,
+                             DecoderMultiCvManip::ReplyL2,
+                             DecoderMultiCvManip::Busy,
+                             DecoderMultiCvManip::Error>;
 
 using Packet = ztl::inplace_vector<uint8_t, sizeof(Message) * 2u>;
 

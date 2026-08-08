@@ -24,6 +24,8 @@ The protocol is based on type-sized messages, that can be roughly categorized in
 
 The stream representation is encoded before and after transfer. Hence, the actual message size may differ from the stream size. 
 
+A rewrite of the protocol as Markdown can be found [here](data/PROTOCOL.md). Otherwise, the [pdf](<data/The serial communication of the MX1_MXULF_V5_9.pdf>) still applies.
+
 :construction:
 > [!TODO]
 > Place example diagrams here

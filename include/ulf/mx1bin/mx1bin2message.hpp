@@ -48,8 +48,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   auto const info{bitfields::Info{d.uint8()}};
   auto const code{static_cast<Command>(d.uint8())};
 
-  auto const type{info.messageType};
-  if (type == MessageType::Primary) {
+  if (info.messageType == MessageType::Primary) {
     switch (code) {
       case Command::Reset: return decode<Reset>(frame);
       case Command::TrackControl: return decode<TrackControl>(frame);
@@ -71,12 +70,15 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
         return decode<CommandStationEquipmentQuery>(frame);
       case Command::SerialInfo: return decode<SerialInfo>(frame);
       case Command::DecoderCvManip: return decode<DecoderCvManip>(frame);
+      case Command::DecoderMultiCvManip:
+        return decode<DecoderMultiCvManip>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
 
-  } else if (type == MessageType::L1Ack) {
+  } else if (info.messageType == MessageType::L1Ack) {
     switch (code) {
-      case Command::DecoderCvManip: return decode<Ack>(frame);
+      case Command::DecoderCvManip: [[fallthrough]];
+      case Command::DecoderMultiCvManip: return decode<Ack>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
   }

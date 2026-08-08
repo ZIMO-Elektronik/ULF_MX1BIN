@@ -31,6 +31,7 @@ enum class Command : uint8_t {
   CommandStationEquipmentQuery = 13u, // CommandStation Equipment Query
   SerialInfo = 17u,                   // Serial Info
   DecoderCvManip = 19u,               // Cv Manipulation
+  DecoderMultiCvManip = 20u,          // Multi Cv Manipulation
   LocoMemoryUpdate = 255u,            // Loco Memory Update
   AccessoryMemoryUpdate = 254u,       // Accessory Memory Update
 };
