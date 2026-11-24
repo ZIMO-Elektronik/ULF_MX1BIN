@@ -64,13 +64,13 @@ struct LocoControl {
   std::optional<uint8_t> cData4{};                ///< F13..20
   std::optional<uint8_t> cData5{};                ///< F21..28
 
-  using fields = field_list<field<&LocoControl::cAdr>,
-                            field<&LocoControl::cSpeed>,
-                            field<&LocoControl::cData1>,
-                            field<&LocoControl::cData2>,
-                            field<&LocoControl::cData3>,
-                            field<&LocoControl::cData4>,
-                            field<&LocoControl::cData5>>;
+  using members = member_list<member<&LocoControl::cAdr>,
+                              member<&LocoControl::cSpeed>,
+                              member<&LocoControl::cData1>,
+                              member<&LocoControl::cData2>,
+                              member<&LocoControl::cData3>,
+                              member<&LocoControl::cData4>,
+                              member<&LocoControl::cData5>>;
 
   template<Encoder E>
   E encode(E e) const {

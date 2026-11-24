@@ -86,7 +86,7 @@ private:
 template<typename T, std::ranges::output_range<uint8_t> R>
 void encode(T const& obj, NewEncoder<R>& encoder) {
   std::apply([&](auto... member) { (encoder.encode(obj.*member), ...); },
-             T::fields::members);
+             T::members::members);
 }
 
 template<typename T, std::ranges::output_range<uint8_t> R>

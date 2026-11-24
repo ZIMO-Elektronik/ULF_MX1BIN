@@ -25,6 +25,30 @@ struct NewDecoder {
   NewDecoder(R const& r)
     : _iter{std::ranges::cbegin(r)}, _end{std::ranges::cend(r)} {}
 
+  /// Strips SOH and EOH
+  ///
+  /// \return NewDecoder reference
+  NewDecoder& strip() {
+    assert(_iter != _end);
+    while (*_iter == detail::soh) _iter++;
+    while (*(_end - 1) == detail::eot) _end--;
+    return *this;
+  }
+
+  /// Strips CRC
+  ///
+  /// @tparam type Type of CRC (uint8_t or uint16_t)
+  /// @return NewDecoder reference
+  template<typename type>
+  NewDecoder& strip_crc() {
+    assert(_iter != _end);
+    for (uint8_t i{0u}; i++ < sizeof(type);) {
+      if (*(_end - 2) == detail::dle) _end--; // Catch encoded crc
+      _end--;
+    }
+    return *this;
+  }
+
   /// -- Required fields --
 
   template<concepts::is_trivial_data T>
@@ -156,9 +180,9 @@ NewDecoder(R const&) -> NewDecoder<decltype(std::declval<R const&>().cbegin()),
 
 template<class Message, typename I, typename S>
 requires requires {
-  typename Message::fields;
+  typename Message::members;
   typename Message::Head;
-  typename Message::Head::fields;
+  typename Message::Head::members;
 }
 auto decode(NewDecoder<I, S>& decoder) {
   auto head = std::apply(
@@ -166,14 +190,14 @@ auto decode(NewDecoder<I, S>& decoder) {
       return typename Message::Head{
         decoder.template decode<member_type_t<decltype(args)>>()...};
     },
-    Message::Head::fields::members);
+    Message::Head::members::members);
 
   return std::apply(
     [&](auto&&... args) {
       return Message{
         head, decoder.template decode<member_type_t<decltype(args)>>()...};
     },
-    Message::fields::members);
+    Message::members::members);
 }
 
 template<class Message, std::ranges::input_range R>

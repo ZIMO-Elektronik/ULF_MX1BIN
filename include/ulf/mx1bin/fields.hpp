@@ -12,14 +12,13 @@ using member_type_t =
   decltype(member_type_of(std::declval<std::remove_cvref_t<T>>()));
 
 template<auto Member>
-struct field {
-  static constexpr auto member = Member;
-  using type = member_type_t<decltype(Member)>;
+struct member {
+  static constexpr auto inner = Member;
 };
 
 template<typename... Ts>
-struct field_list {
-  inline static constexpr auto members = std::tuple{Ts::member...};
+struct member_list {
+  inline static constexpr auto members = std::tuple{Ts::inner...};
 };
 
 } // namespace ulf::mx1bin

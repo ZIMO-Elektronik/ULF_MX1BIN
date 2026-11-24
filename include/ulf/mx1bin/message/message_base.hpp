@@ -55,8 +55,8 @@ struct Head {
   constexpr bool operator==(Head const&) const = default;
   constexpr Head& operator=(Head const&) = default;
 
-  using fields =
-    field_list<field<&Head::uSID>, field<&Head::info>, field<&Head::code>>;
+  using members =
+    member_list<member<&Head::uSID>, member<&Head::info>, member<&Head::code>>;
 };
 
 struct ReplyHead {
