@@ -13,32 +13,11 @@
 #include <cassert>
 #include <iostream>
 #include <span>
+#include "concepts.hpp"
 #include "fields.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin::neww {
-
-template<typename T>
-concept is_optional =
-  requires { typename T::value_type; } &&
-  std::same_as<std::remove_cvref_t<T>,
-               std::optional<std::remove_cvref_t<typename T::value_type>>>;
-
-template<is_optional T>
-using remove_optional_t = std::remove_cvref_t<typename T::value_type>;
-
-template<typename T, typename U>
-concept typed_enum =
-  std::is_enum_v<T> && std::same_as<std::underlying_type_t<T>, U>;
-
-template<typename T, class... Args>
-concept constructible_not_enum =
-  !std::is_enum_v<T> && std::constructible_from<T, Args...>;
-
-template<typename T, typename To>
-concept explicitly_convertible_not_enum =
-  (!std::is_enum_v<T>) && (!std::convertible_to<T, To>) &&
-  requires(T t) { static_cast<To>(t); };
 
 template<std::input_iterator I, std::sentinel_for<I> S>
 struct NewDecoder {
@@ -48,8 +27,7 @@ struct NewDecoder {
 
   /// -- Required fields --
 
-  template<typename T>
-  requires std::same_as<uint8_t, T> || std::same_as<uint16_t, T>
+  template<concepts::is_trivial_data T>
   T decode() {
     if constexpr (std::same_as<uint8_t, T>) {
       std::cout << "Decode U8" << std::endl;
@@ -61,23 +39,19 @@ struct NewDecoder {
   }
 
   template<class T>
-  requires typed_enum<T, std::uint8_t> || typed_enum<T, std::uint16_t>
+  requires concepts::strong_enum<T, std::uint8_t> ||
+           concepts::strong_enum<T, std::uint16_t>
   auto decode() {
     return static_cast<T>(decode<std::underlying_type_t<T>>());
   }
 
   template<class T>
-  requires(!is_optional<T>) &&
-          (!std::same_as<std::remove_cvref_t<T>, std::uint8_t>) &&
-          (!std::same_as<std::remove_cvref_t<T>, std::uint16_t>) &&
-          (constructible_not_enum<T, uint8_t> ||
-           constructible_not_enum<T, uint16_t>) &&
-          (explicitly_convertible_not_enum<T, uint8_t> ||
-           explicitly_convertible_not_enum<T, uint16_t>)
+  requires concepts::bitfield<T, std::uint8_t> ||
+           concepts::bitfield<T, std::uint16_t>
   auto decode() {
-    if constexpr (explicitly_convertible_not_enum<T, uint8_t>)
+    if constexpr (concepts::bitfield<T, std::uint8_t>)
       return T{decode<uint8_t>()};
-    else if constexpr (explicitly_convertible_not_enum<T, uint16_t>)
+    else if constexpr (concepts::bitfield<T, std::uint16_t>)
       return T{decode<uint16_t>()};
     else std::unreachable();
   }
@@ -85,40 +59,36 @@ struct NewDecoder {
   /// -- Optional fields --
 
   template<typename T>
-  requires std::same_as<std::optional<uint8_t>, T> ||
-           std::same_as<std::optional<uint16_t>, T>
+  requires concepts::detail::is_optional<T> &&
+           concepts::is_optional_trivial_data<T>
   T decode() {
-    if constexpr (std::same_as<remove_optional_t<T>, uint8_t>) {
+    if constexpr (std::same_as<concepts::detail::remove_optional_t<T>,
+                               uint8_t>) {
       std::cout << "Decode Optional U8" << std::endl;
       return u8_();
-    } else if constexpr (std::same_as<remove_optional_t<T>, uint16_t>) {
+    } else if constexpr (std::same_as<concepts::detail::remove_optional_t<T>,
+                                      uint16_t>) {
       std::cout << "Decode Optional U16" << std::endl;
       return u16_();
     } else std::unreachable();
   }
 
   template<typename T>
-  requires is_optional<T> && (typed_enum<remove_optional_t<T>, std::uint8_t> ||
-                              typed_enum<remove_optional_t<T>, std::uint16_t>)
+  requires concepts::optional_strong_enum<T, std::uint8_t> ||
+           concepts::optional_strong_enum<T, std::uint16_t>
   auto decode() {
-    return static_cast<remove_optional_t<T>>(
-      decode<std::optional<std::underlying_type_t<remove_optional_t<T>>>>());
+    return static_cast<concepts::detail::remove_optional_t<T>>(
+      decode<std::optional<
+        std::underlying_type_t<concepts::detail::remove_optional_t<T>>>>());
   }
 
   template<class T>
-  requires(is_optional<T>) &&
-          (!std::same_as<remove_optional_t<T>, std::uint8_t>) &&
-          (!std::same_as<remove_optional_t<T>, std::uint16_t>) &&
-          (constructible_not_enum<remove_optional_t<T>, uint8_t> ||
-           constructible_not_enum<remove_optional_t<T>, uint16_t>) &&
-          (explicitly_convertible_not_enum<remove_optional_t<T>, uint8_t> ||
-           explicitly_convertible_not_enum<remove_optional_t<T>, uint16_t>)
+  requires concepts::optional_bitfield<T, uint8_t> ||
+           concepts::optional_bitfield<T, uint16_t>
   auto decode() {
-    if constexpr (explicitly_convertible_not_enum<remove_optional_t<T>,
-                                                  uint8_t>)
+    if constexpr (concepts::optional_bitfield<T, uint8_t>)
       return T{decode<std::optional<std::uint8_t>>()};
-    else if constexpr (explicitly_convertible_not_enum<remove_optional_t<T>,
-                                                       uint16_t>)
+    else if constexpr (concepts::optional_bitfield<T, uint16_t>)
       return T{decode<std::optional<std::uint16_t>>()};
     else std::unreachable();
   }

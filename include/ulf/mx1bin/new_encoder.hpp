@@ -13,6 +13,7 @@
 #include <concepts>
 #include <span>
 #include <ztl/ztl.hpp>
+#include "concepts.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin::neww {
@@ -41,23 +42,21 @@ struct NewEncoder {
   }
 
   template<class T>
-  requires std::is_enum_v<T> &&
-             std::same_as<std::underlying_type_t<T>, std::uint8_t> ||
-             std::same_as<std::underlying_type_t<T>, std::uint16_t>
-           auto encode(T x) {
+  requires concepts::strong_enum<T, std::uint8_t> ||
+           concepts::strong_enum<T, std::uint16_t>
+  auto encode(T x) {
     encode_impl(static_cast<std::underlying_type_t<T>>(x));
   }
 
   template<class T>
-  requires(!std::same_as<std::remove_cvref_t<T>, std::uint8_t>) &&
-          (!std::same_as<std::remove_cvref_t<T>, std::uint16_t>) &&
-          (!std::is_enum_v<T>) &&
-          ((requires(T const& x) { static_cast<std::uint8_t>(x); }) ||
-           (requires(T const& x) { static_cast<std::uint16_t>(x); }))
+  requires concepts::bitfield<T, std::uint8_t> ||
+           concepts::bitfield<T, std::uint16_t>
   auto encode(T const& x) {
-    if constexpr ((requires(T const& x) { static_cast<std::uint8_t>(x); }))
+    if constexpr (concepts::bitfield<T, std::uint8_t>)
       encode_impl(static_cast<std::uint8_t>(x));
-    else encode_impl(static_cast<std::uint16_t>(x));
+    else if constexpr (concepts::bitfield<T, std::uint16_t>)
+      encode_impl(static_cast<std::uint16_t>(x));
+    else std::unreachable();
   }
 
   template<typename... Args>
