@@ -5,7 +5,7 @@
       "name": "Debug MX1BinExamples",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/examples/MX1BinExamples",
+      "program": "${workspaceFolder}/build/examples/ULF_MX1BINExamples",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

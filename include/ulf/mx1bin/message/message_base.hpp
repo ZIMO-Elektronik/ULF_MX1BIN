@@ -20,6 +20,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "../utility.hpp"
 
 namespace ulf::mx1bin::detail {
@@ -53,6 +54,9 @@ struct Head {
   }
   constexpr bool operator==(Head const&) const = default;
   constexpr Head& operator=(Head const&) = default;
+
+  using fields =
+    field_list<field<&Head::uSID>, field<&Head::info>, field<&Head::code>>;
 };
 
 struct ReplyHead {

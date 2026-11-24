@@ -16,6 +16,9 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
+#include "../new_decoder.hpp"
+#include "../new_encoder.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -60,6 +63,15 @@ struct LocoControl {
   std::optional<uint8_t> cData3{};                ///< F9..12
   std::optional<uint8_t> cData4{};                ///< F13..20
   std::optional<uint8_t> cData5{};                ///< F21..28
+
+  using fields = field_list<field<&LocoControl::cAdr>,
+                            field<&LocoControl::cSpeed>,
+                            field<&LocoControl::cData1>,
+                            field<&LocoControl::cData2>,
+                            field<&LocoControl::cData3>,
+                            field<&LocoControl::cData4>,
+                            field<&LocoControl::cData5>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e)
