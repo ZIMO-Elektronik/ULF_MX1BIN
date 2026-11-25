@@ -56,7 +56,7 @@ struct TrackControl {
                                     StationType::MX1},
             .code = Command::TrackControl};
 
-  enum Action : uint8_t {
+  enum class Action : uint8_t {
     StopBroadcast = 0u,
     TrackOff = 1u,
     TrackOn = 2u,

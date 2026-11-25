@@ -59,8 +59,13 @@ concept Codable = ulf::mx1bin::Encodable<T> && ulf::mx1bin::Decodable<T>;
 /// \return Result
 template<Codable T>
 constexpr Result<T> encode_and_decode(T const& in) {
-  auto const encoded{encode(in)};
-  auto const decoded{decode<T>(encoded)};
+  // auto const encoded{encode(in)};
+  // auto const decoded{decode<T>(encoded)};
+
+  std::vector<uint8_t> encoded{};
+
+  ulf::mx1bin::neww::encode(in, encoded);
+  auto const decoded{ulf::mx1bin::neww::decode<T>(encoded)};
 
   assert(decoded); // GTest ASSERT won't compile here somehow..
   return Result{.message = *decoded, .stream = encoded};

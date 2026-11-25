@@ -44,14 +44,14 @@ struct NewEncoder {
   template<class T>
   requires concepts::strong_enum<T, std::uint8_t> ||
            concepts::strong_enum<T, std::uint16_t>
-  auto encode(T x) {
+  constexpr auto encode(T x) {
     encode_impl(static_cast<std::underlying_type_t<T>>(x));
   }
 
   template<class T>
   requires concepts::bitfield<T, std::uint8_t> ||
            concepts::bitfield<T, std::uint16_t>
-  auto encode(T const& x) {
+  constexpr auto encode(T const& x) {
     if constexpr (concepts::bitfield<T, std::uint8_t>)
       encode_impl(static_cast<std::uint8_t>(x));
     else if constexpr (concepts::bitfield<T, std::uint16_t>)
@@ -60,7 +60,7 @@ struct NewEncoder {
   }
 
   template<typename... Args>
-  auto encode(Args... args) {
+  constexpr auto encode(Args... args) {
     return (encode(args), ...);
   }
 
@@ -84,13 +84,13 @@ private:
 };
 
 template<typename T, std::ranges::output_range<uint8_t> R>
-void encode(T const& obj, NewEncoder<R>& encoder) {
+constexpr void encode(T const& obj, NewEncoder<R>& encoder) {
   std::apply([&](auto... member) { (encoder.encode(obj.*member), ...); },
              T::members::members);
 }
 
 template<typename T, std::ranges::output_range<uint8_t> R>
-void encode(T const& obj, R& r) {
+constexpr void encode(T const& obj, R& r) {
   NewEncoder<R> encoder{r};
 
   encode(obj.head, encoder);

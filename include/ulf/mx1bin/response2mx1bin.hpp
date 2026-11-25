@@ -14,21 +14,29 @@
 #include "crc16.hpp"
 #include "crc8.hpp"
 #include "message.hpp"
+#include "new_encoder.hpp"
 
 namespace ulf::mx1bin {
 
 template<Encodable E>
 constexpr Packet response2mx1bin(E const& re) {
   Packet result{};
-  StreamEncoder e{result};
+  neww::NewEncoder e{result};
   e.addSOF();
 
-  e = re.encode(e);
+  // e = re.encode(e);
+  neww::encode(re, e);
+
+  // if constexpr (Long<E>) {
+  //   e.uint16(crc16(std::span<uint8_t const>{result}.subspan(2uz)));
+  // } else {
+  //   e.uint8(crc8(std::span<uint8_t const>{result}.subspan(2uz)));
+  // }
 
   if constexpr (Long<E>) {
-    e.uint16(crc16(std::span<uint8_t const>{result}.subspan(2uz)));
+    e.encode(crc16(std::span<uint8_t const>{result}.subspan(2uz)));
   } else {
-    e.uint8(crc8(std::span<uint8_t const>{result}.subspan(2uz)));
+    e.encode(crc8(std::span<uint8_t const>{result}.subspan(2uz)));
   }
 
   e.addEOT();
