@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -27,6 +28,8 @@ struct Nak {
                                     detail::defaultSender,
                                     StationType::MX1},
             .code = Command::Nak};
+
+  using members = member_list<>;
 
   template<Encoder E>
   E encode(E e) const {

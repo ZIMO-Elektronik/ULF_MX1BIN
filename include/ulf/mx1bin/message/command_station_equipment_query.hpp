@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -48,6 +49,27 @@ struct CommandStationEquipmentQuery {
     std::optional<uint8_t> cSerNum_mh{}; ///< Serial Number [1]
     std::optional<uint8_t> cSerNum_ml{}; ///< Serial Number [2]
     std::optional<uint8_t> cSerNum_lo{}; ///< Serial Number [3]
+
+    using members = member_list<member<&Reply::cAddress>,
+                                member<&Reply::cDevice>,
+                                member<&Reply::cRom_size>,
+                                member<&Reply::cRam_size>,
+                                member<&Reply::cPrintver>,
+                                member<&Reply::cVersion>,
+                                member<&Reply::cDate_day>,
+                                member<&Reply::cDate_month>,
+                                member<&Reply::cDate_century>,
+                                member<&Reply::cDate_year>,
+                                member<&Reply::cSwitches>,
+                                member<&Reply::cDevelopVersion>,
+                                member<&Reply::cBootRom>,
+                                member<&Reply::cBootRom_develop>,
+                                member<&Reply::values>,
+                                member<&Reply::cSerNum_hi>,
+                                member<&Reply::cSerNum_mh>,
+                                member<&Reply::cSerNum_ml>,
+                                member<&Reply::cSerNum_lo>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e)
@@ -81,6 +103,9 @@ struct CommandStationEquipmentQuery {
                                     StationType::MX1},
             .code = Command::CommandStationEquipmentQuery};
   uint8_t const zero{}; ///< Zero --- Yes, zero..
+
+  using members = member_list<member<&CommandStationEquipmentQuery::zero>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint8(zero);

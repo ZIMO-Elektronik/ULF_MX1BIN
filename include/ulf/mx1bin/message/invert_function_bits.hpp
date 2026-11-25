@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -30,6 +31,9 @@ struct InvertFunctionBits {
               .code = Command::InvertFunctionBits};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
+
+    using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);
@@ -58,6 +62,14 @@ struct InvertFunctionBits {
   uint8_t cData3{};                 ///< F9..12
   uint8_t cData4{};                 ///< F13..20
   uint8_t cData5{};                 ///< F21..28
+
+  using members = member_list<member<&InvertFunctionBits::cAdr>,
+                              member<&InvertFunctionBits::cData1>,
+                              member<&InvertFunctionBits::cData2>,
+                              member<&InvertFunctionBits::cData3>,
+                              member<&InvertFunctionBits::cData4>,
+                              member<&InvertFunctionBits::cData5>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e)

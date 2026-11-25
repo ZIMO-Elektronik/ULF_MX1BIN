@@ -34,6 +34,8 @@ struct LocoControl {
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
 
+    using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);

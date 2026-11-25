@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "ack.hpp"
 #include "message_base.hpp"
 
@@ -34,6 +35,12 @@ struct DecoderCvManip {
     uint16_t variable{};
     uint8_t cValue{};
     uint8_t cError{};
+
+    using members = member_list<member<&ReplyL2::cAdr>,
+                                member<&ReplyL2::variable>,
+                                member<&ReplyL2::cValue>,
+                                member<&ReplyL2::cError>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint16(cAdr).uint16(variable).uint8(cValue).uint8(
@@ -68,6 +75,14 @@ struct DecoderCvManip {
     std::optional<uint8_t> activeUSID{};
     std::optional<bitfields::DecoderAddress> activeAddr{};
     std::optional<uint16_t> activeCv{};
+
+    using members = member_list<member<&Busy::busy>,
+                                member<&Busy::cAdr>,
+                                member<&Busy::variable>,
+                                member<&Busy::activeUSID>,
+                                member<&Busy::activeAddr>,
+                                member<&Busy::activeCv>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e)
@@ -105,6 +120,9 @@ struct DecoderCvManip {
               .code = Command::DecoderCvManip};
     bitfields::DecoderAddress cAdr{};
     uint8_t cError{};
+
+    using members = member_list<member<&Error::cAdr>, member<&Error::cError>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint16(cAdr).uint8(cError);
@@ -128,6 +146,11 @@ struct DecoderCvManip {
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint16_t variable{};              ///< Cv Address
   std::optional<uint8_t> value{};   ///< Cv Value
+
+  using members = member_list<member<&DecoderCvManip::cAdr>,
+                              member<&DecoderCvManip::variable>,
+                              member<&DecoderCvManip::value>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(cAdr).uint16(variable).uint8(value);

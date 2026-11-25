@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -30,6 +31,9 @@ struct CommandStationCvManip {
               .code = Command::CommandStationCvManip};
     Error error{Error::NO_ERROR}; ///< Error
     uint8_t value{};              ///< CV Value
+
+    using members = member_list<member<&Reply::error>, member<&Reply::value>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(std::to_underlying(error)).uint8(value);
@@ -54,6 +58,10 @@ struct CommandStationCvManip {
             .code = Command::CommandStationCvManip};
   uint16_t variable{};            ///< Cv Address
   std::optional<uint8_t> value{}; ///< Cv Value
+
+  using members = member_list<member<&CommandStationCvManip::variable>,
+                              member<&CommandStationCvManip::value>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(variable).uint8(value);

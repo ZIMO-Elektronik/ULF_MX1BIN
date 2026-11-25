@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -30,6 +31,10 @@ struct AddressControl {
               .code = Command::AddressControl};
     bitfields::AddressControl_Payload payload{}; ///< Control params
     uint8_t cOutputs{};                          ///< Acc decoder outputs
+
+    using members =
+      member_list<member<&Reply::payload>, member<&Reply::cOutputs>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(payload).uint8(cOutputs);
@@ -53,6 +58,11 @@ struct AddressControl {
   bitfields::DecoderAddress cAdr{};             ///< Address
   bitfields::AddressControl_Control cControl{}; ///< Control parameters
   std::optional<uint8_t> cOutputs{};            ///< Acc decoder outputs
+
+  using members = member_list<member<&AddressControl::cAdr>,
+                              member<&AddressControl::cControl>,
+                              member<&AddressControl::cOutputs>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(cAdr).uint8(cControl).uint8(cOutputs);

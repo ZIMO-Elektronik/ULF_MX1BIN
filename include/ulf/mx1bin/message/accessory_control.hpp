@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -30,6 +31,9 @@ struct AccessoryControl {
               .code = Command::AccessoryControl};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
+
+    using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);
@@ -55,6 +59,10 @@ struct AccessoryControl {
             .code = Command::AccessoryControl};
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint8_t cData{};                  ///< Data
+
+  using members = member_list<member<&AccessoryControl::cAdr>,
+                              member<&AccessoryControl::cData>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(cAdr).uint8(cData);

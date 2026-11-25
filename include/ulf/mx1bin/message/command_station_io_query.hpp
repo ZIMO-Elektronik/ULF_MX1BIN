@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -34,6 +35,14 @@ struct CommandStationIOQuery {
     uint16_t cCurrent2{};
     uint8_t cVoltage2{};
     uint8_t cAux{};
+
+    using members = member_list<member<&Reply::values>,
+                                member<&Reply::cCurrent1>,
+                                member<&Reply::cVoltage1>,
+                                member<&Reply::cCurrent2>,
+                                member<&Reply::cVoltage2>,
+                                member<&Reply::cAux>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e)
@@ -69,6 +78,9 @@ struct CommandStationIOQuery {
                                     StationType::MX1},
             .code = Command::CommandStationIOQuery};
   uint8_t const zero{};
+
+  using members = member_list<member<&CommandStationIOQuery::zero>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint8(zero);

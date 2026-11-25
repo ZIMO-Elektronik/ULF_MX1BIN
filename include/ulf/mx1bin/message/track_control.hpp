@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -29,6 +30,9 @@ struct TrackControl {
                                       StationType::MX1},
               .code = Command::TrackControl};
     bitfields::TrackStatus statusBits{}; ///< Track status
+
+    using members = member_list<member<&Reply::statusBits>>;
+
     template<Encoder E>
     E encode(E e) const {
       e = head.encode(e);
@@ -58,6 +62,9 @@ struct TrackControl {
     TrackOn = 2u,
     Query = 3u
   } cAction{}; ///< Action
+
+  using members = member_list<member<&TrackControl::cAction>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint8(cAction);

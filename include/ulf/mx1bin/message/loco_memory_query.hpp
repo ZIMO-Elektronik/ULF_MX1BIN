@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -38,6 +39,18 @@ struct LocoMemoryQuery {
     uint8_t cStatus{};                ///< Active / inactive
     uint8_t cData4{};                 ///< F13..20
     uint8_t cData5{};                 ///< F21..28
+
+    using members = member_list<member<&Reply::error>,
+                                member<&Reply::cAdr>,
+                                member<&Reply::cSpeed>,
+                                member<&Reply::cData1>,
+                                member<&Reply::cData2>,
+                                member<&Reply::cData3>,
+                                member<&Reply::cAzBz>,
+                                member<&Reply::cStatus>,
+                                member<&Reply::cData4>,
+                                member<&Reply::cData5>>;
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e)
@@ -83,6 +96,9 @@ struct LocoMemoryQuery {
                                     StationType::MX1},
             .code = Command::LocoMemoryQuery};
   bitfields::DecoderAddress cAdr{}; ///< Address
+
+  using members = member_list<member<&LocoMemoryQuery::cAdr>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(cAdr);

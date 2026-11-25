@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "ack.hpp"
 #include "message_base.hpp"
 
@@ -29,6 +30,9 @@ struct Reset {
                                     detail::defaultSender,
                                     StationType::MX1},
             .code = Command::Reset};
+
+  using members = member_list<>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e);

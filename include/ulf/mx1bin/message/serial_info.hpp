@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "ack.hpp"
 #include "message_base.hpp"
 
@@ -31,6 +32,10 @@ struct SerialInfo {
             .code = Command::SerialInfo};
   uint8_t toolID{}; ///< Tool ID
   uint8_t action{}; ///<
+
+  using members =
+    member_list<member<&SerialInfo::toolID>, member<&SerialInfo::action>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint8(toolID).uint8(action);

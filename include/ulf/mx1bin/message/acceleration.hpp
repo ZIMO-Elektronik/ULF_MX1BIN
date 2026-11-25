@@ -16,6 +16,7 @@
 #include "../decoder.hpp"
 #include "../encoder.hpp"
 #include "../error.hpp"
+#include "../fields.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -30,6 +31,8 @@ struct Acceleration {
               .code = Command::Acceleration};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
+
+    using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
 
     template<Encoder E>
     E encode(E e) const {
@@ -56,6 +59,10 @@ struct Acceleration {
             .code = Command::Acceleration};
   bitfields::DecoderAddress cAdr{}; ///< Address
   uint8_t cAzBz{};                  ///< Accel / Break time
+
+  using members =
+    member_list<member<&Acceleration::cAdr>, member<&Acceleration::cAzBz>>;
+
   template<Encoder E>
   E encode(E e) const {
     return head.encode(e).uint16(cAdr).uint8(cAzBz);
