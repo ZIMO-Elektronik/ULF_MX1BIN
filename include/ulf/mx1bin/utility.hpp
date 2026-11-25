@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <ztl/ztl.hpp>
+#include "concepts.hpp"
 
 namespace ulf::mx1bin::detail {
 
@@ -85,6 +86,47 @@ requires(sizeof(std::iter_value_t<InputIt>) == 1uz)
 [[maybe_unused]] constexpr uint16_t decode_16(InputIt& in) {
   return static_cast<uint16_t>(static_cast<uint32_t>(decode_8(in)) << 8u |
                                static_cast<uint32_t>(decode_8(in)) << 0u);
+}
+
+/**
+ * Calculates the unencoded size of a data type within a stream
+ *
+ * @tparam T Type to calculate size
+ *
+ * @return Size of type in stream
+ */
+template<typename T>
+[[maybe_unused]] constexpr auto stream_size() {
+  if constexpr (concepts::trivial_data<T> || concepts::optional_trivial_data<T>)
+    if constexpr (concepts::detail::is_optional<T>)
+      return sizeof(concepts::detail::remove_optional_t<T>);
+    else return sizeof(T);
+  else if constexpr (concepts::strong_enum<T, std::uint8_t> ||
+                     concepts::optional_strong_enum<T, std::uint8_t> ||
+                     concepts::bitfield<T, std::uint8_t> ||
+                     concepts::optional_bitfield<T, std::uint8_t>)
+    return sizeof(std::uint8_t);
+  else if constexpr (concepts::strong_enum<T, std::uint16_t> ||
+                     concepts::optional_strong_enum<T, std::uint16_t> ||
+                     concepts::bitfield<T, std::uint16_t> ||
+                     concepts::optional_bitfield<T, std::uint16_t>)
+    return sizeof(std::uint16_t);
+  else std::unreachable();
+}
+
+/**
+ * Calculates the required, unencoded, size of a data type within a stream
+ *
+ * \note  Optional data types count as `zero`
+ *
+ * @tparam T Type to calculate size
+ *
+ * @return Size of type in stream
+ */
+template<typename T>
+[[maybe_unused]] constexpr auto required_stream_size() {
+  if constexpr (concepts::detail::is_optional<T>) return 0uz;
+  else return stream_size<T>();
 }
 
 } // namespace ulf::mx1bin::detail

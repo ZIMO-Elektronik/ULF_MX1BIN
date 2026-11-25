@@ -64,6 +64,11 @@ struct ReplyHead {
   bitfields::Info info{}; ///< Header info byte
   Command code{};         ///< Command code
   uint8_t reply_uSID{};   ///< Reply uSID reference
+
+  using members = member_list<member<&ReplyHead::uSID>,
+                              member<&ReplyHead::info>,
+                              member<&ReplyHead::code>,
+                              member<&ReplyHead::reply_uSID>>;
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);
@@ -93,6 +98,13 @@ struct ReplyLongHead {
   uint8_t const lengthOfHeader{
     5u}; ///< Length of header --- There surely is a reason why this is always 5
   uint8_t reply_uSID{}; ///< Reply uSID reference
+
+  using members = member_list<member<&ReplyLongHead::uSID>,
+                              member<&ReplyLongHead::info>,
+                              member<&ReplyLongHead::code>,
+                              member<&ReplyLongHead::lengthOfHeader>,
+                              member<&ReplyLongHead::reply_uSID>>;
+
   template<Encoder E>
   auto encode(E e) const {
     e.uint8(uSID);

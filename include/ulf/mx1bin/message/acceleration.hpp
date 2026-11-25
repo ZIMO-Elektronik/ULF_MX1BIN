@@ -30,6 +30,7 @@ struct Acceleration {
               .code = Command::Acceleration};
     Error error{Error::NO_ERROR};
     bitfields::ControlPayload payload{};
+
     template<Encoder E>
     E encode(E e) const {
       return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);

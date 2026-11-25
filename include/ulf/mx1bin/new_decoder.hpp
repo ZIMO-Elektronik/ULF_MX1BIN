@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cassert>
+#include <expected>
 #include <iostream>
 #include <span>
 #include "concepts.hpp"
@@ -49,9 +50,47 @@ struct NewDecoder {
     return *this;
   }
 
+  /// Calculate remaining size
+  ///
+  /// \return Remaining message size
+  size_t remaining() const {
+    auto iter{_iter};
+    size_t size{0uz};
+    while (iter != _end) {
+      if (*iter++ == detail::dle) {
+        // Encoded
+        if (iter++ == _end) break; // Decode error
+      } else {
+        // Non-encoded
+      }
+      size++;
+    }
+    return size;
+  }
+
+  /// Check, if message has at least n byte left
+  ///
+  /// \param n Minimum size to check
+  /// \retval true  At least n bytes left
+  /// \retval false Not enough bytes left
+  bool has_at_least(size_t const n) const {
+    auto iter{_iter};
+    size_t size{0uz};
+    while (iter != _end && size < n) {
+      if (*iter++ == detail::dle) {
+        // Encoded
+        if (iter++ == _end) break; // Decode error
+      } else {
+        // Non-encoded
+      }
+      size++;
+    }
+    return size >= n;
+  }
+
   /// -- Required fields --
 
-  template<concepts::is_trivial_data T>
+  template<concepts::trivial_data T>
   T decode() {
     if constexpr (std::same_as<uint8_t, T>) {
       std::cout << "Decode U8" << std::endl;
@@ -84,7 +123,7 @@ struct NewDecoder {
 
   template<typename T>
   requires concepts::detail::is_optional<T> &&
-           concepts::is_optional_trivial_data<T>
+           concepts::optional_trivial_data<T>
   T decode() {
     if constexpr (std::same_as<concepts::detail::remove_optional_t<T>,
                                uint8_t>) {
@@ -184,20 +223,29 @@ requires requires {
   typename Message::Head;
   typename Message::Head::members;
 }
-auto decode(NewDecoder<I, S>& decoder) {
+std::expected<Message, std::errc> decode(NewDecoder<I, S>& decoder) {
+  using head_t = typename Message::Head;
+  using head_members_t = typename head_t::members;
+  using message_t = Message;
+  using message_members_t = typename message_t::members;
+
+  if (!decoder.has_at_least(head_members_t::required_stream_size +
+                            message_members_t::required_stream_size))
+    return std::unexpected(std::errc::invalid_argument);
+
   auto head = std::apply(
     [&](auto&&... args) {
       return typename Message::Head{
         decoder.template decode<member_type_t<decltype(args)>>()...};
     },
-    Message::Head::members::members);
+    head_members_t::members);
 
   return std::apply(
     [&](auto&&... args) {
       return Message{
         head, decoder.template decode<member_type_t<decltype(args)>>()...};
     },
-    Message::members::members);
+    message_members_t::members);
 }
 
 template<class Message, std::ranges::input_range R>
