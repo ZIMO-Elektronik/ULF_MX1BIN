@@ -3,8 +3,8 @@
 #include "helper.hpp"
 
 #define CODABLE(type)                                                          \
-  static_assert(ulf::mx1bin::Encodable<type>);                                 \
-  static_assert(ulf::mx1bin::Decodable<type>);
+  static_assert(ulf::mx1bin::EncodableProtocolMessage<type>);                  \
+  static_assert(ulf::mx1bin::DecodableProtocolMessage<type>);
 
 #define CODE(var)                                                              \
   auto encoded{mencode(var)};                                                  \
@@ -20,7 +20,7 @@
   ASSERT_EQ(var.head.info.stationType, d_##var.head.info.stationType);         \
   ASSERT_EQ(var.head.code, d_##var.head.code);
 
-template<ulf::mx1bin::Encodable E>
+template<ulf::mx1bin::EncodableProtocolMessage E>
 constexpr ulf::mx1bin::Packet mencode(E& e) {
   ulf::mx1bin::Packet result;
   ulf::mx1bin::StreamEncoder en{result};
@@ -29,7 +29,7 @@ constexpr ulf::mx1bin::Packet mencode(E& e) {
 }
 
 TEST(Message, Ack) {
-  static_assert(Codable<ulf::mx1bin::Ack>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::Ack>);
 
   ulf::mx1bin::Ack message{};
 
@@ -40,7 +40,7 @@ TEST(Message, Ack) {
 }
 
 TEST(Message, Nak) {
-  static_assert(Codable<ulf::mx1bin::Nak>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::Nak>);
 
   ulf::mx1bin::Nak message{};
 
@@ -49,7 +49,7 @@ TEST(Message, Nak) {
 }
 
 TEST(Message, Reset) {
-  static_assert(Codable<ulf::mx1bin::Reset>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::Reset>);
 
   ulf::mx1bin::Reset message{};
 
@@ -58,7 +58,8 @@ TEST(Message, Reset) {
 }
 
 TEST(Message, TrackControl) {
-  static_assert(Codable<ulf::mx1bin::TrackControl>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::TrackControl>);
 
   ulf::mx1bin::TrackControl message{.cAction =
                                       decltype(message)::Action::TrackOn};
@@ -69,7 +70,8 @@ TEST(Message, TrackControl) {
 }
 
 TEST(Message, TrackControl_Reply) {
-  static_assert(Codable<ulf::mx1bin::TrackControl::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::TrackControl::Reply>);
 
   ulf::mx1bin::TrackControl::Reply message{.statusBits = 0x55u};
   message.head.reply_uSID = 0x03u;
@@ -80,7 +82,8 @@ TEST(Message, TrackControl_Reply) {
 }
 
 TEST(Message, LocoControl) {
-  static_assert(Codable<ulf::mx1bin::LocoControl>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::LocoControl>);
 
   ulf::mx1bin::LocoControl message{.cAdr = 0x8003u,
                                    .cSpeed = 0xAAu,
@@ -99,7 +102,8 @@ TEST(Message, LocoControl) {
 }
 
 TEST(Message, LocoControl_Reply) {
-  static_assert(Codable<ulf::mx1bin::LocoControl::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::LocoControl::Reply>);
 
   ulf::mx1bin::LocoControl::Reply message{.error = ulf::mx1bin::Error::NO_ERROR,
                                           .payload = 0x8Cu};
@@ -112,7 +116,8 @@ TEST(Message, LocoControl_Reply) {
 }
 
 TEST(Message, InvertFunctionBits) {
-  static_assert(Codable<ulf::mx1bin::InvertFunctionBits>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::InvertFunctionBits>);
 
   ulf::mx1bin::InvertFunctionBits message{.cAdr = 0x8003u,
                                           .cData1 = 0x55u,
@@ -132,7 +137,8 @@ TEST(Message, InvertFunctionBits) {
 }
 
 TEST(Message, InvertFunctionBits_Reply) {
-  static_assert(Codable<ulf::mx1bin::InvertFunctionBits::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::InvertFunctionBits::Reply>);
 
   ulf::mx1bin::InvertFunctionBits::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
@@ -145,7 +151,8 @@ TEST(Message, InvertFunctionBits_Reply) {
 }
 
 TEST(Message, Acceleration) {
-  static_assert(Codable<ulf::mx1bin::Acceleration>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::Acceleration>);
 
   ulf::mx1bin::Acceleration message{.cAdr = 0x8003u, .cAzBz = 0x55u};
 
@@ -156,7 +163,8 @@ TEST(Message, Acceleration) {
 }
 
 TEST(Message, Acceleration_Reply) {
-  static_assert(Codable<ulf::mx1bin::Acceleration::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::Acceleration::Reply>);
 
   ulf::mx1bin::Acceleration::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
@@ -169,7 +177,8 @@ TEST(Message, Acceleration_Reply) {
 }
 
 TEST(Message, ShuttleTrain) {
-  static_assert(Codable<ulf::mx1bin::ShuttleTrain>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::ShuttleTrain>);
 
   ulf::mx1bin::ShuttleTrain message{.cAdr = 0x8003u, .cData = 0x55u};
 
@@ -180,7 +189,8 @@ TEST(Message, ShuttleTrain) {
 }
 
 TEST(Message, ShuttleTrain_Reply) {
-  static_assert(Codable<ulf::mx1bin::ShuttleTrain::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::ShuttleTrain::Reply>);
 
   ulf::mx1bin::ShuttleTrain::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
@@ -193,7 +203,8 @@ TEST(Message, ShuttleTrain_Reply) {
 }
 
 TEST(Message, AccessoryControl) {
-  static_assert(Codable<ulf::mx1bin::AccessoryControl>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::AccessoryControl>);
 
   ulf::mx1bin::AccessoryControl message{.cAdr = 0x8003u, .cData = 0x55u};
 
@@ -204,7 +215,8 @@ TEST(Message, AccessoryControl) {
 }
 
 TEST(Message, AccessoryControl_Reply) {
-  static_assert(Codable<ulf::mx1bin::AccessoryControl::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::AccessoryControl::Reply>);
 
   ulf::mx1bin::AccessoryControl::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR, .payload = 0x8Cu};
@@ -217,7 +229,8 @@ TEST(Message, AccessoryControl_Reply) {
 }
 
 TEST(Message, LocoMemoryQuery) {
-  static_assert(Codable<ulf::mx1bin::LocoMemoryQuery>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::LocoMemoryQuery>);
 
   ulf::mx1bin::LocoMemoryQuery message{.cAdr = 0x8003u};
 
@@ -227,7 +240,8 @@ TEST(Message, LocoMemoryQuery) {
 }
 
 TEST(Message, LocoMemoryQuery_Reply) {
-  static_assert(Codable<ulf::mx1bin::LocoMemoryQuery::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::LocoMemoryQuery::Reply>);
 
   ulf::mx1bin::LocoMemoryQuery::Reply message{.cAdr = 0x8003u,
                                               .cSpeed = 0x02u,
@@ -256,7 +270,8 @@ TEST(Message, LocoMemoryQuery_Reply) {
 }
 
 TEST(Message, AccessoryMemoryQuery) {
-  static_assert(Codable<ulf::mx1bin::AccessoryMemoryQuery>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::AccessoryMemoryQuery>);
 
   ulf::mx1bin::AccessoryMemoryQuery message{.cAdr = 0x8003u};
 
@@ -266,7 +281,8 @@ TEST(Message, AccessoryMemoryQuery) {
 }
 
 TEST(Message, AccessoryMemoryQuery_Reply) {
-  static_assert(Codable<ulf::mx1bin::AccessoryMemoryQuery::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::AccessoryMemoryQuery::Reply>);
 
   ulf::mx1bin::AccessoryMemoryQuery::Reply message{
     .error = ulf::mx1bin::Error::NO_ERROR,
@@ -285,7 +301,8 @@ TEST(Message, AccessoryMemoryQuery_Reply) {
 }
 
 TEST(Message, AddressControl) {
-  static_assert(Codable<ulf::mx1bin::AddressControl>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::AddressControl>);
 
   ulf::mx1bin::AddressControl message{
     .cAdr = 0x8003u, .cControl = 0x55u, .cOutputs = 0xAAu};
@@ -298,7 +315,8 @@ TEST(Message, AddressControl) {
 }
 
 TEST(Message, AddressControl_Reply) {
-  static_assert(Codable<ulf::mx1bin::AddressControl::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::AddressControl::Reply>);
 
   ulf::mx1bin::AddressControl::Reply message{.payload = 0x55u,
                                              .cOutputs = 0xAAu};
@@ -311,7 +329,8 @@ TEST(Message, AddressControl_Reply) {
 }
 
 TEST(Message, CommandStationIOQuery) {
-  static_assert(Codable<ulf::mx1bin::CommandStationIOQuery>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::CommandStationIOQuery>);
 
   ulf::mx1bin::CommandStationIOQuery message{};
 
@@ -321,7 +340,8 @@ TEST(Message, CommandStationIOQuery) {
 }
 
 TEST(Message, CommandStationIOQuery_Reply) {
-  static_assert(Codable<ulf::mx1bin::CommandStationIOQuery::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::CommandStationIOQuery::Reply>);
 
   ulf::mx1bin::CommandStationIOQuery::Reply message{.cCurrent1 = 0x55u,
                                                     .cVoltage1 = 0xAAu,
@@ -340,7 +360,8 @@ TEST(Message, CommandStationIOQuery_Reply) {
 }
 
 TEST(Message, CommandStationCvManip) {
-  static_assert(Codable<ulf::mx1bin::CommandStationCvManip>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::CommandStationCvManip>);
 
   ulf::mx1bin::CommandStationCvManip message{.variable = 0x55u, .value = 0xAAu};
 
@@ -351,7 +372,8 @@ TEST(Message, CommandStationCvManip) {
 }
 
 TEST(Message, CommandStationCvManip_Reply) {
-  static_assert(Codable<ulf::mx1bin::CommandStationCvManip::Reply>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::CommandStationCvManip::Reply>);
 
   ulf::mx1bin::CommandStationCvManip::Reply message{
 
@@ -365,7 +387,8 @@ TEST(Message, CommandStationCvManip_Reply) {
 }
 
 TEST(Message, CommandStationEquipmentQuery) {
-  static_assert(Codable<ulf::mx1bin::CommandStationEquipmentQuery>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::CommandStationEquipmentQuery>);
 
   ulf::mx1bin::CommandStationEquipmentQuery message{};
 
@@ -377,7 +400,8 @@ TEST(Message, CommandStationEquipmentQuery) {
 // TEST(Message, CommandStationEquipmentQuery_Reply) {}
 
 TEST(Message, SerialInfo) {
-  static_assert(Codable<ulf::mx1bin::SerialInfo>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::SerialInfo>);
 
   ulf::mx1bin::SerialInfo message{.toolID = 0xAAu, .action = 0x55u};
 
@@ -388,7 +412,8 @@ TEST(Message, SerialInfo) {
 }
 
 TEST(Message, DecoderCvManip) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::DecoderCvManip>);
 
   ulf::mx1bin::DecoderCvManip message{
     .cAdr = 0x8003u, .variable = 0x55u, .value = 0xAAu};
@@ -401,7 +426,8 @@ TEST(Message, DecoderCvManip) {
 }
 
 TEST(Message, DecoderCvManip_no_value) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::DecoderCvManip>);
 
   ulf::mx1bin::DecoderCvManip message{.cAdr = 0x8003u, .variable = 0x55u};
 
@@ -414,7 +440,8 @@ TEST(Message, DecoderCvManip_no_value) {
 }
 
 TEST(Message, DecoderCvManip_Reply) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Reply>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::DecoderCvManip::Reply>);
 
   ulf::mx1bin::DecoderCvManip::Reply message{};
 
@@ -423,7 +450,8 @@ TEST(Message, DecoderCvManip_Reply) {
 }
 
 TEST(Message, DecoderCvManip_ReplyL2) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip::ReplyL2>);
+  static_assert(ulf::mx1bin::CompatibleProtocolMessage<
+                ulf::mx1bin::DecoderCvManip::ReplyL2>);
 
   ulf::mx1bin::DecoderCvManip::ReplyL2 message{
     .cAdr = 0x8003u, .variable = 8u, .cValue = 8u};
@@ -437,7 +465,8 @@ TEST(Message, DecoderCvManip_ReplyL2) {
 }
 
 TEST(Message, DecoderCvManip_Busy) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Busy>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::DecoderCvManip::Busy>);
 
   ulf::mx1bin::DecoderCvManip::Busy message{.cAdr = 0x8003u,
                                             .variable = 8u,
@@ -455,7 +484,8 @@ TEST(Message, DecoderCvManip_Busy) {
 }
 
 TEST(Message, DecoderCvManip_Error) {
-  static_assert(Codable<ulf::mx1bin::DecoderCvManip::Error>);
+  static_assert(
+    ulf::mx1bin::CompatibleProtocolMessage<ulf::mx1bin::DecoderCvManip::Error>);
 
   ulf::mx1bin::DecoderCvManip::Error message{.cAdr = 0x8003u, .cError = 1u};
 

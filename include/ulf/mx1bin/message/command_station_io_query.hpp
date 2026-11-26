@@ -43,31 +43,6 @@ struct CommandStationIOQuery {
                                 member<&Reply::cVoltage2>,
                                 member<&Reply::cAux>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e)
-        .uint8(values)
-        .uint16(cCurrent1)
-        .uint8(cVoltage1)
-        .uint16(cCurrent2)
-        .uint8(cVoltage2)
-        .uint8(cAux);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(values) + sizeof(cCurrent1) +
-                                   sizeof(cVoltage1) + sizeof(cCurrent2) +
-                                   sizeof(cVoltage2) + sizeof(cAux)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Reply{.head = *head,
-                   .values = d.uint8(),
-                   .cCurrent1 = d.uint16(),
-                   .cVoltage1 = d.uint8(),
-                   .cCurrent2 = d.uint16(),
-                   .cVoltage2 = d.uint8(),
-                   .cAux = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -81,17 +56,6 @@ struct CommandStationIOQuery {
 
   using members = member_list<member<&CommandStationIOQuery::zero>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint8(zero);
-  }
-  template<Decoder D>
-  static std::expected<CommandStationIOQuery, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(zero)))
-      return std::unexpected(std::errc::invalid_argument);
-    return CommandStationIOQuery{.head = *head, .zero = d.uint8()};
-  }
   constexpr bool operator==(CommandStationIOQuery const&) const = default;
   constexpr CommandStationIOQuery&
   operator=(CommandStationIOQuery const&) = default;

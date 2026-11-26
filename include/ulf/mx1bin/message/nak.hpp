@@ -31,15 +31,6 @@ struct Nak {
 
   using members = member_list<>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e);
-  }
-  template<Decoder D>
-  static std::expected<Nak, std::errc> decode(D& d) {
-    if (auto const head{Head::decode(d)}) return Nak{.head = *head};
-    else return std::unexpected(head.error());
-  }
   constexpr bool operator==(Nak const&) const = default;
   constexpr Nak& operator=(Nak const&) = default;
 };

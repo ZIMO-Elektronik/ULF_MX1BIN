@@ -46,19 +46,31 @@
 
 namespace ulf::mx1bin {
 
-/// Encodable concept
-template<typename T, typename E = StreamEncoder<std::vector<uint8_t>>>
-concept Encodable = requires {
-  { &T::template encode<E> } -> std::same_as<E (T::*)(E) const>;
-};
-
-/// Decodable concept
-///
-/// \note This is safe, since return is checked against the actual type
+namespace detail {
 template<typename T>
-concept Decodable = requires(T t, StreamDecoder<char const*, char const*>& d) {
-  { T::decode(d) } -> std::same_as<std::expected<T, std::errc>>;
-};
+concept has_head = requires { typename T::Head; } && requires(T t) { t.head; };
+
+template<typename T>
+concept has_member_list = requires { typename T::members; };
+
+} // namespace detail
+
+template<typename T>
+concept ProtocolMessage = detail::has_head<T> && detail::has_member_list<T>;
+
+template<typename T, typename E = StreamEncoder<std::vector<uint8_t>>>
+concept EncodableProtocolMessage =
+  ProtocolMessage<T> && requires(T t, E e) { encode(t, e); };
+
+template<typename T, typename D = StreamDecoder<char const*, char const*>>
+concept DecodableProtocolMessage =
+  ProtocolMessage<T> && requires(T t, D d) { decode<T>(d); };
+
+template<typename T,
+         typename E = StreamEncoder<std::vector<uint8_t>>,
+         typename D = StreamDecoder<char const*, char const*>>
+concept CompatibleProtocolMessage =
+  EncodableProtocolMessage<T, E> && DecodableProtocolMessage<T, D>;
 
 /// Long frame message concept
 template<typename T>
@@ -70,23 +82,6 @@ concept Long = requires(T t) {
 /// Short frame message concept
 template<typename T>
 concept Short = requires(T t) { requires !Long<T>; };
-
-/// Decode helper
-///
-/// \tparam T Decodable type
-/// \tparam R Range type
-/// \param r  Input range
-/// \retval T         Decoded message
-/// \retval std::errc Malformed stream
-template<Decodable T, std::ranges::input_range R>
-constexpr std::expected<T, std::errc> decode(R const& r) {
-  using crc_type = std::conditional_t<Short<T>, uint8_t, uint16_t>;
-
-  StreamDecoder d(r);
-  d.strip();
-  d.template strip_crc<crc_type>();
-  return T::decode(d);
-}
 
 /// Message
 using Message = std::variant<Ack,

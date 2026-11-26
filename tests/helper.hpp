@@ -4,23 +4,6 @@
 #include <concepts>
 #include <ulf/mx1bin.hpp>
 
-/// Decode helper
-template<ulf::mx1bin::Decodable D, std::ranges::input_range S>
-constexpr auto decode(S const& s) {
-  ulf::mx1bin::StreamDecoder d{s};
-  return D::decode(d);
-}
-
-/// Encode helper
-template<ulf::mx1bin::Encodable E,
-         std::ranges::output_range<uint8_t> S = std::vector<uint8_t>>
-constexpr auto encode(E const& e) {
-  S result;
-  ulf::mx1bin::StreamEncoder encoder{result};
-  e.encode(encoder);
-  return result;
-}
-
 /// Encode -> Decode Result
 template<typename T,
          std::ranges::output_range<uint8_t> S = std::vector<uint8_t>>
@@ -49,29 +32,22 @@ concept IsReplyL2 = std::same_as<T, ulf::mx1bin::DecoderCvManip::ReplyL2> ||
 template<typename T>
 concept IsL1Ack = !IsPrimary<T> && !IsReplyL2<T>;
 
-/// Checks if the type is `Encodable` AND `Decodable`
-template<typename T>
-concept Codable = ulf::mx1bin::Encodable<T> && ulf::mx1bin::Decodable<T>;
-
 /// Encode and decode helper
 /// \tparam T type to encode / decode
 /// \param in Input
 /// \return Result
-template<Codable T>
+template<ulf::mx1bin::CompatibleProtocolMessage T>
 constexpr Result<T> encode_and_decode(T const& in) {
-  // auto const encoded{encode(in)};
-  // auto const decoded{decode<T>(encoded)};
-
   std::vector<uint8_t> encoded{};
 
-  ulf::mx1bin::neww::encode(in, encoded);
-  auto const decoded{ulf::mx1bin::neww::decode<T>(encoded)};
+  ulf::mx1bin::encode(in, encoded);
+  auto const decoded{ulf::mx1bin::decode<T>(encoded)};
 
   assert(decoded); // GTest ASSERT won't compile here somehow..
   return Result{.message = *decoded, .stream = encoded};
 }
 
-template<Codable T>
+template<ulf::mx1bin::CompatibleProtocolMessage T>
 constexpr void match_head(T const& correct, T const& compare) {
   ASSERT_EQ(correct.head.uSID, compare.head.uSID);
   ASSERT_EQ(correct.head.info, compare.head.info);
@@ -88,31 +64,33 @@ constexpr void match_head(T const& correct, T const& compare) {
   }
 }
 
-template<Codable T>
+template<ulf::mx1bin::EncodableProtocolMessage T>
 constexpr std::vector<uint8_t> encode_message(T const& t) {
   std::vector<uint8_t> result{};
   ulf::mx1bin::StreamEncoder e(result);
   e.addSOF();
-  t.encode(e);
+  ulf::mx1bin::encode(t.head, e);
+  ulf::mx1bin::encode(t, e);
   if constexpr (ulf::mx1bin::Long<T>) {
-    e.uint16(ulf::mx1bin::crc16(std::span<uint8_t const>{result}.subspan(2uz)));
+    e.encode(ulf::mx1bin::crc16(std::span<uint8_t const>{result}.subspan(2uz)));
   } else {
-    e.uint8(ulf::mx1bin::crc8(std::span<uint8_t const>{result}.subspan(2uz)));
+    e.encode(ulf::mx1bin::crc8(std::span<uint8_t const>{result}.subspan(2uz)));
   }
   e.addEOT();
   return result;
 }
 
-template<Codable T>
+template<ulf::mx1bin::EncodableProtocolMessage T>
 constexpr std::vector<uint8_t> encode_message(T const& t, size_t crc) {
   std::vector<uint8_t> result{};
   ulf::mx1bin::StreamEncoder e(result);
   e.addSOF();
-  t.encode(e);
+  ulf::mx1bin::encode(t.head, e);
+  ulf::mx1bin::encode(t, e);
   if constexpr (ulf::mx1bin::Long<T>) {
-    e.uint16(static_cast<uint16_t>(crc));
+    e.encode(static_cast<uint16_t>(crc));
   } else {
-    e.uint8(static_cast<uint8_t>(crc));
+    e.encode(static_cast<uint8_t>(crc));
   }
   e.addEOT();
   return result;

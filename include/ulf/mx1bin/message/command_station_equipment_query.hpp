@@ -70,29 +70,6 @@ struct CommandStationEquipmentQuery {
                                 member<&Reply::cSerNum_ml>,
                                 member<&Reply::cSerNum_lo>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e)
-        .uint16(cAddress)
-        .uint8(cDevice)
-        .uint8(cRom_size)
-        .uint8(cRam_size)
-        .uint16(cPrintver)
-        .uint16(cVersion)
-        .uint8(cDate_day)
-        .uint8(cDate_month)
-        .uint8(cDate_century)
-        .uint8(cDate_year)
-        .uint8(cSwitches)
-        .uint8(cDevelopVersion)
-        .uint16(cBootRom)
-        .uint8(cBootRom_develop)
-        .uint8(values)
-        .uint8(cSerNum_hi)
-        .uint8(cSerNum_mh)
-        .uint8(cSerNum_ml)
-        .uint8(cSerNum_lo);
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -106,17 +83,6 @@ struct CommandStationEquipmentQuery {
 
   using members = member_list<member<&CommandStationEquipmentQuery::zero>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint8(zero);
-  }
-  template<Decoder D>
-  static std::expected<CommandStationEquipmentQuery, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(zero)))
-      return std::unexpected(std::errc::invalid_argument);
-    return CommandStationEquipmentQuery{.head = *head, .zero = d.uint8()};
-  }
   constexpr bool
   operator==(CommandStationEquipmentQuery const&) const = default;
   constexpr CommandStationEquipmentQuery&

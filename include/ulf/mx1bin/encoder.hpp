@@ -13,120 +13,88 @@
 #include <concepts>
 #include <span>
 #include <ztl/ztl.hpp>
+#include "concepts.hpp"
 #include "utility.hpp"
 
 namespace ulf::mx1bin {
 
-/// Is implicitly or explicitly convertible to
-template<typename _From, typename _To>
-concept convertible_to = std::is_convertible_v<_From, _To> ||
-                         requires { static_cast<_To>(std::declval<_From>()); };
-
-template<typename T, typename To>
-concept ConvertibleTo = convertible_to<T, To>;
-
-/// Optional and is convertible to
-template<typename T, typename To>
-concept OptionalConvertibleTo =
-  std::same_as<std::optional<typename std::remove_cvref_t<T>::value_type>,
-               typename std::remove_cvref_t<T>> &&
-  ConvertibleTo<typename std::remove_cvref_t<T>::value_type, To>;
-
-/// Field encoder
-template<typename T>
-concept FieldEncoder = requires(T t, uint8_t const u8, uint16_t const u16) {
-  { t.uint8(u8) } -> std::same_as<T&>;
-  { t.uint16(u16) } -> std::same_as<T&>;
-};
-
-/// Optional field encoder
-template<typename T>
-concept OptionalFieldEncoder = requires(
-  T t, std::optional<uint8_t> const o_u8, std::optional<uint16_t> const o_u16) {
-  { t.uint8(o_u8) } -> std::same_as<T&>;
-  { t.uint16(o_u16) } -> std::same_as<T&>;
-};
-
-/// Is Encoder
-template<typename T>
-concept Encoder = FieldEncoder<T> && OptionalFieldEncoder<T>;
-
-/// MX1Bin message stream encoder
 template<std::ranges::output_range<uint8_t> R>
-requires std::constructible_from<std::back_insert_iterator<R>, R&>
 struct StreamEncoder {
-  // Construct
-  StreamEncoder(R& r) : _iter{std::back_inserter(r)} {}
+  constexpr StreamEncoder(R& r) : _iter{std::back_inserter(r)} {}
 
-  StreamEncoder(std::back_insert_iterator<R> iter) : _iter{iter} {}
-
-  StreamEncoder& addSOF() {
+  constexpr StreamEncoder& addSOF() {
     *_iter++ = detail::soh;
     *_iter++ = detail::soh;
     return *this;
   }
 
-  StreamEncoder& addEOT() {
+  constexpr StreamEncoder& addEOT() {
     *_iter++ = detail::eot;
     return *this;
   }
 
-  /// Encode uint8
-  ///
-  /// \tparam T Type
-  /// \param  t Value
-  /// \warning UB if out of space
-  template<typename T>
-  requires ConvertibleTo<T, uint8_t>
-  StreamEncoder& uint8(T const t) {
-    auto const v{static_cast<uint8_t>(t)};
+  constexpr auto encode(uint8_t val) { encode_impl(val); }
+  constexpr auto encode(uint16_t val) { encode_impl(val); }
+
+  template<class T>
+  constexpr auto encode(std::optional<T> const val) {
+    if (val) encode(*val);
+  }
+
+  template<class T>
+  requires concepts::strong_enum<T, std::uint8_t> ||
+           concepts::strong_enum<T, std::uint16_t>
+  constexpr auto encode(T x) {
+    encode_impl(static_cast<std::underlying_type_t<T>>(x));
+  }
+
+  template<class T>
+  requires concepts::bitfield<T, std::uint8_t> ||
+           concepts::bitfield<T, std::uint16_t>
+  constexpr auto encode(T const& x) {
+    if constexpr (concepts::bitfield<T, std::uint8_t>)
+      encode_impl(static_cast<std::uint8_t>(x));
+    else if constexpr (concepts::bitfield<T, std::uint16_t>)
+      encode_impl(static_cast<std::uint16_t>(x));
+    else std::unreachable();
+  }
+
+  template<typename... Args>
+  constexpr auto encode(Args... args) {
+    return (encode(args), ...);
+  }
+
+private:
+  constexpr StreamEncoder& encode_impl(uint8_t val) {
+    auto const v{static_cast<uint8_t>(val)};
     if (detail::is_control_char(v)) {
       *_iter++ = detail::dle;
       *_iter++ = v ^ detail::cypher;
     } else *_iter++ = v;
     return *this;
   }
-
-  /// Overloaded Encode uint8
-  ///
-  /// \tparam T Optional type
-  /// \param  v Optional value
-  /// \see StreamEncoder::uint8(uint8_t)
-  template<typename T>
-  requires OptionalConvertibleTo<T, uint8_t>
-  StreamEncoder& uint8(T&& t) {
-    if (t) return uint8(static_cast<uint8_t>(*t));
-    else return *this;
-  }
-
-  /// Encode uint16
-  ///
-  /// \tparam T Type
-  /// \param  t Value
-  /// \warning UB if out of space
-  template<typename T>
-  requires ConvertibleTo<T, uint16_t>
-  StreamEncoder& uint16(T const t) {
-    auto const v{static_cast<uint16_t>(t)};
-    uint8(static_cast<uint8_t>(v >> 8u));
-    uint8(static_cast<uint8_t>(v >> 0u));
+  constexpr StreamEncoder& encode_impl(uint16_t val) {
+    auto const v{static_cast<uint16_t>(val)};
+    encode_impl(static_cast<uint8_t>(v >> 8u));
+    encode_impl(static_cast<uint8_t>(v >> 0u));
     return *this;
   }
 
-  /// Overloaded Encode uint16
-  ///
-  /// \tparam T Optional type
-  /// \param  v Optional value
-  /// \see StreamEncoder::uint16(uint16_t)
-  template<typename T>
-  requires OptionalConvertibleTo<T, uint16_t>
-  StreamEncoder& uint16(T&& v) {
-    if (v) return uint16(*v);
-    else return *this;
-  }
-
-private:
   std::back_insert_iterator<R> _iter; ///< Iterator
 };
+
+template<typename T, std::ranges::output_range<uint8_t> R>
+constexpr void encode(T const& obj, StreamEncoder<R>& encoder) {
+  std::apply([&](auto... member) { (encoder.encode(obj.*member), ...); },
+             T::members::members);
+}
+
+template<typename T, std::ranges::output_range<uint8_t> R>
+constexpr void encode(T const& obj, R& r) {
+  StreamEncoder<R> encoder{r};
+
+  encode(obj.head, encoder);
+  encode(obj, encoder);
+}
 
 } // namespace ulf::mx1bin

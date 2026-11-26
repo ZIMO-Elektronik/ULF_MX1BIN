@@ -35,17 +35,6 @@ struct AddressControl {
     using members =
       member_list<member<&Reply::payload>, member<&Reply::cOutputs>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint8(payload).uint8(cOutputs);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(payload) + sizeof(cOutputs)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Reply{.head = *head, .payload = d.uint8(), .cOutputs = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -63,21 +52,6 @@ struct AddressControl {
                               member<&AddressControl::cControl>,
                               member<&AddressControl::cOutputs>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(cAdr).uint8(cControl).uint8(cOutputs);
-  }
-  template<Decoder D>
-  static std::expected<AddressControl, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cControl)))
-      return std::unexpected(std::errc::invalid_argument);
-    return AddressControl{.head = *head,
-                          .cAdr = d.uint16(),
-                          .cControl = d.uint8(),
-                          // Add optional data
-                          .cOutputs = d.s_uint8()};
-  }
   constexpr bool operator==(AddressControl const&) const = default;
   constexpr AddressControl& operator=(AddressControl const&) = default;
 };

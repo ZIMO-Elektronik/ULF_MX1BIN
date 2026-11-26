@@ -37,21 +37,7 @@ struct Head {
   uint8_t uSID{};         ///< Unique Service ID
   bitfields::Info info{}; ///< Header info byte
   Command code{};         ///< Command code
-  template<Encoder E>
-  auto encode(E e) const {
-    e.uint8(uSID);
-    e.uint8(static_cast<uint8_t>(info));
-    e.uint8(std::to_underlying(code));
-    return e;
-  }
-  template<Decoder D>
-  static std::expected<Head, std::errc> decode(D& d) {
-    if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code)))
-      return std::unexpected{std::errc::invalid_argument};
-    return Head{.uSID = d.uint8(),
-                .info = d.uint8(),
-                .code = static_cast<Command>(d.uint8())};
-  }
+
   constexpr bool operator==(Head const&) const = default;
   constexpr Head& operator=(Head const&) = default;
 
@@ -69,24 +55,7 @@ struct ReplyHead {
                               member<&ReplyHead::info>,
                               member<&ReplyHead::code>,
                               member<&ReplyHead::reply_uSID>>;
-  template<Encoder E>
-  auto encode(E e) const {
-    e.uint8(uSID);
-    e.uint8(static_cast<uint8_t>(info));
-    e.uint8(std::to_underlying(code));
-    e.uint8(reply_uSID);
-    return e;
-  }
-  template<Decoder D>
-  static std::expected<ReplyHead, std::errc> decode(D& d) {
-    if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(Command) +
-                        sizeof(reply_uSID)))
-      return std::unexpected{std::errc::invalid_argument};
-    return ReplyHead{.uSID = d.uint8(),
-                     .info = d.uint8(),
-                     .code = static_cast<Command>(d.uint8()),
-                     .reply_uSID = d.uint8()};
-  }
+
   constexpr bool operator==(ReplyHead const&) const = default;
   constexpr ReplyHead& operator=(ReplyHead const&) = default;
 };
@@ -105,26 +74,6 @@ struct ReplyLongHead {
                               member<&ReplyLongHead::lengthOfHeader>,
                               member<&ReplyLongHead::reply_uSID>>;
 
-  template<Encoder E>
-  auto encode(E e) const {
-    e.uint8(uSID);
-    e.uint8(static_cast<uint8_t>(info));
-    e.uint8(std::to_underlying(code));
-    e.uint8(lengthOfHeader);
-    e.uint8(reply_uSID);
-    return e;
-  }
-  template<Decoder D>
-  static std::expected<ReplyLongHead, std::errc> decode(D& d) {
-    if (!d.has_at_least(sizeof(uSID) + sizeof(info) + sizeof(code) +
-                        sizeof(lengthOfHeader) + sizeof(reply_uSID)))
-      return std::unexpected{std::errc::invalid_argument};
-    return ReplyLongHead{.uSID = d.uint8(),
-                         .info = d.uint8(),
-                         .code = static_cast<Command>(d.uint8()),
-                         .lengthOfHeader = d.uint8(),
-                         .reply_uSID = d.uint8()};
-  }
   constexpr bool operator==(ReplyLongHead const&) const = default;
   constexpr ReplyLongHead& operator=(ReplyLongHead const&) = default;
 };

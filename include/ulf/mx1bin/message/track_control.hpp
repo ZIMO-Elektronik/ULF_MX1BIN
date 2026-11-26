@@ -33,19 +33,6 @@ struct TrackControl {
 
     using members = member_list<member<&Reply::statusBits>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      e = head.encode(e);
-      e.uint8(statusBits);
-      return e;
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const base{Head::decode(d)};
-      if (!base || !d.has_at_least(sizeof(statusBits)))
-        return std::unexpected(std::errc::invalid_argument);
-      return Reply{.head = *base, .statusBits = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -65,18 +52,6 @@ struct TrackControl {
 
   using members = member_list<member<&TrackControl::cAction>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint8(cAction);
-  }
-  template<Decoder D>
-  static std::expected<TrackControl, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAction)))
-      return std::unexpected(std::errc::invalid_argument);
-    return TrackControl{.head = *head,
-                        .cAction = static_cast<Action>(d.uint8())};
-  }
   constexpr bool operator==(TrackControl const&) const = default;
   constexpr TrackControl& operator=(TrackControl const&) = default;
 };

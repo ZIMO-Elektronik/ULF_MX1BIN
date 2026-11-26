@@ -51,41 +51,6 @@ struct LocoMemoryQuery {
                                 member<&Reply::cData4>,
                                 member<&Reply::cData5>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e)
-        .uint8(std::to_underlying(error))
-        .uint16(cAdr)
-        .uint8(cSpeed)
-        .uint8(cData1)
-        .uint8(cData2)
-        .uint8(cData3)
-        .uint8(cAzBz)
-        .uint8(cStatus)
-        .uint8(cData4)
-        .uint8(cData5);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head ||
-          !d.has_at_least(sizeof(error) + sizeof(cAdr) + sizeof(cSpeed) +
-                          sizeof(cData1) + sizeof(cData2) + sizeof(cData3) +
-                          sizeof(cAzBz) + sizeof(cStatus) + sizeof(cData4) +
-                          sizeof(cData5)))
-        return std::unexpected(std::errc::invalid_argument);
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .cAdr = d.uint16(),
-                   .cSpeed = d.uint8(),
-                   .cData1 = d.uint8(),
-                   .cData2 = d.uint8(),
-                   .cData3 = d.uint8(),
-                   .cAzBz = d.uint8(),
-                   .cStatus = d.uint8(),
-                   .cData4 = d.uint8(),
-                   .cData5 = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -99,17 +64,6 @@ struct LocoMemoryQuery {
 
   using members = member_list<member<&LocoMemoryQuery::cAdr>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(cAdr);
-  }
-  template<Decoder D>
-  static std::expected<LocoMemoryQuery, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr)))
-      return std::unexpected(std::errc::invalid_argument);
-    return LocoMemoryQuery{.head = *head, .cAdr = d.uint16()};
-  }
   constexpr bool operator==(LocoMemoryQuery const&) const = default;
   constexpr LocoMemoryQuery& operator=(LocoMemoryQuery const&) = default;
 };

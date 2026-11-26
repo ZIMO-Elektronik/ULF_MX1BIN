@@ -17,8 +17,6 @@
 #include "../encoder.hpp"
 #include "../error.hpp"
 #include "../fields.hpp"
-#include "../new_decoder.hpp"
-#include "../new_encoder.hpp"
 #include "message_base.hpp"
 
 namespace ulf::mx1bin {
@@ -36,19 +34,6 @@ struct LocoControl {
 
     using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(error) + sizeof(payload)))
-        return std::unexpected(std::errc::invalid_argument);
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .payload = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -74,32 +59,10 @@ struct LocoControl {
                               member<&LocoControl::cData4>,
                               member<&LocoControl::cData5>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e)
-      .uint16(cAdr)
-      .uint8(cSpeed)
-      .uint8(cData1)
-      .uint8(cData2)
-      .uint8(cData3)
-      .uint8(cData4)
-      .uint8(cData5);
+  constexpr size_t stream_size() {
+    return Head::members::stream_size + members::stream_size;
   }
-  template<Decoder D>
-  static std::expected<LocoControl, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cSpeed)))
-      return std::unexpected(std::errc::invalid_argument);
-    return LocoControl{.head = *head,
-                       .cAdr = d.uint16(),
-                       .cSpeed = d.uint8(),
-                       // Add optional data
-                       .cData1 = d.s_uint8(),
-                       .cData2 = d.s_uint8(),
-                       .cData3 = d.s_uint8(),
-                       .cData4 = d.s_uint8(),
-                       .cData5 = d.s_uint8()};
-  }
+
   constexpr bool operator==(LocoControl const&) const = default;
   constexpr LocoControl& operator=(LocoControl const&) = default;
 };

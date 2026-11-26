@@ -36,17 +36,6 @@ struct SerialInfo {
   using members =
     member_list<member<&SerialInfo::toolID>, member<&SerialInfo::action>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint8(toolID).uint8(action);
-  }
-  template<Decoder D>
-  static std::expected<SerialInfo, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(toolID) + sizeof(action)))
-      return std::unexpected(std::errc::invalid_argument);
-    return SerialInfo{.head = *head, .toolID = d.uint8(), .action = d.uint8()};
-  }
   constexpr bool operator==(SerialInfo const&) const = default;
   constexpr SerialInfo& operator=(SerialInfo const&) = default;
 };

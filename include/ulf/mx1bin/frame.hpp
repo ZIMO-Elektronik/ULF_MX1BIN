@@ -63,8 +63,8 @@ verify(std::span<uint8_t const> frame) {
   // Check if at least uSID and Info are present
   if (!d.has_at_least(2uz)) return std::unexpected(std::errc::invalid_argument);
 
-  d.uint8(); // Skip uSID
-  bitfields::Info info{d.uint8()};
+  d.decode<uint8_t>(); // Skip uSID
+  bitfields::Info info{d.decode<bitfields::Info>()};
 
   if (info.frameType == FrameType::Long) {
     // Long Frame - CRC16

@@ -35,15 +35,6 @@ struct TAck {
 
   using members = member_list<>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e);
-  }
-  template<Decoder D>
-  static std::expected<TAck<C>, std::errc> decode(D& d) {
-    if (auto const head{Head::decode(d)}) return TAck<C>{.head = *head};
-    else return std::unexpected(head.error());
-  }
   constexpr bool operator==(TAck const&) const = default;
   constexpr TAck& operator=(TAck const&) = default;
 };

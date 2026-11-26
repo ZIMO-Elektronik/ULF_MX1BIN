@@ -34,19 +34,6 @@ struct CommandStationCvManip {
 
     using members = member_list<member<&Reply::error>, member<&Reply::value>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint8(std::to_underlying(error)).uint8(value);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(error) + sizeof(value)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .value = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -62,20 +49,6 @@ struct CommandStationCvManip {
   using members = member_list<member<&CommandStationCvManip::variable>,
                               member<&CommandStationCvManip::value>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(variable).uint8(value);
-  }
-  template<Decoder D>
-  static std::expected<CommandStationCvManip, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(variable)))
-      return std::unexpected(std::errc::invalid_argument);
-    return CommandStationCvManip{.head = *head,
-                                 .variable = d.uint16(),
-                                 // Add optional data
-                                 .value = d.s_uint8()};
-  }
   constexpr bool operator==(CommandStationCvManip const&) const = default;
   constexpr CommandStationCvManip&
   operator=(CommandStationCvManip const&) = default;

@@ -34,19 +34,6 @@ struct InvertFunctionBits {
 
     using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(error) + sizeof(payload)))
-        return std::unexpected(std::errc::invalid_argument);
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .payload = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -70,31 +57,6 @@ struct InvertFunctionBits {
                               member<&InvertFunctionBits::cData4>,
                               member<&InvertFunctionBits::cData5>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e)
-      .uint16(cAdr)
-      .uint8(cData1)
-      .uint8(cData2)
-      .uint8(cData3)
-      .uint8(cData4)
-      .uint8(cData5);
-  }
-  template<Decoder D>
-  static std::expected<InvertFunctionBits, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head ||
-        !d.has_at_least(sizeof(cAdr) + sizeof(cData1) + sizeof(cData2) +
-                        sizeof(cData3) + sizeof(cData4) + sizeof(cData5)))
-      return std::unexpected(std::errc::invalid_argument);
-    return InvertFunctionBits{.head = *head,
-                              .cAdr = d.uint16(),
-                              .cData1 = d.uint8(),
-                              .cData2 = d.uint8(),
-                              .cData3 = d.uint8(),
-                              .cData4 = d.uint8(),
-                              .cData5 = d.uint8()};
-  }
   constexpr bool operator==(InvertFunctionBits const&) const = default;
   constexpr InvertFunctionBits& operator=(InvertFunctionBits const&) = default;
 };

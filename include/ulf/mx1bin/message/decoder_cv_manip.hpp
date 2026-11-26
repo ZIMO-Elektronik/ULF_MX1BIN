@@ -41,23 +41,6 @@ struct DecoderCvManip {
                                 member<&ReplyL2::cValue>,
                                 member<&ReplyL2::cError>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint16(cAdr).uint16(variable).uint8(cValue).uint8(
-        cError);
-    }
-    template<Decoder D>
-    static std::expected<ReplyL2, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(variable) +
-                                   sizeof(cValue) + sizeof(cError)))
-        return std::unexpected{std::errc::invalid_argument};
-      return ReplyL2{.head = *head,
-                     .cAdr = d.uint16(),
-                     .variable = d.uint16(),
-                     .cValue = d.uint8(),
-                     .cError = d.uint8()};
-    }
     constexpr bool operator==(ReplyL2 const&) const = default;
     constexpr ReplyL2& operator=(ReplyL2 const&) = default;
   };
@@ -83,30 +66,6 @@ struct DecoderCvManip {
                                 member<&Busy::activeAddr>,
                                 member<&Busy::activeCv>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e)
-        .uint8(busy)
-        .uint16(cAdr)
-        .uint16(variable)
-        .uint8(activeUSID)
-        .uint16(activeAddr)
-        .uint16(activeCv);
-    }
-    template<Decoder D>
-    static std::expected<Busy, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head ||
-          !d.has_at_least(sizeof(busy) + sizeof(cAdr) + sizeof(variable)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Busy{.head = *head,
-                  .busy = d.uint8(),
-                  .cAdr = d.uint16(),
-                  .variable = d.uint16(),
-                  .activeUSID = d.s_uint8(),
-                  .activeAddr = d.s_uint16(),
-                  .activeCv = d.s_uint16()};
-    }
     constexpr bool operator==(Busy const&) const = default;
     constexpr Busy& operator=(Busy const&) = default;
   };
@@ -123,17 +82,6 @@ struct DecoderCvManip {
 
     using members = member_list<member<&Error::cAdr>, member<&Error::cError>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint16(cAdr).uint8(cError);
-    }
-    template<Decoder D>
-    static std::expected<Error, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cError)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Error{.head = *head, .cAdr = d.uint16(), .cError = d.uint8()};
-    }
     constexpr bool operator==(Error const&) const = default;
     constexpr Error& operator=(Error const&) = default;
   };
@@ -151,21 +99,6 @@ struct DecoderCvManip {
                               member<&DecoderCvManip::variable>,
                               member<&DecoderCvManip::value>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(cAdr).uint16(variable).uint8(value);
-  }
-  template<Decoder D>
-  static std::expected<DecoderCvManip, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(variable)))
-      return std::unexpected(std::errc::invalid_argument);
-    return DecoderCvManip{.head = *head,
-                          .cAdr = d.uint16(),
-                          .variable = d.uint16(),
-                          // Add optional data
-                          .value = d.s_uint8()};
-  }
   constexpr bool operator==(DecoderCvManip const&) const = default;
   constexpr DecoderCvManip& operator=(DecoderCvManip const&) = default;
 };

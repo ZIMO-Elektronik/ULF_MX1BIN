@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include "../helper.hpp"
 
-template<Codable T>
+template<ulf::mx1bin::CompatibleProtocolMessage T>
 void check_info(T const& t) {
   ASSERT_EQ(t.head.info.sender, ulf::mx1bin::detail::defaultSender);
   ASSERT_EQ(t.head.info.stationType, ulf::mx1bin::StationType::MX1);
@@ -32,12 +32,12 @@ void check_info(T const& t) {
   }
 }
 
-template<ulf::mx1bin::Command C, Codable T>
+template<ulf::mx1bin::Command C, ulf::mx1bin::CompatibleProtocolMessage T>
 void check_code(T const& t) {
   ASSERT_EQ(t.head.code, C);
 }
 
-template<ulf::mx1bin::Command C, Codable T>
+template<ulf::mx1bin::Command C, ulf::mx1bin::CompatibleProtocolMessage T>
 void check() {
   T message{};
 

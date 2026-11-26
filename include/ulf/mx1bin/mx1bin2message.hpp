@@ -20,7 +20,6 @@
 #include "decoder.hpp"
 #include "frame.hpp"
 #include "message.hpp"
-#include "new_decoder.hpp"
 
 namespace ulf::mx1bin {
 
@@ -39,7 +38,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
 
   auto frame{**res};
 
-  neww::NewDecoder d{frame};
+  StreamDecoder d{frame};
   d.strip(); // Remove SOF
 
   // Check if at least the head exists
@@ -52,34 +51,32 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
   auto const type{info.messageType};
   if (type == MessageType::Primary) {
     switch (code) {
-      case Command::Reset: return neww::decode<Reset>(frame);
-      case Command::TrackControl: return neww::decode<TrackControl>(frame);
-      case Command::LocoControl: return neww::decode<LocoControl>(frame);
+      case Command::Reset: return decode<Reset>(frame);
+      case Command::TrackControl: return decode<TrackControl>(frame);
+      case Command::LocoControl: return decode<LocoControl>(frame);
       case Command::InvertFunctionBits:
-        return neww::decode<InvertFunctionBits>(frame);
-      case Command::Acceleration: return neww::decode<Acceleration>(frame);
-      case Command::ShuttleTrain: return neww::decode<ShuttleTrain>(frame);
-      case Command::AccessoryControl:
-        return neww::decode<AccessoryControl>(frame);
-      case Command::LocoMemoryQuery:
-        return neww::decode<LocoMemoryQuery>(frame);
+        return decode<InvertFunctionBits>(frame);
+      case Command::Acceleration: return decode<Acceleration>(frame);
+      case Command::ShuttleTrain: return decode<ShuttleTrain>(frame);
+      case Command::AccessoryControl: return decode<AccessoryControl>(frame);
+      case Command::LocoMemoryQuery: return decode<LocoMemoryQuery>(frame);
       case Command::AccessoryMemoryQuery:
-        return neww::decode<AccessoryMemoryQuery>(frame);
-      case Command::AddressControl: return neww::decode<AddressControl>(frame);
+        return decode<AccessoryMemoryQuery>(frame);
+      case Command::AddressControl: return decode<AddressControl>(frame);
       case Command::CommandStationIOQuery:
-        return neww::decode<CommandStationIOQuery>(frame);
+        return decode<CommandStationIOQuery>(frame);
       case Command::CommandStationCvManip:
-        return neww::decode<CommandStationCvManip>(frame);
+        return decode<CommandStationCvManip>(frame);
       case Command::CommandStationEquipmentQuery:
-        return neww::decode<CommandStationEquipmentQuery>(frame);
-      case Command::SerialInfo: return neww::decode<SerialInfo>(frame);
-      case Command::DecoderCvManip: return neww::decode<DecoderCvManip>(frame);
+        return decode<CommandStationEquipmentQuery>(frame);
+      case Command::SerialInfo: return decode<SerialInfo>(frame);
+      case Command::DecoderCvManip: return decode<DecoderCvManip>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
 
   } else if (type == MessageType::L1Ack) {
     switch (code) {
-      case Command::DecoderCvManip: return neww::decode<Ack>(frame);
+      case Command::DecoderCvManip: return decode<Ack>(frame);
       default: return std::unexpected(std::errc::invalid_argument);
     }
   }

@@ -10,7 +10,7 @@ TEST(encoder, sof) {
                                 ulf::mx1bin::detail::soh};
 
   std::vector<uint8_t> result{};
-  ulf::mx1bin::StreamEncoder encoder{std::back_inserter(result)};
+  ulf::mx1bin::StreamEncoder encoder{result};
 
   encoder.addSOF();
   ASSERT_EQ(result, expected);
@@ -35,7 +35,7 @@ TEST(encoder, encode_uint8) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint8(value);
+  encoder.encode(value);
   ASSERT_EQ(result, expected);
 }
 
@@ -47,8 +47,8 @@ TEST(encoder, encode_uint8_optional) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint8(opt_value);
-  encoder.uint8(nopt_value);
+  encoder.encode(opt_value);
+  encoder.encode(nopt_value);
   ASSERT_EQ(result, expected);
 }
 
@@ -61,7 +61,7 @@ TEST(encoder, encode_uint8_escaped) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint8(value);
+  encoder.encode(value);
   ASSERT_EQ(result, expected);
 }
 
@@ -73,7 +73,7 @@ TEST(encoder, encode_uint16) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint16(value);
+  encoder.encode(value);
   ASSERT_EQ(result, expected);
 }
 
@@ -85,8 +85,8 @@ TEST(encoder, encode_uint16_optional) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint16(opt_value);
-  encoder.uint16(nopt_value);
+  encoder.encode(opt_value);
+  encoder.encode(nopt_value);
   ASSERT_EQ(result, expected);
 }
 
@@ -101,6 +101,6 @@ TEST(encoder, encode_uint16_escaped) {
   result.reserve(16u);
   ulf::mx1bin::StreamEncoder encoder{result};
 
-  encoder.uint16(value);
+  encoder.encode(value);
   ASSERT_EQ(result, expected);
 }

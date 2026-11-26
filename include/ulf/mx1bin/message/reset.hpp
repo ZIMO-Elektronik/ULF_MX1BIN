@@ -33,15 +33,6 @@ struct Reset {
 
   using members = member_list<>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e);
-  }
-  template<Decoder D>
-  static std::expected<Reset, std::errc> decode(D& d) {
-    if (auto const head{Head::decode(d)}) return Reset{.head = *head};
-    else return std::unexpected(head.error());
-  }
   constexpr bool operator==(Reset const&) const = default;
   constexpr Reset& operator=(Reset const&) = default;
 };

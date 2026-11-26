@@ -34,19 +34,6 @@ struct ShuttleTrain {
 
     using members = member_list<member<&Reply::error>, member<&Reply::payload>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e).uint8(std::to_underlying(error)).uint8(payload);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(error) + sizeof(payload)))
-        return std::unexpected(std::errc::invalid_argument);
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .payload = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -62,17 +49,6 @@ struct ShuttleTrain {
   using members =
     member_list<member<&ShuttleTrain::cAdr>, member<&ShuttleTrain::cData>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(cAdr).uint8(cData);
-  }
-  template<Decoder D>
-  static std::expected<ShuttleTrain, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr) + sizeof(cData)))
-      return std::unexpected(std::errc::invalid_argument);
-    return ShuttleTrain{.head = *head, .cAdr = d.uint16(), .cData = d.uint8()};
-  }
   constexpr bool operator==(ShuttleTrain const&) const = default;
   constexpr ShuttleTrain& operator=(ShuttleTrain const&) = default;
 };

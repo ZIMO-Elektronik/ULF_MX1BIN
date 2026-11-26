@@ -39,26 +39,6 @@ struct AccessoryMemoryQuery {
                                 member<&Reply::cPair>,
                                 member<&Reply::cOutputs>>;
 
-    template<Encoder E>
-    E encode(E e) const {
-      return head.encode(e)
-        .uint8(std::to_underlying(error))
-        .uint16(cAdr)
-        .uint8(cPair)
-        .uint8(cOutputs);
-    }
-    template<Decoder D>
-    static std::expected<Reply, std::errc> decode(D& d) {
-      auto const head{Head::decode(d)};
-      if (!head || !d.has_at_least(sizeof(error) + sizeof(cAdr) +
-                                   sizeof(cPair) + sizeof(cOutputs)))
-        return std::unexpected{std::errc::invalid_argument};
-      return Reply{.head = *head,
-                   .error = static_cast<Error>(d.uint8()),
-                   .cAdr = d.uint16(),
-                   .cPair = d.uint8(),
-                   .cOutputs = d.uint8()};
-    }
     constexpr bool operator==(Reply const&) const = default;
     constexpr Reply& operator=(Reply const&) = default;
   };
@@ -72,17 +52,6 @@ struct AccessoryMemoryQuery {
 
   using members = member_list<member<&AccessoryMemoryQuery::cAdr>>;
 
-  template<Encoder E>
-  E encode(E e) const {
-    return head.encode(e).uint16(cAdr);
-  }
-  template<Decoder D>
-  static std::expected<AccessoryMemoryQuery, std::errc> decode(D& d) {
-    auto const head{Head::decode(d)};
-    if (!head || !d.has_at_least(sizeof(cAdr)))
-      return std::unexpected(std::errc::invalid_argument);
-    return AccessoryMemoryQuery{.head = *head, .cAdr = d.uint16()};
-  }
   constexpr bool operator==(AccessoryMemoryQuery const&) const = default;
   constexpr AccessoryMemoryQuery&
   operator=(AccessoryMemoryQuery const&) = default;
