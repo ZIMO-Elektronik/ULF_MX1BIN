@@ -12,7 +12,6 @@
 
 #include <cassert>
 #include <expected>
-#include <iostream>
 #include <span>
 #include "concepts.hpp"
 #include "fields.hpp"
@@ -23,13 +22,13 @@ namespace ulf::mx1bin::neww {
 template<std::input_iterator I, std::sentinel_for<I> S>
 struct NewDecoder {
   template<std::ranges::input_range R>
-  NewDecoder(R const& r)
+  constexpr NewDecoder(R const& r)
     : _iter{std::ranges::cbegin(r)}, _end{std::ranges::cend(r)} {}
 
   /// Strips SOH and EOH
   ///
   /// \return NewDecoder reference
-  NewDecoder& strip() {
+  constexpr NewDecoder& strip() {
     assert(_iter != _end);
     while (*_iter == detail::soh) _iter++;
     while (*(_end - 1) == detail::eot) _end--;
@@ -41,7 +40,7 @@ struct NewDecoder {
   /// @tparam type Type of CRC (uint8_t or uint16_t)
   /// @return NewDecoder reference
   template<typename type>
-  NewDecoder& strip_crc() {
+  constexpr NewDecoder& strip_crc() {
     assert(_iter != _end);
     for (uint8_t i{0u}; i++ < sizeof(type);) {
       if (*(_end - 2) == detail::dle) _end--; // Catch encoded crc
@@ -53,7 +52,7 @@ struct NewDecoder {
   /// Calculate remaining size
   ///
   /// \return Remaining message size
-  size_t remaining() const {
+  constexpr size_t remaining() const {
     auto iter{_iter};
     size_t size{0uz};
     while (iter != _end) {
@@ -73,7 +72,7 @@ struct NewDecoder {
   /// \param n Minimum size to check
   /// \retval true  At least n bytes left
   /// \retval false Not enough bytes left
-  bool has_at_least(size_t const n) const {
+  constexpr bool has_at_least(size_t const n) const {
     auto iter{_iter};
     size_t size{0uz};
     while (iter != _end && size < n) {
@@ -91,12 +90,10 @@ struct NewDecoder {
   /// -- Required fields --
 
   template<concepts::trivial_data T>
-  T decode() {
+  constexpr T decode() {
     if constexpr (std::same_as<uint8_t, T>) {
-      std::cout << "Decode U8" << std::endl;
       return u8();
     } else if constexpr (std::same_as<uint16_t, T>) {
-      std::cout << "Decode U16" << std::endl;
       return u16();
     } else std::unreachable();
   }
@@ -104,14 +101,14 @@ struct NewDecoder {
   template<class T>
   requires concepts::strong_enum<T, std::uint8_t> ||
            concepts::strong_enum<T, std::uint16_t>
-  auto decode() {
+  constexpr auto decode() {
     return static_cast<T>(decode<std::underlying_type_t<T>>());
   }
 
   template<class T>
   requires concepts::bitfield<T, std::uint8_t> ||
            concepts::bitfield<T, std::uint16_t>
-  auto decode() {
+  constexpr auto decode() {
     if constexpr (concepts::bitfield<T, std::uint8_t>)
       return T{decode<uint8_t>()};
     else if constexpr (concepts::bitfield<T, std::uint16_t>)
@@ -124,14 +121,12 @@ struct NewDecoder {
   template<typename T>
   requires concepts::detail::is_optional<T> &&
            concepts::optional_trivial_data<T>
-  T decode() {
+  constexpr T decode() {
     if constexpr (std::same_as<concepts::detail::remove_optional_t<T>,
                                uint8_t>) {
-      std::cout << "Decode Optional U8" << std::endl;
       return u8_();
     } else if constexpr (std::same_as<concepts::detail::remove_optional_t<T>,
                                       uint16_t>) {
-      std::cout << "Decode Optional U16" << std::endl;
       return u16_();
     } else std::unreachable();
   }
@@ -139,7 +134,7 @@ struct NewDecoder {
   template<typename T>
   requires concepts::optional_strong_enum<T, std::uint8_t> ||
            concepts::optional_strong_enum<T, std::uint16_t>
-  auto decode() {
+  constexpr auto decode() {
     return static_cast<concepts::detail::remove_optional_t<T>>(
       decode<std::optional<
         std::underlying_type_t<concepts::detail::remove_optional_t<T>>>>());
@@ -148,7 +143,7 @@ struct NewDecoder {
   template<class T>
   requires concepts::optional_bitfield<T, uint8_t> ||
            concepts::optional_bitfield<T, uint16_t>
-  auto decode() {
+  constexpr auto decode() {
     if constexpr (concepts::optional_bitfield<T, uint8_t>)
       return T{decode<std::optional<std::uint8_t>>()};
     else if constexpr (concepts::optional_bitfield<T, uint16_t>)
@@ -223,7 +218,7 @@ requires requires {
   typename Message::Head;
   typename Message::Head::members;
 }
-std::expected<Message, std::errc> decode(NewDecoder<I, S>& decoder) {
+constexpr std::expected<Message, std::errc> decode(NewDecoder<I, S>& decoder) {
   using head_t = typename Message::Head;
   using head_members_t = typename head_t::members;
   using message_t = Message;
@@ -249,7 +244,7 @@ std::expected<Message, std::errc> decode(NewDecoder<I, S>& decoder) {
 }
 
 template<class Message, std::ranges::input_range R>
-auto decode(R const& r) {
+constexpr auto decode(R const& r) {
   NewDecoder decoder{r};
   return decode<Message>(decoder);
 }

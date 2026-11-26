@@ -20,15 +20,15 @@ namespace ulf::mx1bin::neww {
 
 template<std::ranges::output_range<uint8_t> R>
 struct NewEncoder {
-  NewEncoder(R& r) : _iter{std::back_inserter(r)} {}
+  constexpr NewEncoder(R& r) : _iter{std::back_inserter(r)} {}
 
-  NewEncoder& addSOF() {
+  constexpr NewEncoder& addSOF() {
     *_iter++ = detail::soh;
     *_iter++ = detail::soh;
     return *this;
   }
 
-  NewEncoder& addEOT() {
+  constexpr NewEncoder& addEOT() {
     *_iter++ = detail::eot;
     return *this;
   }

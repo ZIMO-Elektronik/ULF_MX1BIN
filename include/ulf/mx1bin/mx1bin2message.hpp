@@ -44,7 +44,7 @@ mx1bin_2message(std::span<uint8_t const> bytes) {
 
   // Check if at least the head exists
   if (!d.has_at_least(3u)) return std::unexpected(std::errc::invalid_argument);
-
+  //
   d.decode<uint8_t>(); // Skip uSID
   auto const info{d.decode<bitfields::Info>()};
   auto const code{d.decode<Command>()};
